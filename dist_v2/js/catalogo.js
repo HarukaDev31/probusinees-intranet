@@ -22,6 +22,33 @@ const ROLE_CHINA = "CatalogoChina";
 
 $(document).ready(async function () {
 
+    $('#productGrid').on('change', '.checkbox', function () {
+        updateSelectAllBtnText();
+    });
+
+    function mostrarBotones() {
+        $('#btnEnviarProductos').show();
+        $('#btnCancelarEnvio').hide();
+        $('#btnDeleteProducts').hide();
+        $('#dynamicCategorizeBtnContainer').hide();
+        $('#selectAll').hide();
+    }
+
+    $.ajax({
+        url: base_url + 'CatalogoController/getCategorias', // Ajusta la ruta si es necesario
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            // response es un array de categorías
+            var $select = $('#txt-ID_Categoria');
+            $select.empty();
+            $select.append('<option value="0" selected>Todos</option>');
+            response.forEach(function(cat) {
+                $select.append('<option value="' + cat.id + '">' + cat.name + '</option>');
+            });
+        }
+    });
+
     // Cambiar imagen principal al hacer click en miniatura o video
     $('#detalleMiniatura1, #detalleMiniatura2, #detalleMiniatura3').on('click', function () {
         const src = $(this).attr('src');
@@ -87,7 +114,7 @@ $(document).ready(async function () {
     showSkeletons();
 
     // Simulate loading data (replace with actual API call)
-    await loadProducts();
+    await loadProducts({ sort: $('#sortSelect').val() });
 
     // Setup event handlers
     setupEventHandlers();
@@ -113,11 +140,11 @@ $(document).ready(async function () {
         } else if (window.location.href.includes("listarSeleccionados")) {
             isInTienda = true;
             isInCompleted = false;
-            $("#section-title").text("Listado de Seleccionados");
+            $("#section-title").text("Listado de Seleccionados").append('<span id="select-count" class="text-green-600 font-bold"></span>');
         } else {
             isInCompleted = false;
             isInTienda = false;
-            $("#section-title").text("Listado de Nuevos");
+            $("#section-title").html('Listado de Nuevos <span id="nuevos-count" class="text-blue-600 font-bold"></span>');
         }
         updateCategorizeButton();
 
@@ -145,9 +172,21 @@ $(document).ready(async function () {
             if (data.status) {
                 const products = data.data;
                 renderProducts(products);
+                updateSelectAllBtnText();
+                if (!isInCompleted && !isInTienda) {
+                    $('#nuevos-count').text(`(${products.length})`);
+                    $('#select-count').text('');
+                } else if (isInTienda) {
+                    $('#select-count').text(`(${products.length})`);
+                    $('#nuevos-count').text('');
+                } else {
+                    $('#nuevos-count').text('');
+                    $('#select-count').text('');
+                }
             } else {
                 console.error('Error loading products:', data.message);
             }
+            mostrarBotones();
         } else {
             console.error('Network error:', response.statusText);
         }
@@ -249,6 +288,7 @@ $(document).ready(async function () {
             const $product = $($template.html());
             const $checkbox = $product.find('.checkbox');
             //add badge in tienda 
+            $product.attr('data-fecha', product.created_at);
             $product.find('.badge').text(product.status);
             switch (product.status) {
                 case "COTIZADO":
@@ -273,9 +313,6 @@ $(document).ready(async function () {
             $product.find('.precioChina').text(`RMB: ¥${product.precio}`);
             $product.find('.MOQ').text(`MOQ: ${product.moq}`);
             $product.find('.codProducto').text(`${product.cod_producto}`);
-            let precioPeru = parseFloat(product.precio_peru);
-            if (isNaN(precioPeru)) precioPeru = 0;
-            $product.find('.precioPeru').text(`Precio Peru: S/. ${parseFloat(precioPeru).toFixed(2)}`);
             let precioUSD = parseFloat(product.precio_usd);
             if (isNaN(precioUSD)) precioUSD = 0;
             $product.find('.precioUSD').text(`Precio USD: $ ${parseFloat(precioUSD).toFixed(2)}`);
@@ -287,13 +324,19 @@ $(document).ready(async function () {
                     const priceRangeObj = JSON.parse(product.prices_range);
                     if (Array.isArray(priceRangeObj) && priceRangeObj.length > 0) {
                         // Buscar el mínimo en el array de precios
-                        minPrecio = Math.min(...priceRangeObj.map(obj => parseFloat(obj.price) || 0));
+                        minPrecio = Math.min(...priceRangeObj.map(obj => {
+                                // Elimina comas antes de convertir a número
+                                const cleanPrice = (obj.price + '').replace(/,/g, '');
+                                return parseFloat(cleanPrice) || 0;
+                            })
+                        );;
                     }
                 } catch (e) {
                     minPrecio = 0;
                 }
             }
-            $product.find('.precioPeru').text(`Precio: S/. ${parseFloat(minPrecio).toFixed(2)}`);
+            $product.attr('data-precio', minPrecio);
+            $product.find('.precioPeru').text(`Precio: S/. ${minPrecio.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
             if (product.category_name) {
                 $product.find('.text-gray-800').text(`${product.category_name}`);
             }
@@ -349,6 +392,9 @@ $(document).ready(async function () {
             } else {
                 $checkbox.prop('checked', false);
             }
+            $checkbox.on('change', function () {
+                updateSelectAllBtnText();
+            });
             $checkbox.on('click', function (e) {
                 e.stopPropagation();
                 const productId = $(this).data('product-id');
@@ -357,6 +403,7 @@ $(document).ready(async function () {
                 } else {
                     checkedProducts = checkedProducts.filter(id => id !== productId);
                 }
+                updateSelectAllBtnText();
             });
             initializeProductDropdowns();
 
@@ -369,8 +416,11 @@ $(document).ready(async function () {
             $grid.append($noResults);
             $noResults.show();
         }
+        // Ordenar productos según el valor actual del select
+        const sortValue = $('#sortSelect').val();
+        sortProducts(sortValue);
 
-
+        updateSelectAllBtnText();
     }
     function renderProductDetails(product) {
         productoFormSection.show();
@@ -469,12 +519,16 @@ $(document).ready(async function () {
         $('#searchInput').on('input', debounce(function () {
             const query = $("#searchInput").val()?.toLowerCase() || '';
             filterProducts(query);
+            updateSelectAllBtnText();
         }, 300));
 
         // Sort select handler
-        $('#sortSelect').on('change', function () {
-            const value = $(this).val();
-            sortProducts(value);
+        $('#sortSelect').on('change',async function () {
+            const sortValue = $(this).val();
+            showSkeletons();
+            const filtros = {}; // agrega aquí otros filtros si los usas
+            filtros.sort = sortValue;
+            await loadProducts(filtros);
         });
 
         // Botón Categorizar/Enviar Producto
@@ -529,10 +583,7 @@ $(document).ready(async function () {
                         });
                         if (response.ok) {
                             const data = await response.json();
-                            $('#btnEnviarProductos').show();
-                            $('#btnCancelarEnvio').hide();
-                            $('#btnDeleteProducts').hide();
-                            $('#dynamicCategorizeBtnContainer').hide();
+                            mostrarBotones();
                             if (data.status) {
                                 Swal.fire({
                                     icon: 'success',
@@ -586,10 +637,7 @@ $(document).ready(async function () {
                 if (response.ok) {
                     const data = await response.json();
                     checkedProducts = [];
-                    $('#btnEnviarProductos').show();
-                    $('#btnCancelarEnvio').hide();
-                    $('#btnDeleteProducts').hide();
-                    $('#dynamicCategorizeBtnContainer').hide();
+                    mostrarBotones();
                     Swal.fire({
                         icon: 'success',
                         title: 'Éxito',
@@ -605,6 +653,7 @@ $(document).ready(async function () {
                 }
             });
         })
+        
         // Filter button handler
         $('#filterBtn').on('click', async function (e) {
             e.preventDefault();
@@ -623,7 +672,7 @@ $(document).ready(async function () {
             if (fechaInicio) filtros.fechaInicio = fechaInicio;
             if (fechaFin) filtros.fechaFin = fechaFin;
             if (categoria) filtros.categoria = categoria;
-
+            showSkeletons();
             await loadProducts(Object.keys(filtros).length > 0 ? filtros : null);
         });
 
@@ -644,10 +693,7 @@ $(document).ready(async function () {
             e.preventDefault();
             e.stopPropagation();
             $(".checkbox").hide();
-            $('#btnEnviarProductos').show();
-            $('#btnCancelarEnvio').hide();
-            $('#btnDeleteProducts').hide();
-            $('#dynamicCategorizeBtnContainer').hide();
+            mostrarBotones();
             const $card = $(this).closest('.card');
             const productId = $card.data('product-id');
             // Redirect to edit page
@@ -823,27 +869,57 @@ $(document).ready(async function () {
         }
         // Reset scroll position
         $grid.scrollTop(0);
+
+        // Actualizar contador de productos visibles
+        const visibles = $grid.find('.card:visible').length;
+        if (!isInCompleted && !isInTienda) {
+            $('#nuevos-count').text(`(${visibles})`);
+            $('#select-count').text('');
+        } else if (isInTienda) {
+            $('#select-count').text(`(${visibles})`);
+            $('#nuevos-count').text('');
+        } else {
+            $('#nuevos-count').text('');
+            $('#select-count').text('');
+        }
     }
 
     function sortProducts(criteria) {
         const $grid = $('#productGrid');
         const $cards = $grid.find('.card');
 
-        // Sort cards based on criteria
         const sortedCards = $cards.sort((a, b) => {
-            const aValue = $(a).find('.text-gray-600').text().replace('RMB: ¥', '');
-            const bValue = $(b).find('.text-gray-600').text().replace('RMB: ¥', '');
-            if (criteria === 'priceAsc') {
-                return parseFloat(aValue) - parseFloat(bValue);
-            } else if (criteria === 'priceDesc') {
-                return parseFloat(bValue) - parseFloat(aValue);
+            // Por nombre
+            if (criteria === 'nameAZ' || criteria === 'nameZA') {
+                const aName = $(a).find('.nameProducto').text().toLowerCase();
+                const bName = $(b).find('.nameProducto').text().toLowerCase();
+                if (criteria === 'nameAZ') {
+                    return aName.localeCompare(bName);
+                } else {
+                    return bName.localeCompare(aName);
+                }
+            }
+            // Por precio
+            if (criteria === 'pricemin' || criteria === 'pricemax') {
+                const aPrice = parseFloat($(a).data('precio')) || 0;
+                const bPrice = parseFloat($(b).data('precio')) || 0;
+                if (criteria === 'pricemin') {
+                    return aPrice - bPrice;
+                } else {
+                    return bPrice - aPrice;
+                }
+            }
+            // Por fecha (más reciente primero)
+            if (criteria === 'recent') {
+                // Asegúrate de que cada .card tenga data-fecha con la fecha en formato ISO o timestamp
+                const aDate = new Date($(a).data('fecha') || 0);
+                const bDate = new Date($(b).data('fecha') || 0);
+                return bDate - aDate;
             }
             return 0;
         });
 
-        // Clear grid and append sorted cards
         $grid.empty().append(sortedCards);
-
     }
     async function loadProductDetails(productId) {
         url = base_url + 'CatalogoController/getProductDetails/' + productId;
@@ -918,7 +994,40 @@ $(document).ready(async function () {
             }
         })
     }
+    $('#selectAll').on('click', function (e) {
+        e.preventDefault();
+        const $checkboxes = $('#productGrid .card:visible .checkbox');
+        const checkedCount = $checkboxes.filter(':checked').length;
 
+        if (checkedCount > 0) {
+            // Deseleccionar todos los visibles
+            $checkboxes.prop('checked', false);
+            checkedProducts = checkedProducts.filter(id =>
+                $checkboxes.filter(`[data-product-id="${id}"]`).length === 0
+            );
+        } else {
+            // Seleccionar todos los visibles
+            $checkboxes.prop('checked', true);
+            $checkboxes.each(function () {
+                const id = $(this).data('product-id');
+                if (!checkedProducts.includes(id)) {
+                    checkedProducts.push(id);
+                }
+            });
+        }
+        updateSelectAllBtnText(); // <-- Asegura que el texto se actualice siempre
+    });
+
+    // Cambia el texto del botón al cargar productos o filtrar
+    function updateSelectAllBtnText() {
+        const $checkboxes = $('#productGrid .card:visible .checkbox');
+        const checkedCount = $checkboxes.filter(':checked').length;
+        if (checkedCount === 0) {
+            $('#selectAll').text('Seleccionar a todos');
+        } else {
+            $('#selectAll').text('Deseleccionar a todos');
+        }
+    }
 
     $('#btnEnviarProductos').on('click', function (e) {
         e.preventDefault();
@@ -927,6 +1036,7 @@ $(document).ready(async function () {
         $('#btnDeleteProducts').show().css('display', 'flex');
         $('#dynamicCategorizeBtnContainer').show();
         $(".checkbox").show();
+        $('#selectAll').show();
 
         // Quitar clases view-btn y edit-btn de los productos
         $('#productGrid .view-btn, #productGrid .edit-btn').removeClass('view-btn edit-btn');
@@ -940,12 +1050,12 @@ $(document).ready(async function () {
     });
     $('#btnCancelarEnvio').on('click', function (e) {
         e.preventDefault();
-        $('#btnEnviarProductos').show();
-        $('#btnCancelarEnvio').hide();
-        $('#btnDeleteProducts').hide();
-        $('#dynamicCategorizeBtnContainer').hide();
-        $(".checkbox").hide();
+        mostrarBotones();
         checkedProducts = [];
+        // Desmarcar todos los checkboxes visibles
+        $('#productGrid .card:visible .checkbox').prop('checked', false);
+        $(".checkbox").hide();
+        updateSelectAllBtnText();
 
         // Regresar las clases según el perfil
         if (currentPrivilege === ROLE_PERU) {
@@ -1047,16 +1157,22 @@ $(document).ready(async function () {
         e.preventDefault();
         //change productsGrid to flex column
         const $grid = $('#productGrid');
-        $grid.removeClass('grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5');
-        $grid.addClass('flex flex-col gap-5');
+        $grid.removeClass('grid sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-5 w-full');
+        $grid.addClass('flex flex-col gap-5 items-center');
+        $grid.find('.card').removeClass('w-full').addClass('w-50');
+        $grid.find('.card-img').removeClass('w-full').addClass('w-[15rem] h-[15rem]');
+        $grid.find('.card-content').removeClass('flex-col justify-between').addClass('flex-row justify-center');
 
     })
     $("#gridViewBtn").on("click", function (e) {
         e.preventDefault();
         //change productsGrid to grid
         const $grid = $('#productGrid');
-        $grid.removeClass('flex flex-col gap-5 ');
-        $grid.addClass('grid  gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3');
+        $grid.removeClass('flex flex-col gap-5 items-center');
+        $grid.addClass('grid  gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 w-full');
+        $grid.find('.card').removeClass('w-50').addClass('w-full');
+        $grid.find('.card-img').removeClass('w-[15rem] h-[15rem]').addClass('w-full');
+        $grid.find('.card-content').removeClass('flex-row justify-center').addClass('flex-col justify-between');
     })
     $("#btnDelete").on("click", function (e) {
         e.preventDefault();
@@ -1118,10 +1234,7 @@ $(document).ready(async function () {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    $('#btnEnviarProductos').show();
-                    $('#btnCancelarEnvio').hide();
-                    $('#btnDeleteProducts').hide();
-                    $('#dynamicCategorizeBtnContainer').hide();
+                    mostrarBotones();
                     $(".checkbox").hide();
                     if (data.status) {
                         Swal.fire({
@@ -1214,6 +1327,7 @@ $(document).ready(async function () {
 
     async function showProductDetail(productId) {
 
+        mostrarSkeletonProducto();
         const response = await fetch(`${base_url}CatalogoController/getProductDetails/${productId}`);
 
         if (!response.ok) {
@@ -1234,7 +1348,7 @@ $(document).ready(async function () {
         }
         $('#dynamicCategorizeBtnContainerView').html(btnHtml);
 
-
+        ocultarSkeletonProducto();
         const producto = data.data;
         currentProductId = producto.id;
 
@@ -1372,9 +1486,7 @@ $(document).ready(async function () {
         $('#contenedorProductDetails').addClass('bg-[#f4f8fc] p-8 rounded-xl');
 
 
-        // Mostrar la sección de detalle
-        $('#productListSection').hide();
-        $('#viewProductSection').removeClass('hidden');
+
     }
     async function fillDropdownCategorias() {
         const url = base_url + 'CatalogoController/getCategorias';
@@ -1811,6 +1923,22 @@ $(document).ready(async function () {
             return 300 * cbmParsed;
         }
         return 0;
+    }
+    
+
+    function mostrarSkeletonProducto() {
+        // Oculta solo el detalle, muestra el skeleton
+        $('#ViewProduct').fadeOut(150, function() {
+            $('#viewProductSkeleton').removeClass('hidden').css('display', 'flex').hide().fadeIn(200);
+        });
+    }
+
+    function ocultarSkeletonProducto() {
+        // Oculta el skeleton y muestra el detalle
+        $('#viewProductSkeleton').fadeOut(150, function() {
+            $('#viewProductSkeleton').addClass('hidden');
+            $('#ViewProduct').fadeIn(200);
+        });
     }
 
     // Event listeners for input changes

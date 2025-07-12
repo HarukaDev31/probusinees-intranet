@@ -257,10 +257,59 @@ class CatalogoModel extends CI_Model
             if (!empty($filters['categoria']) && $filters['categoria'] != '0') {
                 $this->db->where('category_id', $filters['categoria']);
             }
+            // Filtro por nombre, precio u orden (sort)
+            if (!empty($filters['sort'])) {
+                switch ($filters['sort']) {
+                    case 'nameAZ':
+                        $this->db->order_by('nombre', 'ASC');
+                        break;
+                    case 'nameZA':
+                        $this->db->order_by('nombre', 'DESC');
+                        break;
+                    case 'pricemin':
+                    case 'pricemax':
+                        break;
+                    case 'recent':
+                    default:
+                        $this->db->order_by('created_at', 'DESC');
+                        break;
+                }
+            } else {
+                $this->db->order_by('created_at', 'DESC');
+            }
 
             $query = $this->db->get();
             if ($this->db->error()['code'] == 0) {
-                return array('status' => true, 'data' => $query->result());
+                $result = $query->result();
+
+                if (!empty($filters['sort']) && ($filters['sort'] === 'pricemin' || $filters['sort'] === 'pricemax')) {
+                    usort($result, function($a, $b) use ($filters) {
+                        // Obtener el menor precio de prices_range para cada producto
+                        $aPrices = json_decode($a->prices_range, true);
+                        $bPrices = json_decode($b->prices_range, true);
+
+                        $aMin = 0;
+                        $bMin = 0;
+                        if (is_array($aPrices) && count($aPrices) > 0) {
+                            $aMin = min(array_map(function($p) {
+                                return floatval(str_replace(',', '', $p['price']));
+                            }, $aPrices));
+                        }
+                        if (is_array($bPrices) && count($bPrices) > 0) {
+                            $bMin = min(array_map(function($p) {
+                                return floatval(str_replace(',', '', $p['price']));
+                            }, $bPrices));
+                        }
+
+                        if ($filters['sort'] === 'pricemin') {
+                            return $aMin <=> $bMin; // menor a mayor
+                        } else {
+                            return $bMin <=> $aMin; // mayor a menor
+                        }
+                    });
+                }
+
+                return array('status' => true, 'data' => $result);
             } else {
                 log_message('error', 'Error al obtener el catálogo: ' . $this->db->error()['message']);
                 return array('status' => false, 'message' => 'Error al obtener el catálogo');
