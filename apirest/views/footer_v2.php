@@ -72,6 +72,26 @@
 <script src="<?php echo base_url() . 'dist_v2/js/Administracion\js_administracion.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
 
+<?php if (isset($js_orders) && $js_orders==true) : ?>
+<!-- datepicker -->
+<link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
+<script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
+<script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
+<script src="<?php echo base_url() . 'assets/js/js_orders.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<?php if (isset($js_order_detail) && $js_order_detail==true) : ?>
+<!-- datepicker -->
+<link rel="stylesheet" href="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'; ?>">
+<script src="<?php echo base_url() . 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'; ?>"></script>
+<script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
+<script src="<?php echo base_url() . 'assets/js/js_order_detail.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
+<?php if (isset($js_order_confirmado_detail) && $js_order_confirmado_detail==true) : ?>
+<script src="<?php echo base_url() . 'assets/js/js_order_confirmado_detail.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
+
 <?php if (isset($js_cliente) && $js_cliente==true) : ?>
 <script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/Ventas/ReglasVentas/cliente.js?ver=' . $iControlVersionDashboard; ?>"></script>

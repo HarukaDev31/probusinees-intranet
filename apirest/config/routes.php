@@ -54,3 +54,14 @@ $route['default_controller'] = 'LoginController';
 $route['Panel_Inicio'] = 'InicioController';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+// Rutas para Orders
+$route['orders/listar'] = 'OrdersController/listar';
+$route['orders/getOrders'] = 'OrdersController/getOrders';
+$route['orders/detalle/(:num)'] = 'OrdersController/detalle/$1';
+$route['orders/getOrderInfo/(:num)'] = 'OrdersController/getOrderInfo/$1';
+$route['orders/getOrderProducts/(:num)'] = 'OrdersController/getOrderProducts/$1';
+$route['orders/uploadCotizacion'] = 'OrdersController/uploadCotizacion';
+$route['orders/cotizacion/(:num)'] = 'OrdersController/cotizacion/$1';
+$route['orders/downloadCotizacion/(:num)'] = 'OrdersController/downloadOrderExcel/$1';
+$route['orders/deleteOrder'] = 'OrdersController/deleteOrder';
