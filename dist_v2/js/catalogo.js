@@ -517,10 +517,10 @@ $(document).ready(async function () {
     function setupEventHandlers() {
         // Search input handler
         $('#searchInput').on('input', debounce(function () {
-            const query = $("#searchInput").val()?.toLowerCase() || '';
+            const query = String($("#searchInput").val() || '').toLowerCase();
             filterProducts(query);
             updateSelectAllBtnText();
-            currentFilters.search = $(this).val();
+            currentFilters.search = query;
             loadProducts(currentFilters);
         }, 300));
 
@@ -848,6 +848,42 @@ $(document).ready(async function () {
         };
     }
 
+    function filterProducts(query) {
+        const $grid = $('#productGrid');
+        const $cards = $grid.find('.card');
+        // Filter cards based on query
+        $cards.each(function () {
+            const $card = $(this);
+            const name = $card.find('h3').text().toLowerCase();
+            if (name.includes(query)) {
+                $card.show();
+            } else {
+                $card.hide();
+            }
+        });
+        // Show or hide "No results" message
+        const $noResults = $('#noResults');
+        if ($grid.find('.card:visible').length === 0) {
+            $noResults.show();
+        } else {
+            $noResults.hide();
+        }
+        // Reset scroll position
+        $grid.scrollTop(0);
+
+        // Actualizar contador de productos visibles
+        const visibles = $grid.find('.card:visible').length;
+        if (!isInCompleted && !isInTienda) {
+            $('#nuevos-count').text(`(${visibles})`);
+            $('#select-count').text('');
+        } else if (isInTienda) {
+            $('#select-count').text(`(${visibles})`);
+            $('#nuevos-count').text('');
+        } else {
+            $('#nuevos-count').text('');
+            $('#select-count').text('');
+        }
+    }
 
     function sortProducts(criteria) {
         const $grid = $('#productGrid');

@@ -239,6 +239,10 @@ class CatalogoModel extends CI_Model
 
             $this->db->where('status', 'PENDIENTE');
 
+            // Filtro por búsqueda de texto (nombre)
+            if (!empty($filters['search'])) {
+                $this->db->like('nombre', $filters['search']);
+            }
             // Filtro por fecha inicio
             if (!empty($filters['fechaInicio'])) {
                 $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaInicio']);
@@ -376,7 +380,11 @@ class CatalogoModel extends CI_Model
             $this->db->where('prices_range IS NOT NULL');
             
             $this->db->where('status', 'EN TIENDA');
-
+            
+            // Filtro por búsqueda de texto (nombre)
+            if (!empty($filters['search'])) {
+                $this->db->like('nombre', $filters['search']);
+            }
             // Filtro por fecha inicio
             if (!empty($filters['fechaInicio'])) {
                 $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaInicio']);
