@@ -22,7 +22,12 @@ const ROLE_CHINA = "CatalogoChina";
 
 $(document).ready(async function () {
 
-    $('#productGrid').on('change', '.checkbox', function () {
+    // Al inicio del $(document).ready
+    $('#productGrid').off('change.selectProducts').on('change.selectProducts', '.checkbox', function () {
+        // Actualiza checkedProducts con TODOS los checkboxes marcados (visibles o no)
+        checkedProducts = $('#productGrid .card .checkbox:checked').map(function () {
+            return $(this).data('product-id');
+        }).get();
         updateSelectAllBtnText();
     });
 
@@ -174,10 +179,10 @@ $(document).ready(async function () {
                 renderProducts(products);
                 updateSelectAllBtnText();
                 if (!isInCompleted && !isInTienda) {
-                    $('#nuevos-count').text(`(${products.length})`);
+                    $('#nuevos-count').text(`(${data.total})`);
                     $('#select-count').text('');
                 } else if (isInTienda) {
-                    $('#select-count').text(`(${products.length})`);
+                    $('#nuevos-count').text(`(${data.total})`);
                     $('#nuevos-count').text('');
                 } else {
                     $('#nuevos-count').text('');
@@ -393,16 +398,11 @@ $(document).ready(async function () {
                 $checkbox.prop('checked', false);
             }
             $checkbox.on('change', function () {
-                updateSelectAllBtnText();
-            });
-            $checkbox.on('click', function (e) {
-                e.stopPropagation();
-                const productId = $(this).data('product-id');
-                if ($(this).is(':checked')) {
-                    checkedProducts.push(productId);
-                } else {
-                    checkedProducts = checkedProducts.filter(id => id !== productId);
-                }
+                // Actualiza checkedProducts con TODOS los checkboxes marcados (visibles o no)
+                checkedProducts = $('#productGrid .card .checkbox:checked').map(function () {
+                    return $(this).data('product-id');
+                }).get();
+                console.log('Checked products:', checkedProducts);
                 updateSelectAllBtnText();
             });
             initializeProductDropdowns();
@@ -517,18 +517,20 @@ $(document).ready(async function () {
     function setupEventHandlers() {
         // Search input handler
         $('#searchInput').on('input', debounce(function () {
-            const query = $("#searchInput").val()?.toLowerCase() || '';
+            const query = String($("#searchInput").val() || '').toLowerCase();
             filterProducts(query);
             updateSelectAllBtnText();
+            currentFilters.search = query;
+            loadProducts(currentFilters);
         }, 300));
 
         // Sort select handler
         $('#sortSelect').on('change',async function () {
             const sortValue = $(this).val();
+            currentFilters.sort = sortValue;
             showSkeletons();
-            const filtros = {}; // agrega aquí otros filtros si los usas
-            filtros.sort = sortValue;
-            await loadProducts(filtros);
+            loadProducts(currentFilters);
+
         });
 
         // Botón Categorizar/Enviar Producto
@@ -653,7 +655,7 @@ $(document).ready(async function () {
                 }
             });
         })
-        
+        let currentFilters = {};
         // Filter button handler
         $('#filterBtn').on('click', async function (e) {
             e.preventDefault();
@@ -667,13 +669,13 @@ $(document).ready(async function () {
             if (!fechaFin || fechaFin.trim() === '') fechaFin = null;
             if (!categoria || categoria === '0') categoria = null;
 
-            // Construir objeto de filtros solo con valores definidos
-            const filtros = {};
-            if (fechaInicio) filtros.fechaInicio = fechaInicio;
-            if (fechaFin) filtros.fechaFin = fechaFin;
-            if (categoria) filtros.categoria = categoria;
+            // Normalizar fechas: si están vacías, enviar null
+            currentFilters.fechaInicio = fechaInicio && fechaInicio.trim() !== '' ? fechaInicio : null;
+            currentFilters.fechaFin = fechaFin && fechaFin.trim() !== '' ? fechaFin : null;
+            currentFilters.categoria = categoria && categoria !== '0' ? categoria : null;
+
             showSkeletons();
-            await loadProducts(Object.keys(filtros).length > 0 ? filtros : null);
+            loadProducts(currentFilters);
         });
 
         // View toggle handlers
@@ -849,7 +851,6 @@ $(document).ready(async function () {
     function filterProducts(query) {
         const $grid = $('#productGrid');
         const $cards = $grid.find('.card');
-        console.log($cards)
         // Filter cards based on query
         $cards.each(function () {
             const $card = $(this);

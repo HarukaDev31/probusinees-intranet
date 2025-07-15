@@ -239,6 +239,10 @@ class CatalogoModel extends CI_Model
 
             $this->db->where('status', 'PENDIENTE');
 
+            // Filtro por búsqueda de texto (nombre)
+            if (!empty($filters['search'])) {
+                $this->db->like('nombre', $filters['search']);
+            }
             // Filtro por fecha inicio
             if (!empty($filters['fechaInicio'])) {
                 $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaInicio']);
@@ -309,7 +313,7 @@ class CatalogoModel extends CI_Model
                     });
                 }
 
-                return array('status' => true, 'data' => $result);
+                return array('status' => true, 'data' => $result,'total'=>count($result));
             } else {
                 log_message('error', 'Error al obtener el catálogo: ' . $this->db->error()['message']);
                 return array('status' => false, 'message' => 'Error al obtener el catálogo');
@@ -346,7 +350,7 @@ class CatalogoModel extends CI_Model
 
             $query = $this->db->get();
             if ($this->db->error()['code'] == 0) {
-                return array('status' => true, 'data' => $query->result());
+                return array('status' => true, 'data' => $query->result(),'total'=>count($query->result()));
             } else {
                 log_message('error', 'Error al obtener el catálogo: ' . $this->db->error()['message']);
                 return array('status' => false, 'message' => 'Error al obtener el catálogo');
@@ -376,7 +380,11 @@ class CatalogoModel extends CI_Model
             $this->db->where('prices_range IS NOT NULL');
             
             $this->db->where('status', 'EN TIENDA');
-
+            
+            // Filtro por búsqueda de texto (nombre)
+            if (!empty($filters['search'])) {
+                $this->db->like('nombre', $filters['search']);
+            }
             // Filtro por fecha inicio
             if (!empty($filters['fechaInicio'])) {
                 $fecha = DateTime::createFromFormat('d/m/Y', $filters['fechaInicio']);
@@ -398,7 +406,7 @@ class CatalogoModel extends CI_Model
 
             $query = $this->db->get();
             if ($this->db->error()['code'] == 0) {
-                return array('status' => true, 'data' => $query->result());
+                return array('status' => true, 'data' => $query->result(),'total'=>count($query->result()));
             } else {
                 log_message('error', 'Error al obtener el catálogo: ' . $this->db->error()['message']);
                 return array('status' => false, 'message' => 'Error al obtener el catálogo');
