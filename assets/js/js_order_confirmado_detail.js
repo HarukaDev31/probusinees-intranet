@@ -27,13 +27,17 @@ $(document).ready(function() {
                 if (order.estado_confirmado) {
                     $('#selectEstadoConfirmado').val(order.estado_confirmado);
                 }
-                // Orden
+                // Orden - lógica corregida para mostrar/ocultar botones
                 if (order.orden_url) {
+                    // Si existe orden: mostrar descargar y borrar, ocultar subir
                     $('#btnDescargarOrden').show().data('url', order.orden_url);
                     $('#btnBorrarOrden').show();
+                    $('#btnSubirOrden').hide();
                 } else {
+                    // Si NO existe orden: mostrar subir, ocultar descargar y borrar
                     $('#btnDescargarOrden').hide();
                     $('#btnBorrarOrden').hide();
+                    $('#btnSubirOrden').show();
                 }
             } else {
                 $('#customerName').text('No disponible');
@@ -41,6 +45,7 @@ $(document).ready(function() {
                 $('#cotizacionInfo').hide();
                 $('#btnDescargarOrden').hide();
                 $('#btnBorrarOrden').hide();
+                $('#btnSubirOrden').show(); // Mostrar subir si no hay datos
             }
         },
         error: function() {
@@ -49,6 +54,7 @@ $(document).ready(function() {
             $('#cotizacionInfo').hide();
             $('#btnDescargarOrden').hide();
             $('#btnBorrarOrden').hide();
+            $('#btnSubirOrden').show(); // Mostrar subir si hay error
         }
     });
 
