@@ -11,7 +11,6 @@ $(document).ready(function() {
         success: function(response) {
             if (response.status === 'success') {
                 var order = response.order;
-                // Nombre del cliente
                 $('#customerName').text(order.customer_full_name || 'No disponible');
                 // Puedes agregar aquí más campos si quieres mostrar más datos de la orden
                 // Ejemplo: $('#orderNumber').text(order.order_number);
