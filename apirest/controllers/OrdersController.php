@@ -530,6 +530,42 @@ class OrdersController extends CI_Controller
         }
     }
 
+    public function deleteOrden()
+    {
+        try {
+            $orderId = $this->input->post('orderId');
+            $order = $this->OrdersModel->getOrderById($orderId);
+            
+            if ($order && !empty($order->orden_url)) {
+                // Eliminar archivo físico
+                $filePath = str_replace(base_url(), '', $order->orden_url);
+                if (file_exists($filePath)) {
+                    @unlink($filePath);
+                }
+                
+                // Limpiar URL en base de datos
+                $this->db->where('id', $orderId);
+                $this->db->update('orders', ['orden_url' => null]);
+                
+                echo json_encode([
+                    'status' => 'success', 
+                    'message' => 'Orden eliminada correctamente'
+                ]);
+            } else {
+                echo json_encode([
+                    'status' => 'error', 
+                    'message' => 'No existe orden para eliminar'
+                ]);
+            }
+        } catch (Exception $e) {
+            log_message('error', 'OrdersController : deleteOrden() => ' . $e->getMessage());
+            echo json_encode([
+                'status' => 'error', 
+                'message' => 'Error interno al eliminar orden'
+            ]);
+        }
+    }
+
     private function getEstadoClass($status)
     {
         switch ($status) {
