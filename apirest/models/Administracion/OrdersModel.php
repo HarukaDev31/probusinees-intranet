@@ -58,7 +58,7 @@ class OrdersModel extends CI_Model
     public function getOrderItems($orderId)
     {
         try {
-            $this->db->select('order_items.*, catalogo_producto.main_image_url as product_image, catalogo_producto.nombre as product_name, catalogo_producto.url_tienda as store_link, catalogo_producto.url_alibaba as alibaba_link, catalogo_producto.delivery_lead_times');
+            $this->db->select('order_items.*, catalogo_producto.main_image_url as product_image, catalogo_producto.nombre as product_name, catalogo_producto.url_tienda as store_link, catalogo_producto.url_alibaba as alibaba_link, catalogo_producto.delivery_lead_times, catalogo_producto.id as product_id');
             $this->db->from('order_items');
             $this->db->join('catalogo_producto', 'catalogo_producto.id = order_items.product_id', 'left');
             $this->db->where('order_items.order_id', $orderId);

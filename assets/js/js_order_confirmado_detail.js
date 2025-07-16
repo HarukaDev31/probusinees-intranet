@@ -180,12 +180,13 @@ $(document).ready(function() {
             {"data": "total_price", "render": function(data) {
                 return 'S/. ' + parseFloat(data).toFixed(2);
             }},
-            {"data": "store_link", "render": function(data) {
-                if (data && data !== '') {
-                    return '<a href="' + data + '" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-external-link-alt"></i> Ver</a>';
-                } else {
-                    return '<span class="text-muted">No disponible</span>';
+            {"data": "store_link", "render": function(data, type, row) {
+                var link = data;
+                // Si no hay store_link, usar base_url + 'producto/' + product_id como fallback
+                if (!data || data === '') {
+                    link = base_url + 'producto/' + row.product_id;
                 }
+                return '<a href="' + link + '" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-external-link-alt"></i> Ver</a>';
             }},
             {"data": "alibaba_link", "render": function(data) {
                 if (data && data !== '') {

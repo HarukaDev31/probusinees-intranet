@@ -329,6 +329,7 @@ class OrdersController extends CI_Controller
             $data = [];
             foreach ($orderItems as $item) {
                 $data[] = [
+                    'product_id' => $item->product_id,
                     'product_image' => $item->product_image,
                     'product_name' => $item->product_name,
                     'quantity' => $item->quantity,
