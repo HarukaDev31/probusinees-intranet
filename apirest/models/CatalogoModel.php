@@ -485,49 +485,10 @@ class CatalogoModel extends CI_Model
                 return array('status' => false, 'message' => 'No se recibieron IDs para eliminar');
             }
 
-            // Eliminar registros relacionados en catalogo_producto_media
-            $this->db->where_in('id_catalogo_producto', $ids);
-            $this->db->delete('catalogo_producto_media');
-
-            // Obtener productos para borrar archivos asociados
-            $productos = $this->db->where_in('id', $ids)->get($this->table)->result();
-            $pattern = '/probusinees-intranet\/(.+)/';
-            foreach ($productos as $data) {
-                // contact_card_url
-                $matches = [];
-                if (!empty($data->contact_card_url) && preg_match($pattern, $data->contact_card_url, $matches) && isset($matches[1])) {
-                    $contactCardUrl = $matches[1];
-                    if (file_exists($contactCardUrl)) @unlink($contactCardUrl);
-                }
-                // main_image_url
-                $matches = [];
-                if (!empty($data->main_image_url) && preg_match($pattern, $data->main_image_url, $matches) && isset($matches[1])) {
-                    $mainImageUrl = $matches[1];
-                    if (file_exists($mainImageUrl)) @unlink($mainImageUrl);
-                }
-                // aditional_image1_url
-                $matches = [];
-                if (!empty($data->aditional_image1_url) && preg_match($pattern, $data->aditional_image1_url, $matches) && isset($matches[1])) {
-                    $aditionalImage1Url = $matches[1];
-                    if (file_exists($aditionalImage1Url)) @unlink($aditionalImage1Url);
-                }
-                // aditional_image2_url
-                $matches = [];
-                if (!empty($data->aditional_image2_url) && preg_match($pattern, $data->aditional_image2_url, $matches) && isset($matches[1])) {
-                    $aditionalImage2Url = $matches[1];
-                    if (file_exists($aditionalImage2Url)) @unlink($aditionalImage2Url);
-                }
-                // aditional_video1_url
-                $matches = [];
-                if (!empty($data->aditional_video1_url) && preg_match($pattern, $data->aditional_video1_url, $matches) && isset($matches[1])) {
-                    $aditionalVideo1Url = $matches[1];
-                    if (file_exists($aditionalVideo1Url)) @unlink($aditionalVideo1Url);
-                }
-            }
-
-            // Eliminar los productos de la base de datos
-            $this->db->where_in('id', $ids);
-            $this->db->delete($this->table);
+        // Soft delete: actualizar el campo updated_at en vez de eliminar los productos
+        $fechaBorrado = date('Y-m-d H:i:s');
+        $this->db->where_in('id', $ids);
+        $this->db->update($this->table, ['updated_at' => $fechaBorrado]);
 
             if ($this->db->affected_rows() > 0) {
                 $this->reordenarCodigosCatalogo();
