@@ -1016,8 +1016,11 @@ function showImageModal(url) {
   const modalContent = document.createElement('div');
   modalContent.className = 'modal-content';
   const modalBody = document.createElement('div');
-  modalBody.className = 'modal-body';
-  modalBody.innerHTML = `<img src="${url}" alt="Image" class="img-fluid">`;
+  modalBody.className = 'modal-body d-flex justify-content-center align-items-center';
+  modalBody.innerHTML = `
+    <img src="${url}" alt="Image" class="img-fluid image-zoom"
+      style="max-width:80vw; max-height:50vh; min-width:300px; min-height:200px; object-fit:contain; transition:transform 0.3s; cursor:zoom-in; display:block; margin:auto;">
+  `;
   modalContent.appendChild(modalBody);
   modalDialog.appendChild(modalContent);
   modal.appendChild(modalDialog);
@@ -1025,6 +1028,16 @@ function showImageModal(url) {
   $(modal).modal('show');
   $(modal).on('hidden.bs.modal', function () {
     $(this).remove(); // Remove modal from DOM after closing
+  });
+  // Zoom al hacer click
+  modalBody.querySelector('.image-zoom').addEventListener('click', function () {
+    if (this.style.transform === "scale(2)") {
+      this.style.transform = "scale(1)";
+      this.style.cursor = "zoom-in";
+    } else {
+      this.style.transform = "scale(2)";
+      this.style.cursor = "zoom-out";
+    }
   });
 }
 
