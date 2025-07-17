@@ -328,13 +328,9 @@ $(document).ready(async function () {
                 try {
                     const priceRangeObj = JSON.parse(product.prices_range);
                     if (Array.isArray(priceRangeObj) && priceRangeObj.length > 0) {
-                        // Buscar el mínimo en el array de precios
-                        minPrecio = Math.min(...priceRangeObj.map(obj => {
-                                // Elimina comas antes de convertir a número
-                                const cleanPrice = (obj.price + '').replace(/,/g, '');
-                                return parseFloat(cleanPrice) || 0;
-                            })
-                        );;
+                        // Tomar el primer precio del array (cantidad mínima)
+                        const cleanPrice = (priceRangeObj[0].price + '').replace(/,/g, '');
+                        minPrecio = parseFloat(cleanPrice) || 0;
                     }
                 } catch (e) {
                     minPrecio = 0;

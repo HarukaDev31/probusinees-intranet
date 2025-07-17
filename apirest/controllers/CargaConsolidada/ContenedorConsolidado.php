@@ -10,6 +10,11 @@ class ContenedorConsolidado extends CI_Controller
 	private $logo_cliente_logos_empresa_almacen_path = '../assets/images/logos_empresa_almacen/';
 	private $roleGerencia = "GERENCIA";
 	private $roleCoordinacion = "Coordinación";
+	private $rolesChina = [
+		"ContenedorAlmacen",
+		"CatalogoChina",
+	];
+	private $roleCotizador = "Cotizador";
 	function __construct()
 	{
 		try {
@@ -106,7 +111,7 @@ class ContenedorConsolidado extends CI_Controller
 				$subdata[] = date("d/m/Y", strtotime($row->f_entrega));
 			}
 			$subdata[] = $row->empresa;
-			if ($this->user->No_Grupo == "ContenedorAlmacen") {
+			if (in_array($this->user->No_Grupo, $this->rolesChina)) {
 				$divEstado = '<select disabled
 		onchange="updateEstado(' . $row->id . ')"
 				 id="estado-' . $row->id . '"
@@ -228,7 +233,7 @@ class ContenedorConsolidado extends CI_Controller
 				}
 
 				$subdata[] = $row->empresa;
-				if ($this->user->No_Grupo == "ContenedorAlmacen") {
+				if (in_array($this->user->No_Grupo, $this->rolesChina)) {
 					$divEstado = '<select
 					onchange="updateEstado(' . $row->id . ')"
 							id="estado-' . $row->id . '"
@@ -456,10 +461,13 @@ class ContenedorConsolidado extends CI_Controller
 						}
 						$subdata[] = $divAcciones;
 					}
+					else{
+						$subdata[] = '';
+					}
 					$data[] = $subdata;
 				} else if ($tipoTabla == "embarque"){
 					$subdata = [];
-					if ($this->user->No_Grupo != "ContenedorAlmacen") {
+					if (!in_array($this->user->No_Grupo, $this->rolesChina)) {
 						$subdata[] = $row->No_Nombres_Apellidos;
 					}
 					$proveedores = $row->proveedores;
@@ -496,7 +504,7 @@ class ContenedorConsolidado extends CI_Controller
 							$cbmTotalPeru += $proveedor->cbm_total;
 						}
 
-						if ($this->user->No_Grupo == "ContenedorAlmacen" || $this->user->No_Grupo == "GERENCIA") {
+						if (in_array($this->user->No_Grupo, $this->rolesChina) || $this->user->No_Grupo == "GERENCIA") {
 							$proveedoresSelect .= '<select class="form-control
 							' . ($proveedor->estados_proveedor == "NC" ? "bg-info" : "") .
 								($proveedor->estados_proveedor == "C" ? "bg-warning" : "") .
@@ -580,13 +588,13 @@ class ContenedorConsolidado extends CI_Controller
 						}
 						//add select with status enum("ROTULADO","DATOS PROVEEDOR","INSPECCIONADO","RESERVADO","EMBARCADO","NO EMBARCADO"),
 
-						$estadoSelect .= '<select class="form-control mb-1" style="font-weight: bold;background-color:#DFDFDF"' . ($this->user->No_Grupo == "Cotizador" ? "disabled" : "") . '
+						$estadoSelect .= '<select class="form-control mb-1" style="font-weight: bold;background-color:#DFDFDF"' . ($this->user->No_Grupo == $this->roleCotizador ? "disabled" : "") . '
 						id="estado-' . $row->id . '-' . $proveedor->id_proveedor . '"
 						name="estado" onchange="updateEstadoCotizacionProveedor(' . $row->id . ',' . $proveedor->id . ',' . $row->estados . ')">
 							<option value="DEFAULT" ' . ($proveedor->estados == "" ? "selected disabled"  : "") . '>Seleccionar</option>
 							<option value="ROTULADO" ' . ($proveedor->estados == "ROTULADO" ? "selected" : "") . '>ROTULADO</option>
 							<option value="DATOS PROVEEDOR" ' . ($proveedor->estados == "DATOS PROVEEDOR" ? "selected disabled" : "disabled") . '>DATOS PROVEEDOR</option>
-							<option value="INSPECCIONADO" ' . ($proveedor->estados == "INSPECCIONADO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "ContenedorAlmacen" ? " disabled" : "") . '		>INSPECCIONADO</option>
+							<option value="INSPECCIONADO" ' . ($proveedor->estados == "INSPECCIONADO" ? "selected" : "") . '' . (!in_array($this->user->No_Grupo, $this->rolesChina) ? " disabled" : "") . '		>INSPECCIONADO</option>
 							<option value="COBRANDO" ' . ($proveedor->estados == "COBRANDO" ? "selected" : "") . '' . ($this->user->No_Grupo !== "Coordinación" ? " disabled" : "") . '		>COBRANDO</option>
 							<option value="RESERVADO" ' . ($proveedor->estados == "RESERVADO" ? "selected" : "") . '>RESERVADO</option>
 							
@@ -597,29 +605,29 @@ class ContenedorConsolidado extends CI_Controller
 						$pesoTotalDiv .= '<div><input type="number" class="form-control" disabled value="' . ($proveedor->peso ?? 0) . '"></input></div>';
 						//add inputs to supplier
 						$divInputsSupplier .= '<div class="d-flex flex-row mb-1">
-						<input type="text" class="form-control"' . ($this->user->No_Grupo == "Cotizador" ? "disabled" : "") . '
+						<input type="text" class="form-control"' . ($this->user->No_Grupo == $this->roleCotizador ? "disabled" : "") . '
 
 						id="proveedor-' . $proveedor->id_proveedor . '" name="proveedor" value="' . $proveedor->supplier . '"
-						' . ($this->user->No_Grupo == "ContenedorAlmacen" ? "disabled" : "") . '>
+						' . (in_array($this->user->No_Grupo, $this->rolesChina) ? "disabled" : "") . '>
 
 						</div>';
 						$divInputsCodeSupplier .= '<div class="d-flex flex-row mb-1">
-						<input type="text" class="form-control"' . ($this->user->No_Grupo == "Cotizador" ? "disabled" : "") . ' id="codigo-' . $proveedor->id_proveedor . '" name="codigo" value="' . $proveedor->code_supplier . '"
-						' . ($this->user->No_Grupo == "ContenedorAlmacen" ? "disabled" : "") . '>
+						<input type="text" class="form-control"' . ($this->user->No_Grupo == $this->roleCotizador ? "disabled" : "") . ' id="codigo-' . $proveedor->id_proveedor . '" name="codigo" value="' . $proveedor->code_supplier . '"
+						' . (in_array($this->user->No_Grupo, $this->rolesChina) ? "disabled" : "") . '>
 
 						</div>';
 						$divInputsPhoneNumberSupplier .= '<div class="d-flex flex-row mb-1">
 						<input type="text" class="form-control"'
 							. ($this->user->No_Grupo == "Cotizador" ? "disabled" : "") . '
 						id="telefono-' . $proveedor->id_proveedor . '" name="telefono" value="' . $proveedor->supplier_phone . '"
-						' . ($this->user->No_Grupo == "ContenedorAlmacen" ? "disabled" : "") . '>
+						' . (in_array($this->user->No_Grupo, $this->rolesChina) ? "disabled" : "") . '>
 
 						</div>';
 						$divProductos .= '<div class="d-flex flex-row gap-2 mb-1">
 						<input type="text" class="form-control cotizacion-products-' . $row->id . '"
 
 						id="productos-' . $proveedor->id_proveedor . '" name="productos" value="' . $proveedor->products . '"
-						' . ($this->user->No_Grupo == "ContenedorAlmacen" ? "disabled" : "") . '
+						' . (in_array($this->user->No_Grupo, $this->rolesChina) ? "disabled" : "") . '
 						>
 						</input>
 
@@ -656,7 +664,7 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $proveedoresSelect;
 					$subdata[] = $index;
 					$subdata[] = ucwords(strtolower($row->nombre));;
-					if ($this->user->No_Grupo != "ContenedorAlmacen") {
+					if (!in_array($this->user->No_Grupo, $this->rolesChina)) {
 						$subdata[] = $row->telefono;
 						$subdata[] = $estadoSelect;
 					}
@@ -717,7 +725,7 @@ class ContenedorConsolidado extends CI_Controller
 					for ($i = 0; $i < 4; $i++) {
 						if (isset($arrData[$i])) {
 							$divAcciones .= '
-								<button class="nav-link p-2 col-3 border-2 border-[#DFDFDF] rounded-lg"
+								<button class="nav-link p-2 col-3 border-2 border-[#DFDFDF] rounded-lg ' . $this->getColorTabByStatus($arrData[$i]->status) . '"
 									onclick="viewClientePagoCoordination(' . $arrData[$i]->id . ', '. $row->id_cotizacion . ' )"
 									style="cursor:pointer;">
 									$' . number_format($arrData[$i]->monto, 2) . '
@@ -947,7 +955,7 @@ class ContenedorConsolidado extends CI_Controller
 					for ($i = 0; $i < 4; $i++) {
 						if (isset($arrData[$i])) {
 							$divAcciones .= '
-								<button class="nav-link p-2 col-3 border-2 border-[#DFDFDF] rounded-lg"
+								<button class="nav-link p-2 col-3 border-2 border-[#DFDFDF] rounded-lg ' . $this->getColorTabByStatus($arrData[$i]->status) . '"
 									onclick="viewClientePagoCoordination(' . $arrData[$i]->id . ', '. $row->id_cotizacion . ' )"
 									style="cursor:pointer;">
 									$' . number_format($arrData[$i]->monto, 2) . '
@@ -1090,7 +1098,7 @@ class ContenedorConsolidado extends CI_Controller
 					for ($i = 0; $i < 4; $i++) {
 						if (isset($arrData[$i])) {
 							$divAcciones .= '
-								<button class="nav-link p-2 col-3 border-2 border-[#DFDFDF] rounded-lg"
+								<button class="nav-link p-2 col-3 border-2 border-[#DFDFDF] rounded-lg ' . $this->getColorTabByStatus($arrData[$i]->status) . '"
 									onclick="viewClientePagoCoordination(' . $arrData[$i]->id . ', '. $row->id_cotizacion . ' )"
 									style="cursor:pointer;">
 									$' . number_format($arrData[$i]->monto, 2) . '
@@ -2108,4 +2116,13 @@ class ContenedorConsolidado extends CI_Controller
 			"message" => $arrResponse['message']
 		]);
 	}
+	private function getColorTabByStatus($status) {
+    switch ($status) {
+        case 'PENDIENTE': return 'bg-secondary text-white';
+        case 'ADELANTO': return 'bg-warning text-dark';
+        case 'CONFIRMADO': return 'bg-success text-white';
+        case 'SOBREPAGO': return 'bg-danger text-white';
+        default: return 'bg-secondary text-white';
+    }
+}
 }

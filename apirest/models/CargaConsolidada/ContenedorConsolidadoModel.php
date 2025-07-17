@@ -30,6 +30,7 @@ class ContenedorConsolidadoModel extends CI_Model
     private $roleCotizador = "Cotizador";
     private $roleCoordinacion = "Coordinación";
     private $roleContenedorAlmacen = "ContenedorAlmacen";
+    private $roleCatalogoChina = "CatalogoChina";
     private $roleDocumentacion = "Documentacion";
     private $aNewContainer = "new-container";
     private $aNewConfirmado = "new-confirmado";
@@ -102,7 +103,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $this->db->where('estado_documentacion !=', "COMPLETADO");
             }
             //if no grupo in ["Cotizador", "Coordinación"] where estado_documentacion = "COMPLETADO"
-            if (in_array($this->user->No_Grupo, [$this->roleCotizador, $this->roleCoordinacion, $this->roleContenedorAlmacen])) {
+            if (in_array($this->user->No_Grupo, [$this->roleCotizador, $this->roleCoordinacion, $this->roleContenedorAlmacen, $this->roleCatalogoChina])) {
                 $this->db->where('estado_china !=', "COMPLETADO");
             }
             $this->db->order_by('carga', 'desc');
@@ -123,7 +124,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 ->from($this->table)
                 ->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.id_pais', 'join');
 
-            if (in_array($this->user->No_Grupo, [$this->roleCotizador, $this->roleCoordinacion, $this->roleContenedorAlmacen])) {
+            if (in_array($this->user->No_Grupo, [$this->roleCotizador, $this->roleCoordinacion, $this->roleContenedorAlmacen, $this->roleCatalogoChina])) {
                 $this->db->where('estado_china =', "COMPLETADO");
             }
             if ($this->user->No_Grupo == "Documentacion") {
@@ -291,6 +292,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $fieldToFilter = [
                     'Coordinación' => 'estado',
                     'ContenedorAlmacen' => 'estado_china',
+                    'CatalogoChina' => 'estado_china',
                     'Documentacion' => 'estado',
                 ];
                 $this->db->where($fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
@@ -343,6 +345,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $fieldToFilter = [
                     'Coordinación' => 'estado',
                     'ContenedorAlmacen' => 'estado_china',
+                    'CatalogoChina' => 'estado_china',
                     'Documentacion' => 'estado',
                 ];
                 $this->db->where($fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
@@ -395,6 +398,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $fieldToFilter = [
                     'Coordinación' => 'estado',
                     'ContenedorAlmacen' => 'estado_china',
+                    'CatalogoChina' => 'estado_china',
                     'Documentacion' => 'estado',
                 ];
                 $this->db->where($fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
@@ -456,6 +460,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 $fieldToFilter = [
                     'Coordinación' => 'estado',
                     'ContenedorAlmacen' => 'estado_china',
+                    'CatalogoChina' => 'estado_china',
                     'Documentacion' => 'estado',
                 ];
                 $this->db->where("main" . $fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
@@ -1606,7 +1611,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
     {
         //if no_grupo is  roleContenedorAlmacen
         try {
-            if ($this->user->No_Grupo == $this->roleContenedorAlmacen) {
+            if ($this->user->No_Grupo == $this->roleContenedorAlmacen || $this->user->No_Grupo == $this->roleCatalogoChina) {
                 $this->db->set('estado_china', $estado);
                 $this->db->where('id', $id);
                 $this->db->update($this->table);
@@ -3507,7 +3512,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
 
 
                 $this->verifyContainerIsCompleted($idContenedor);
-                $usuariosAlmacen = $this->getUsersByGrupo($this->roleContenedorAlmacen);
+                $usuariosAlmacen = $this->getUsersByGrupo($this->roleContenedorAlmacen || $this->roleCatalogoChina);
                 $ids = array_column($usuariosAlmacen, 'ID_Usuario');
                 $message = "Se ha actualizado el proveedor con codigo de proveedor " . $supplierCode . " a estado DATOS PROVEEDOR";
                 $notifications = $this->createNotification($ids, $message, "CARGA CONSOLIDADA", $this->user->ID_Usuario);

@@ -1,6 +1,11 @@
 <?php
+$rolesChina = ["ContenedorAlmacen", "CatalogoChina"];
 $SectionNames = [
   "ContenedorAlmacen" => [
+    "Carga Consolidada" => "Waiting",
+    "Completados" => "Finished",
+  ],
+  "CatalogoChina" => [
     "Carga Consolidada" => "Waiting",
     "Completados" => "Finished",
   ],
@@ -311,7 +316,7 @@ $rolesViewFeatures = [
                     <a class="nav-link <?php echo $No_Class_A_Padre_Active; ?>" title="<?php echo $arrMenuPadre->No_Menu; ?>" href="<?php echo base_url() . $arrMenuPadre->No_Menu_Url; ?>">
                       <i class="nav-icon <?php echo $arrMenuPadre->Txt_Css_Icons; ?>"></i>
                       <p>&nbsp;<?php
-                                if ($this->user->No_Grupo == 'ContenedorAlmacen') {
+                                if (in_array($this->user->No_Grupo, $rolesChina)) {
                                   echo $arrMenuPadre->No_Menu_China;
                                 } else {
                                   echo $arrMenuPadre->No_Menu;
@@ -378,7 +383,7 @@ $rolesViewFeatures = [
                     <a class="nav-link <?php echo $No_Class_A_Padre_Active; ?>" title="<?php echo $arrMenuPadre->No_Menu; ?>" href="<?php echo base_url() . $arrMenuPadre->No_Menu_Url; ?>">
                       <i class="nav-icon <?php echo $arrMenuPadre->Txt_Css_Icons; ?>"></i>
                       <p>&nbsp;<?php
-                                if ($this->user->No_Grupo == 'ContenedorAlmacen') {
+                                if (in_array($this->user->No_Grupo, $rolesChina)) {
                                   echo $arrMenuPadre->No_Menu_China;
                                 } else {
                                   echo $arrMenuPadre->No_Menu;
@@ -446,7 +451,7 @@ $rolesViewFeatures = [
                 <a href="<?php echo base_url() . 'LoginController/logout'; ?>" class="nav-link">
                   <i class="nav-icon fa fa-sign-out-alt"></i>
                   <p>&nbsp;
-                    <?php if ($this->user->No_Grupo == 'ContenedorAlmacen') { ?>
+                    <?php if (in_array($this->user->No_Grupo, $rolesChina)) { ?>
                       Close Session
                     <?php } else { ?>
                       Cerrar Sesión

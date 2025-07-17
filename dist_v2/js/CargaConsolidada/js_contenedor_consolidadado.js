@@ -12,6 +12,7 @@ var currentProveedor = 0;
 var currentCotizacion;
 var currentTableCotizacion = "prospectos";
 var currentPrivilege = localStorage.getItem("currentPrivilege") == null ? "" : localStorage.getItem("currentPrivilege");
+const rolesChina = ["ContenedorAlmacen", "CatalogoChina"];
 var fileManager = null;
 var fileManagerInspection = null;
 var fileManagerInspectionCoordinacion = null;
@@ -256,7 +257,7 @@ function viewClientePagoCoordination(idPago) {
   }, 'json');
 }
 function getSwalConfig(type, privilege) {
-  const isEnglish = privilege === "ContenedorAlmacen";
+  const isEnglish = rolesChina.includes(privilege);
 
   const messages = {
     confirmDelete: {
@@ -930,7 +931,7 @@ async function verCotizacionEmbarque(
   const result = await response.json();
   $("#txt-Id_Carga_Consolidada").val(result.nota);
   originalNoteInpectionText = result.nota;
-  if (currentPrivilege != "ContenedorAlmacen") {
+  if (!(rolesChina.includes(currentPrivilege))) {
     $("#btn-upload-document-cotizacion").css("pointer-events", "none");
     $("#btn-upload-inspection-cotizacion").css("pointer-events", "none");
   }
@@ -1837,7 +1838,7 @@ async function viewSteps(id, carga, disabled = false) {
       const data = result.data;
       currentPrivilege = result.currentPrivilege;
       //here
-      if (currentPrivilege == "ContenedorAlmacen") {
+      if (rolesChina.includes(currentPrivilege)) {
         openStepFunction(1, id);
         mainContainer.hide();
         contentHeader.hide();
@@ -2787,7 +2788,7 @@ const openStepFunction = async (step, id) => {
   if (stepIndex == 1 && currentPrivilege != "Documentacion") {
     cotizacionContainer.show();
     if (
-      currentPrivilege == "ContenedorAlmacen" ||
+      rolesChina.includes(currentPrivilege) ||
       currentPrivilege == "Documentacion"
     ) {
       if ($.fn.DataTable.isDataTable("#table-cotizacion-embarque")) {
@@ -4013,7 +4014,7 @@ const openStepFunction = async (step, id) => {
   $(".btn-back-cotizacion").off("click");
   $(".btn-back-cotizacion").on("click", function () {
     $("#Txt-ID_Estado_Cotizacion").val("0");
-    if (currentPrivilege == "ContenedorAlmacen") {
+    if (rolesChina.includes(currentPrivilege)) {
       mainContainer.show();
       contentHeader.show();
       cotizacionContainer.hide();
@@ -8921,7 +8922,7 @@ function applyDynamicStylesForTableRows() {
       console.log("Aplicando estilos para móvil...");
       document.querySelectorAll("tbody tr").forEach((row) => {
         // Ajustar el grid-template-areas dinámicamente según el perfil
-        if (currentPrivilege === "ContenedorAlmacen") {
+        if (rolesChina.includes(currentPrivilege)) {
           row.style.gridTemplateRows = "repeat(5, 1fr)";
         } else if (currentPrivilege === "Coordinación") {
           row.style.gridTemplateRows = "repeat(7, 1fr)";

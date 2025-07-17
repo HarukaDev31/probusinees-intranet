@@ -1,3 +1,6 @@
+<?php
+$rolesChina = ["ContenedorAlmacen", "CatalogoChina"];
+?>
 <script>
 var currentPrivilege = "<?php echo $this->user->No_Grupo; ?>";
 localStorage.setItem("currentPrivilege", currentPrivilege);
@@ -26,7 +29,7 @@ localStorage.setItem("currentPrivilege", currentPrivilege);
                     <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
                         <input type="search"
                             class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table"
-                            placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            placeholder=" <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
 Buscar por
                           <?php } else { ?>
 Search for
@@ -38,7 +41,7 @@ Search for
                     <button type="button" id="btn-exportar-carga"
                         class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte"
                         type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
-                            class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            class="fa fa-upload"></i> <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                         Exportar
                         <?php } else { ?>
                         Export
@@ -46,14 +49,14 @@ Search for
                     <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
                         <button class="dropdown-item btn-block export-pdf-main-content"><i
                                 class="fa fa-file-pdf color_icon_pdf"></i>
-                            <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                             Exportar
                             <?php } else { ?>
                             Export
                             <?php } ?> PDF</button>
                         <button class="dropdown-item btn-block export-excel-main-content"><i
                                 class="fa fa-file-excel color_icon_excel"></i>
-                            <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                             Exportar
                             <?php } else { ?>
                             Export
@@ -67,7 +70,7 @@ Search for
                         class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte"
                         type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true"
                         aria-expanded="false">
-                        <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                        <i class="fa fa-filter"></i> <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                         Filtros
                         <?php } else { ?>
                         Filters
@@ -137,7 +140,7 @@ Search for
                         <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
                             <input type="search"
                                 class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table-carga"
-                                id="search-input-filter" placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                id="search-input-filter" placeholder=" <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                 Buscar por
                           <?php } else { ?>
                 Search for
@@ -150,7 +153,7 @@ Search for
                         <button type="button" id="btn-exportar-carga"
                             class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte"
                             type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
-                                class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                class="fa fa-upload"></i> <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                             Exportar
                             <?php } else { ?>
                             Export
@@ -158,14 +161,14 @@ Search for
                         <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
                             <button class="dropdown-item btn-block export-pdf-main-content"><i
                                     class="fa fa-file-pdf color_icon_pdf"></i>
-                                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                 Exportar
                                 <?php } else { ?>
                                 Export
                                 <?php } ?> PDF</button>
                             <button class="dropdown-item btn-block export-excel-main-content"><i
                                     class="fa fa-file-excel color_icon_excel"></i>
-                                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                 Exportar
                                 <?php } else { ?>
                                 Export
@@ -179,7 +182,7 @@ Search for
                             class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte"
                             type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true"
                             aria-expanded="false">
-                            <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            <i class="fa fa-filter"></i> <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                             Filtros
                             <?php } else { ?>
                             Filters
@@ -229,7 +232,7 @@ Search for
                             </div>
 
                         </div>
-                        <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                        <!-- Contenedor Principal de  <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                            Filtros
                           <?php } else { ?>
                            Filters
@@ -650,20 +653,20 @@ Search for
                                                 <i class="fas fa-upload"></i>
                                                 <div class="file-group-text">
                                                     <span class="file-text">
-                                                        <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                        <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                         Selecciona o arrastra tu archivo aquí
                                                         <?php } else { ?>
                                                         Select or drag your file here
                                                         <?php } ?></span>
                                                     <span class="file-format">
-                                                        <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                        <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                         Formatos
                                                         <?php } else { ?>
                                                         Formats
                                                         <?php } ?>: .xlsx</span>
                                                 </div>
                                                 <button class="upload-button upload-button-aduana" type="button">
-                                                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                    <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                     Subir archivo
                                                     <?php } else { ?>
                                                     Upload Files
@@ -723,20 +726,20 @@ Search for
                                                 <i class="fas fa-upload"></i>
                                                 <div class="file-group-text">
                                                     <span class="file-text">
-                                                        <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                        <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                         Selecciona o arrastra tu archivo aquí
                                                         <?php } else { ?>
                                                         Select or drag your file here
                                                         <?php } ?></span>
                                                     <span class="file-format">
-                                                        <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                        <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                         Formatos
                                                         <?php } else { ?>
                                                         Formats
                                                         <?php } ?>: .xlsx</span>
                                                 </div>
                                                 <button class="upload-button upload-button-impuestos" type="button">
-                                                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                    <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                     Subir archivo
                                                     <?php } else { ?>
                                                     Upload Files
@@ -770,7 +773,7 @@ Search for
                             <div class="col-9"></div>
                             <div class="col-3 d-flex justify-content-end gap-2">
                                 <button type="submit" class="btn btn-primary btn-block btn-reporte btn-guardar-aduana">
-                                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                    <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                     Guardar
                                     <?php } else { ?>
                                     Save
@@ -787,7 +790,7 @@ Search for
     <section class="content" id="cotizacion-container">
         <div class="container-fluid ">
             <!-- Header de la tabla -->
-            <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+            <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
             <div class="row mb-2 d-flex justify-content-between">
                 <div class="col-3 col-xl-1 py-sm-3 py-xl-0 py-md-0">
                     <button type="button"
@@ -799,7 +802,7 @@ Search for
                     <div class="dataTables_filter">
                         <input type="search"
                             class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table"
-                            placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            placeholder=" <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                 Buscar por
                           <?php } else { ?>
                   Search for
@@ -808,7 +811,7 @@ Search for
                     </div>
 
 
-                    <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    <!-- Contenedor Principal de  <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                             Exportar
                           <?php } else { ?>
                             Export
@@ -817,7 +820,7 @@ Search for
                         <button type="button" id="btn-exportar-carga"
                             class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte"
                             type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
-                                class="fa fa-upload"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                class="fa fa-upload"></i> <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                             Exportar
                             <?php } else { ?>
                             Export
@@ -825,27 +828,27 @@ Search for
                         <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
                             <button class="dropdown-item btn-block export-pdf-main-content"><i
                                     class="fa fa-file-pdf color_icon_pdf"></i>
-                                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                 Exportar
                                 <?php } else { ?>
                                 Export
                                 <?php } ?> PDF</button>
                             <button class="dropdown-item btn-block export-excel-main-content"><i
                                     class="fa fa-file-excel color_icon_excel"></i>
-                                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                 Exportar
                                 <?php } else { ?>
                                 Export
                                 <?php } ?> Excel</button>
                         </div>
                     </div>
-                    <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    <!-- Contenedor Principal de  <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                            Filtros
                           <?php } else { ?>
               Filters
                           <?php } ?>-->
                     <div class=" col-6 col-sm-2 dropdown">
-                        <!-- Botón de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                        <!-- Botón de  <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                            Filtros
                           <?php } else { ?>
                           Filters
@@ -854,7 +857,7 @@ Search for
                             class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte"
                             type="button" id="btn-filtrar-carga" data-toggle="dropdown" aria-haspopup="true"
                             aria-expanded="false">
-                            <i class="fa fa-filter"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            <i class="fa fa-filter"></i> <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                             Filtros
                             <?php } else { ?>
                             Filters
@@ -937,7 +940,7 @@ Search for
                                     id="aplicar-btn-cotizacion">Aplicar</button>
                             </div>
                         </div>
-                        <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                        <!-- Contenedor Principal de  <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                             Exportar
                           <?php } else { ?>
                             Export
@@ -965,7 +968,7 @@ Search for
                         <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
                             <input type="search"
                                 class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table"
-                                placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                placeholder=" <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                   Buscar por
                 <?php } else { ?>
                   Search for
@@ -979,7 +982,7 @@ Search for
                             class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte"
                             type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
                                 class="fa fa-upload"></i>
-                            <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                             Cargar
                             <?php } else { ?>
                             Upload
@@ -990,7 +993,7 @@ Search for
                             <div class="dropdown-item btn-block" id="bl-file-container"></div>
                         </div>
                     </div>
-                    <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    <!-- Contenedor Principal de  <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                               Exportar
                             <?php } else { ?>
                               Export
@@ -1000,7 +1003,7 @@ Search for
                             class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte"
                             type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
                                 class="fa fa-download"></i>
-                            <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                             Exportar
                             <?php } else { ?>
                             Export
@@ -1008,7 +1011,7 @@ Search for
                         <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
                             <button class="dropdown-item btn-block" id="export-excel"><i
                                     class="fa fa-file-excel color_icon_excel"></i>
-                                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                 Exportar
                                 <?php } else { ?>
                                 Export
@@ -1078,7 +1081,7 @@ Search for
 
                 <div class="col-xl-12 list-cmb row mb-2 gap-xs-3 gap-md-0 mx-100 py-3"
                     style="border-bottom: #DFDFDF solid 2px">
-                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                     <div class="d-flex align-items-center col-sm-3"
                         style="border-right: #DFDFDF solid 2px; width:10%; padding:15px 10px">
                         <span>Consolidado </span>
@@ -1148,7 +1151,7 @@ Search for
                     <?php } ?>
                 </div>
                 <div class="row tabs">
-                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                     <div data-table="prospectos"
                         class="col-12 col-md-4 col-xl-1 d-flex align-items-center justify-content-center btn tab tab-cotizacion">
                         Prospectos
@@ -1197,7 +1200,7 @@ Search for
                         <thead class="thead-default">
                             <tr>
                                 <?php if (
-                        $this->user->No_Grupo != "ContenedorAlmacen"
+                        !in_array($this->user->No_Grupo, $rolesChina)
                         && $this->user->No_Grupo != "Documentacion"
                       ) {  ?>
                                 <th>Asesor</th>
@@ -1205,13 +1208,13 @@ Search for
                                 <th style="min-width: 8em;" class="no-sort">Status</th>
                                 <th class="orderable">N.</th>
                                 <th class="buyer" style="min-width: 10em;">Buyer</th>
-                                <?php if ($this->user->No_Grupo != "ContenedorAlmacen" && $this->user->No_Grupo != "Documentacion") {  ?>
+                                <?php if (!in_array($this->user->No_Grupo, $rolesChina) && $this->user->No_Grupo != "Documentacion") {  ?>
                                 <th style="min-width: 8em;">Whatsapp</th>
                                 <th style="min-width: 9em;">Estado</th>
                                 <?php } ?>
 
                                 <th style="min-width: 10em;">
-                                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                    <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                     Productos
                                     <?php } else { ?>
                                     Products
@@ -1226,7 +1229,7 @@ Search for
                                 <th style="min-width: 4em;">CBM Ch.</th>
                                 <th style="min-width: 8em;">Arrive Date </th>
                                 <th>
-                                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                    <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                     Acciones
                                     <?php } else { ?>
                                     Actions
@@ -1281,12 +1284,12 @@ Search for
                 <div class="dataTables_filter" style="display: flex;justify-content: flex-end;">
                     <input type="search"
                         class="form-control bg-white hover:bg-white-200 text-black-200 py-2 border border-transparent hover:border-orange-600 rounded search-table"
-                        placeholder=" <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?> Buscar por
+                        placeholder=" <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?> Buscar por
                           <?php } else { ?> Search for <?php } ?> " aria-controls="table-contenedor"
                         style="width:100%;min-width:200px; padding-left: 40px; background: url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/search.svg') no-repeat 15px center;background-size: 14px; font-size: 14px;">
                 </div>
             </div>
-            <!-- Contenedor Principal de  <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+            <!-- Contenedor Principal de  <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                             Exportar
                           <?php } else { ?>
                             Export
@@ -1295,7 +1298,7 @@ Search for
                 <button type="button" id="btn-exportar-carga"
                     class="bg-white hover:bg-white-200 text-black-200 py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte"
                     type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
-                        class="fa fa-download"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                        class="fa fa-download"></i> <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                     Exportar
                     <?php } else { ?>
                     Export
@@ -1303,14 +1306,14 @@ Search for
                 <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
                     <button class="dropdown-item btn-block export-pdf-main-content"><i
                             class="fa fa-file-pdf color_icon_pdf"></i>
-                        <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                        <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                         Exportar
                         <?php } else { ?>
                         Export
                         <?php } ?> PDF</button>
                     <button class="dropdown-item btn-block export-excel-main-content"><i
                             class="fa fa-file-excel color_icon_excel"></i>
-                        <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                        <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                         Exportar
                         <?php } else { ?>
                         Export
@@ -1468,7 +1471,7 @@ Search for
                 <button type="button" id="btn-guardar-documentacion"
                     class="bg-orange text-black-200 py-2 px-2 border border-transparent rounded btn-block btn-reporte"
                     data-type="html"><i class="fa fa-save"></i>
-                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                     Guardar
                     <?php } else { ?>
                     Save
@@ -1546,7 +1549,7 @@ Search for
           <div class="col-12 col-guardar-documentacion m-2 d-flex justify-content-center align-items-center">
             <div id="btn-guardar-documentacion"
 
-              class="btn btn-primary btn-block btn-reporte col-6" data-type="html"><i class="fa fa-save"></i> <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+              class="btn btn-primary btn-block btn-reporte col-6" data-type="html"><i class="fa fa-save"></i> <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
               Guardar
             <?php } else { ?>
               Save
@@ -1626,7 +1629,7 @@ Search for
                 class="col-12 col-md-3 col-xl-1 px-xl-1 px-lg-1 px-md-1 px-sm-5 px-5 <?php echo ($this->user->No_Grupo == "Cotizador") ? 'd-none' : ''; ?>">
                 <button type="button" id="btn-guardar-doc-not"
                     class="py-sm-3 py-3 py-xl-2 py-md-2 py-lg-2 bg-orange hover:bg-orange-200 text-black-200 border border-transparent hover:border-orange-600 rounded btn-block btn-reporte"
-                    data-type="html"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    data-type="html"><?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                     Guardar
                     <?php } else { ?>
                     Save
@@ -1660,7 +1663,7 @@ Search for
                         class="text-lg font-semibold bg-white  shadow documentation-title d-flex justify-content-between rounded-top <?php echo ($this->user->No_Grupo == "Cotizador") ? 'pt-5 pl-5' : 'p-xl-5 p-lg-5 p-md-5 pt-sm-3 pt-3'; ?> title-inspection">
                         <h2 class="d-flex w-100 justify-content-between align-items-center title-inspection"><label
                                 class="text-lg">
-                                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                 Documentación
                                 <?php } else { ?>
                                 Documentation
@@ -1699,20 +1702,20 @@ Search for
                                             <i class="fas fa-upload"></i>
                                             <div class="file-group-text">
                                                 <span class="file-text">
-                                                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                    <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                     Selecciona o arrastra tu archivo aquí
                                                     <?php } else { ?>
                                                     Select or drag your file here
                                                     <?php } ?></span>
                                                 <span class="file-format">
-                                                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                    <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                     Formatos
                                                     <?php } else { ?>
                                                     Formats
                                                     <?php } ?>: .xlsx</span>
                                             </div>
                                             <button class="upload-button upload-button-documentacion" type="button">
-                                                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                 Subir archivo
                                                 <?php } else { ?>
                                                 Upload Files
@@ -1743,7 +1746,7 @@ Search for
                     <label class="text-lg">Inspection <i class="fas fa-images"></i></label>
                     <div id="btn-guardar-inspection" onclick="saveInspection()"
                         class="hidden bg-orange py-2 px-5 border border-transparent rounded text-sm" data-type="html">
-                        <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                        <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                         Guardar
                         <?php } else { ?>
                         Save
@@ -1773,20 +1776,20 @@ Search for
                                             <i class="fas fa-upload"></i>
                                             <div class="file-group-text">
                                                 <span class="file-text">
-                                                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                    <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                     Selecciona o arrastra tu archivo aquí
                                                     <?php } else { ?>
                                                     Select or drag your file here
                                                     <?php } ?></span>
                                                 <span class="file-format">
-                                                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                    <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                     Formatos
                                                     <?php } else { ?>
                                                     Formats
                                                     <?php } ?>: .jpeg .png .mp4</span>
                                             </div>
                                             <button class="upload-button upload-button-inspeccion" type="button">
-                                                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                 Subir archivo
                                                 <?php } else { ?>
                                                 Upload Files
@@ -1813,7 +1816,7 @@ Search for
             <div class="col-12 col-xl-3 col-md-12 px-4 py-8 pt-sm-4 note-container-container">
                 <h2
                     class="text-lg font-semibold bg-white shadow documentation-title d-flex justify-content-between rounded-top p-5 title-inspection">
-                    <label class="text-lg"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                    <label class="text-lg"><?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                         Notas
                         <?php } else { ?>
                         Notes
@@ -1822,7 +1825,7 @@ Search for
                         class="hidden new-doc-btn hover-effect flex items-center space-x-2 px-4 py-2 text-white rounded-lg hover:bg-orange-700 transition-colors bg-orange border border-transparent rounded">
                         <i class="fas fa-save  float-right"></i>
 
-                        <span><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                        <span><?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                             Guardar
                             <?php } else { ?>
                             Save
@@ -2112,20 +2115,20 @@ Search for
                                             <i class="fas fa-upload"></i>
                                             <div class="file-group-text">
                                                 <span class="file-text">
-                                                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                    <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                     Selecciona o arrastra tu archivo aquí
                                                     <?php } else { ?>
                                                     Select or drag your file here
                                                     <?php } ?></span>
                                                 <span class="file-format">
-                                                    <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                    <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                     Formatos
                                                     <?php } else { ?>
                                                     Formats
                                                     <?php } ?>: .xlsx</span>
                                             </div>
                                             <button class="upload-button" type="button">
-                                                <?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                                                <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                                                 Subir archivo
                                                 <?php } else { ?>
                                                 Upload Files
@@ -2159,7 +2162,7 @@ Search for
                         <button type="button" id="btn-actualizar-cotizacion"
                             class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded">Actualizar</button>
                         <button type="button" id="btn-guardar-cotizacion"
-                            class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                            class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded"><?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                             Guardar
                             <?php } else { ?>
                             Save
@@ -2274,7 +2277,7 @@ Search for
                     <button type="button" id="btn-actualizar"
                         class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded">Actualizar</button>
                     <button type="button" id="btn-guardar"
-                        class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded"><?php if ($this->user->No_Grupo != "ContenedorAlmacen") {  ?>
+                        class="bg-orange py-2 px-5 border border-transparent hover:border-orange-600 rounded"><?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
                         Guardar
                         <?php } else { ?>
                         Save

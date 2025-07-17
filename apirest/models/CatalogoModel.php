@@ -236,7 +236,9 @@ class CatalogoModel extends CI_Model
             $this->db->from($this->table);
             // Excluir productos donde prices_range es NULL
             $this->db->where('prices_range IS NOT NULL');
-
+            // Solo productos no eliminados
+            $this->db->where('updated_at IS NULL');
+            // Solo productos pendientes
             $this->db->where('status', 'PENDIENTE');
 
             // Filtro por búsqueda de texto (nombre)
@@ -378,7 +380,9 @@ class CatalogoModel extends CI_Model
             $this->db->join('catalogo_producto_category', 'catalogo_producto_category.id = catalogo_producto.category_id', 'left');
             // Excluir productos donde prices_range es NULL
             $this->db->where('prices_range IS NOT NULL');
-            
+            // Solo productos no eliminados
+            $this->db->where('updated_at IS NULL');
+            // Solo productos en tienda
             $this->db->where('status', 'EN TIENDA');
             
             // Filtro por búsqueda de texto (nombre)
@@ -455,45 +459,12 @@ class CatalogoModel extends CI_Model
     public function deleteProduct($id)
     {
         try {
-            // Eliminar registros relacionados en catalogo_producto_media
-            $this->db->where('id_catalogo_producto', $id);
-            $this->db->delete('catalogo_producto_media');
 
-
-            //get files and unlink
-            $this->db->select('contact_card_url,main_image_url,aditional_image1_url,aditional_image2_url,aditional_video1_url');
-            $this->db->from($this->table);
+            // Actualizar el campo updated_at en vez de borrar el producto
+            $fechaBorrado = date('Y-m-d H:i:s');
             $this->db->where('id', $id);
-            $query = $this->db->get();
-            if ($this->db->error()['code'] == 0) {
-                $data = $query->row();
-                $pattern = '/probusinees-intranet\/(.+)/';
-                if (preg_match($pattern, $data->contact_card_url, $matches)) {
-                    $contactCardUrl = $matches[1];
-                    unlink($contactCardUrl);
-                }
-                if (preg_match($pattern, $data->main_image_url, $matches)) {
-                    $mainImageUrl = $matches[1];
-                    unlink($mainImageUrl);
-                }
-                if (preg_match($pattern, $data->aditional_image1_url, $matches)) {
-                    $aditionalImage1Url = $matches[1];
-                    unlink($aditionalImage1Url);
-                }
-                if (preg_match($pattern, $data->aditional_image2_url, $matches)) {
-                    $aditionalImage2Url = $matches[1];
-                    unlink($aditionalImage2Url);
-                }
-                if (preg_match($pattern, $data->aditional_video1_url, $matches)) {
-                    $aditionalVideo1Url = $matches[1];
-                    unlink($aditionalVideo1Url);
-                }
-                $this->db->where('id', $id);
-                $this->db->delete($this->table);
-            } else {
-                log_message('error', 'Error al obtener el producto: ' . $this->db->error()['message']);
-                return array('status' => false, 'message' => 'Error al obtener el producto');
-            }
+            $this->db->update($this->table, ['updated_at' => $fechaBorrado]);
+
             if ($this->db->error()['code'] == 0) {
                 // Reordenar los códigos después de borrar
                 $this->reordenarCodigosCatalogo();
@@ -514,49 +485,10 @@ class CatalogoModel extends CI_Model
                 return array('status' => false, 'message' => 'No se recibieron IDs para eliminar');
             }
 
-            // Eliminar registros relacionados en catalogo_producto_media
-            $this->db->where_in('id_catalogo_producto', $ids);
-            $this->db->delete('catalogo_producto_media');
-
-            // Obtener productos para borrar archivos asociados
-            $productos = $this->db->where_in('id', $ids)->get($this->table)->result();
-            $pattern = '/probusinees-intranet\/(.+)/';
-            foreach ($productos as $data) {
-                // contact_card_url
-                $matches = [];
-                if (!empty($data->contact_card_url) && preg_match($pattern, $data->contact_card_url, $matches) && isset($matches[1])) {
-                    $contactCardUrl = $matches[1];
-                    if (file_exists($contactCardUrl)) @unlink($contactCardUrl);
-                }
-                // main_image_url
-                $matches = [];
-                if (!empty($data->main_image_url) && preg_match($pattern, $data->main_image_url, $matches) && isset($matches[1])) {
-                    $mainImageUrl = $matches[1];
-                    if (file_exists($mainImageUrl)) @unlink($mainImageUrl);
-                }
-                // aditional_image1_url
-                $matches = [];
-                if (!empty($data->aditional_image1_url) && preg_match($pattern, $data->aditional_image1_url, $matches) && isset($matches[1])) {
-                    $aditionalImage1Url = $matches[1];
-                    if (file_exists($aditionalImage1Url)) @unlink($aditionalImage1Url);
-                }
-                // aditional_image2_url
-                $matches = [];
-                if (!empty($data->aditional_image2_url) && preg_match($pattern, $data->aditional_image2_url, $matches) && isset($matches[1])) {
-                    $aditionalImage2Url = $matches[1];
-                    if (file_exists($aditionalImage2Url)) @unlink($aditionalImage2Url);
-                }
-                // aditional_video1_url
-                $matches = [];
-                if (!empty($data->aditional_video1_url) && preg_match($pattern, $data->aditional_video1_url, $matches) && isset($matches[1])) {
-                    $aditionalVideo1Url = $matches[1];
-                    if (file_exists($aditionalVideo1Url)) @unlink($aditionalVideo1Url);
-                }
-            }
-
-            // Eliminar los productos de la base de datos
-            $this->db->where_in('id', $ids);
-            $this->db->delete($this->table);
+        // Soft delete: actualizar el campo updated_at en vez de eliminar los productos
+        $fechaBorrado = date('Y-m-d H:i:s');
+        $this->db->where_in('id', $ids);
+        $this->db->update($this->table, ['updated_at' => $fechaBorrado]);
 
             if ($this->db->affected_rows() > 0) {
                 $this->reordenarCodigosCatalogo();
