@@ -105,7 +105,7 @@
                 <div class="flex flex-col md:flex-row gap-4">
                     <!-- Search -->
                     <div class="flex-1">
-
+                        
                     </div>
 
                     <!-- Filters -->
@@ -152,6 +152,26 @@
             <!-- Product Grid -->
             <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4  gap-5 p-5 h-full">
 
+            </div>
+            
+            <!-- Pagination Controls -->
+            <div id="paginationContainer" class="flex items-center justify-between px-5 py-4 bg-white border-t border-gray-200">
+                <div class="flex items-center text-sm text-gray-700">
+                    <span id="paginationInfo">Mostrando 0 de 0 productos</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="prevPageBtn" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa fa-chevron-left mr-1"></i>
+                        Anterior
+                    </button>
+                    <div id="pageNumbers" class="flex items-center space-x-1">
+                        <!-- Los números de página se generarán dinámicamente -->
+                    </div>
+                    <button id="nextPageBtn" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Siguiente
+                        <i class="fa fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </section>

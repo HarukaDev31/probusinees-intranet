@@ -18,6 +18,18 @@ const EXCHANGE_RATE = 3.8;
 const YUAN_TO_USD = 6.8;
 const ROLE_PERU = "CatalogoPeru";
 const ROLE_CHINA = "CatalogoChina";
+
+// Variables de paginación
+var currentPage = 1;
+var totalPages = 1;
+var perPage = 12;
+var totalRecords = 0;
+
+    // Variables de filtros
+    var currentFilters = {};
+    
+    // Variables de estado de selección
+    var isSelectionMode = false;
 // Function to format number as currency
 
 $(document).ready(async function () {
@@ -32,6 +44,7 @@ $(document).ready(async function () {
     });
 
     function mostrarBotones() {
+        isSelectionMode = false; // Desactivar modo de selección
         $('#btnEnviarProductos').show();
         $('#btnCancelarEnvio').hide();
         $('#btnDeleteProducts').hide();
@@ -118,8 +131,12 @@ $(document).ready(async function () {
 
     showSkeletons();
 
+    // Cargar estado de selección si existe
+    loadSelectionState();
+    
     // Simulate loading data (replace with actual API call)
-    await loadProducts({ sort: $('#sortSelect').val() });
+    currentFilters.sort = $('#sortSelect').val();
+    await loadProducts();
 
     // Setup event handlers
     setupEventHandlers();
@@ -137,6 +154,18 @@ $(document).ready(async function () {
     }
 
     async function loadProducts(filters = null) {
+        // Si no se pasan filtros, usar los filtros actuales
+        if (!filters) {
+            filters = currentFilters;
+        } else {
+            // Si se pasan filtros nuevos, actualizar currentFilters
+            currentFilters = { ...filters };
+        }
+        
+        // Resetear a página 1 si son filtros nuevos
+        if (filters && !filters.page) {
+            currentPage = 1;
+        }
 
         if (window.location.href.includes("listarCompletados")) {
             isInCompleted = true;
@@ -160,44 +189,70 @@ $(document).ready(async function () {
             url = base_url + 'CatalogoController/getCatalogoTienda';
         }
 
+        // Agregar parámetros de paginación
+        filters.page = currentPage;
+        filters.per_page = perPage;
+
         let response;
-        if (filters) {
-            response = await fetch(url, {
-                method: 'POST',
-                body: JSON.stringify(filters),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-        } else {
-            response = await fetch(url);
-        }
+        response = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(filters),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
         if (response.ok) {
             const data = await response.json();
             if (data.status) {
                 const products = data.data;
                 renderProducts(products);
                 updateSelectAllBtnText();
+                
+                // Actualizar variables de paginación
+                totalRecords = data.total;
+                totalPages = data.total_pages;
+                currentPage = data.current_page;
+                
+                // Actualizar contadores
                 if (!isInCompleted && !isInTienda) {
                     $('#nuevos-count').text(`(${data.total})`);
                     $('#select-count').text('');
                 } else if (isInTienda) {
-                    $('#nuevos-count').text(`(${data.total})`);
+                    $('#select-count').text(`(${data.total})`);
                     $('#nuevos-count').text('');
                 } else {
                     $('#nuevos-count').text('');
                     $('#select-count').text('');
                 }
+                
+                // Actualizar controles de paginación
+                updatePaginationControls();
+                
+                // Sincronizar controles con filtros actuales
+                syncControlsWithFilters();
+                
+                // Actualizar apariencia del botón de limpiar
+                updateClearButtonAppearance();
+                
+                // Verificar si necesitamos restaurar el modo de selección
+                if (isSelectionMode) {
+                    console.log('Verificando restauración de modo de selección después de cargar productos');
+                    setTimeout(() => {
+                        restoreSelectionMode();
+                    }, 100);
+                }
             } else {
                 console.error('Error loading products:', data.message);
             }
-            mostrarBotones();
+            
+            // Solo mostrar botones si no estamos en modo selección
+            if (!isSelectionMode) {
+                mostrarBotones();
+            }
         } else {
             console.error('Network error:', response.statusText);
         }
-
-
-
     }
 
     // Función para alternar la visibilidad del dropdown
@@ -400,6 +455,11 @@ $(document).ready(async function () {
                 }).get();
                 console.log('Checked products:', checkedProducts);
                 updateSelectAllBtnText();
+                
+                // Guardar estado en localStorage si estamos en modo selección
+                if (isSelectionMode) {
+                    saveSelectionState();
+                }
             });
             initializeProductDropdowns();
 
@@ -417,6 +477,14 @@ $(document).ready(async function () {
         sortProducts(sortValue);
 
         updateSelectAllBtnText();
+        
+        // Mantener el estado de selección si estamos en modo selección
+        if (isSelectionMode) {
+            // Usar setTimeout para asegurar que los elementos estén renderizados
+            setTimeout(() => {
+                restoreSelectionMode();
+            }, 50);
+        }
     }
     function renderProductDetails(product) {
         productoFormSection.show();
@@ -514,19 +582,19 @@ $(document).ready(async function () {
         // Search input handler
         $('#searchInput').on('input', debounce(function () {
             const query = String($("#searchInput").val() || '').toLowerCase();
-            filterProducts(query);
-            updateSelectAllBtnText();
             currentFilters.search = query;
-            loadProducts(currentFilters);
+            currentPage = 1; // Resetear a página 1 en búsqueda
+            showSkeletons();
+            loadProducts();
         }, 300));
 
         // Sort select handler
         $('#sortSelect').on('change',async function () {
             const sortValue = $(this).val();
             currentFilters.sort = sortValue;
+            currentPage = 1; // Resetear a página 1 en ordenamiento
             showSkeletons();
-            loadProducts(currentFilters);
-
+            loadProducts();
         });
 
         // Botón Categorizar/Enviar Producto
@@ -590,7 +658,7 @@ $(document).ready(async function () {
                                     showConfirmButton: false,
                                     timer: 1500
                                 });
-                                checkedProducts = [];
+                                clearSelectionState();
                                 await loadProducts();
                             } else {
                                 Swal.fire({
@@ -634,8 +702,7 @@ $(document).ready(async function () {
             }).then(async response => {
                 if (response.ok) {
                     const data = await response.json();
-                    checkedProducts = [];
-                    mostrarBotones();
+                    clearSelectionState();
                     Swal.fire({
                         icon: 'success',
                         title: 'Éxito',
@@ -651,7 +718,6 @@ $(document).ready(async function () {
                 }
             });
         })
-        let currentFilters = {};
         // Filter button handler
         $('#filterBtn').on('click', async function (e) {
             e.preventDefault();
@@ -670,8 +736,21 @@ $(document).ready(async function () {
             currentFilters.fechaFin = fechaFin && fechaFin.trim() !== '' ? fechaFin : null;
             currentFilters.categoria = categoria && categoria !== '0' ? categoria : null;
 
+            currentPage = 1; // Resetear a página 1 en filtros
             showSkeletons();
-            loadProducts(currentFilters);
+            loadProducts();
+        });
+
+        // Botón cancelar filtros
+        $('#cancelar-btn').on('click', function (e) {
+            e.preventDefault();
+            clearAllFilters();
+        });
+
+        // Botón limpiar filtros (nuevo botón)
+        $('#clearFiltersBtn').on('click', function (e) {
+            e.preventDefault();
+            clearAllFilters();
         });
 
         // View toggle handlers
@@ -845,18 +924,22 @@ $(document).ready(async function () {
     }
 
     function filterProducts(query) {
+        // Esta función ahora solo se usa para filtrado local
+        // El filtrado principal se hace en el servidor con paginación
         const $grid = $('#productGrid');
         const $cards = $grid.find('.card');
+        
         // Filter cards based on query
         $cards.each(function () {
             const $card = $(this);
-            const name = $card.find('h3').text().toLowerCase();
+            const name = $card.find('.nameProducto').text().toLowerCase();
             if (name.includes(query)) {
                 $card.show();
             } else {
                 $card.hide();
             }
         });
+        
         // Show or hide "No results" message
         const $noResults = $('#noResults');
         if ($grid.find('.card:visible').length === 0) {
@@ -864,6 +947,7 @@ $(document).ready(async function () {
         } else {
             $noResults.hide();
         }
+        
         // Reset scroll position
         $grid.scrollTop(0);
 
@@ -1028,38 +1112,11 @@ $(document).ready(async function () {
 
     $('#btnEnviarProductos').on('click', function (e) {
         e.preventDefault();
-        $('#btnEnviarProductos').hide();
-        $('#btnCancelarEnvio').show();
-        $('#btnDeleteProducts').show().css('display', 'flex');
-        $('#dynamicCategorizeBtnContainer').show();
-        $(".checkbox").show();
-        $('#selectAll').show();
-
-        // Quitar clases view-btn y edit-btn de los productos
-        $('#productGrid .view-btn, #productGrid .edit-btn').removeClass('view-btn edit-btn');
-
-        // Hacer que al hacer click en la tarjeta, se active su checkbox
-        $('#productGrid .card').off('click.selectProduct').on('click.selectProduct', function (e) {
-            if ($(e.target).is('.checkbox') || $(e.target).is('button') || $(e.target).closest('button').length) return;
-            const $checkbox = $(this).find('.checkbox');
-            $checkbox.trigger('click');
-        });
+        activateSelectionMode();
     });
     $('#btnCancelarEnvio').on('click', function (e) {
         e.preventDefault();
-        mostrarBotones();
-        checkedProducts = [];
-        // Desmarcar todos los checkboxes visibles
-        $('#productGrid .card:visible .checkbox').prop('checked', false);
-        $(".checkbox").hide();
-        updateSelectAllBtnText();
-
-        // Regresar las clases según el perfil
-        if (currentPrivilege === ROLE_PERU) {
-            $('#productGrid .card').addClass('view-btn').removeClass('edit-btn');
-        } else if (currentPrivilege === ROLE_CHINA) {
-            $('#productGrid .card').addClass('edit-btn').removeClass('view-btn');
-        }
+        deactivateSelectionMode();
     });
     // on show modalNuevaCategoria 
     $('#modalNuevaCategoria').on('show.bs.modal', function (e) {
@@ -1241,7 +1298,7 @@ $(document).ready(async function () {
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        checkedProducts = [];
+                        clearSelectionState();
                         await loadProducts();
                     } else {
                         Swal.fire({
@@ -1970,5 +2027,282 @@ $(document).ready(async function () {
         language: 'es',
         autoclose: true
     });
+
+    // Event handlers para paginación
+    $('#prevPageBtn').on('click', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            loadProducts();
+        }
+    });
+
+    $('#nextPageBtn').on('click', function() {
+        if (currentPage < totalPages) {
+            currentPage++;
+            loadProducts();
+        }
+    });
+
+    // Función para actualizar controles de paginación
+    function updatePaginationControls() {
+        const startRecord = (currentPage - 1) * perPage + 1;
+        const endRecord = Math.min(currentPage * perPage, totalRecords);
+        
+        // Actualizar información de paginación
+        $('#paginationInfo').text(`Mostrando ${startRecord}-${endRecord} de ${totalRecords} productos`);
+        
+        // Actualizar botones anterior/siguiente
+        $('#prevPageBtn').prop('disabled', currentPage <= 1);
+        $('#nextPageBtn').prop('disabled', currentPage >= totalPages);
+        
+        // Generar números de página
+        generatePageNumbers();
+    }
+
+    // Función para generar números de página
+    function generatePageNumbers() {
+        const $pageNumbers = $('#pageNumbers');
+        $pageNumbers.empty();
+        
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        
+        // Ajustar si no hay suficientes páginas
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+        
+        // Agregar botón "..." al inicio si es necesario
+        if (startPage > 1) {
+            $pageNumbers.append('<span class="px-3 py-2 text-sm text-gray-500">...</span>');
+        }
+        
+        // Generar botones de página
+        for (let i = startPage; i <= endPage; i++) {
+            const isActive = i === currentPage;
+            const pageBtn = $(`
+                <button class="page-number px-3 py-2 text-sm font-medium rounded-md ${
+                    isActive 
+                        ? 'bg-orange-600 text-white' 
+                        : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
+                }" data-page="${i}">
+                    ${i}
+                </button>
+            `);
+            
+            pageBtn.on('click', function() {
+                const page = parseInt($(this).data('page'));
+                if (page !== currentPage) {
+                    currentPage = page;
+                    loadProducts();
+                }
+            });
+            
+            $pageNumbers.append(pageBtn);
+        }
+        
+        // Agregar botón "..." al final si es necesario
+        if (endPage < totalPages) {
+            $pageNumbers.append('<span class="px-3 py-2 text-sm text-gray-500">...</span>');
+        }
+    }
+
+    // Función para sincronizar el estado de los controles con los filtros actuales
+    function syncControlsWithFilters() {
+        // Sincronizar select de ordenamiento
+        if (currentFilters.sort) {
+            $('#sortSelect').val(currentFilters.sort);
+        } else {
+            $('#sortSelect').val('recent'); // Valor por defecto
+        }
+        
+        // Sincronizar campo de búsqueda
+        if (currentFilters.search) {
+            $('#searchInput').val(currentFilters.search);
+        } else {
+            $('#searchInput').val('');
+        }
+        
+        // Sincronizar filtros de fecha y categoría
+        if (currentFilters.fechaInicio) {
+            $('#txt-Fe_Inicio_Carga').val(currentFilters.fechaInicio);
+        } else {
+            $('#txt-Fe_Inicio_Carga').val('');
+        }
+        if (currentFilters.fechaFin) {
+            $('#txt-Fe_Fin_Carga').val(currentFilters.fechaFin);
+        } else {
+            $('#txt-Fe_Fin_Carga').val('');
+        }
+        if (currentFilters.categoria) {
+            $('#txt-ID_Categoria').val(currentFilters.categoria);
+        } else {
+            $('#txt-ID_Categoria').val('0');
+        }
+    }
+
+    // Función para limpiar todos los filtros
+    function clearAllFilters() {
+        currentFilters = {};
+        currentPage = 1;
+        
+        // Limpiar controles
+        $('#searchInput').val('');
+        $('#sortSelect').val('recent');
+        $('#txt-Fe_Inicio_Carga').val('');
+        $('#txt-Fe_Fin_Carga').val('');
+        $('#txt-ID_Categoria').val('0');
+        
+        loadProducts();
+    }
+
+    // Función para verificar si hay filtros activos
+    function hasActiveFilters() {
+        return !!(currentFilters.search || 
+                 currentFilters.fechaInicio || 
+                 currentFilters.fechaFin || 
+                 currentFilters.categoria || 
+                 (currentFilters.sort && currentFilters.sort !== 'recent'));
+    }
+
+    // Función para actualizar la apariencia del botón de limpiar
+    function updateClearButtonAppearance() {
+        const $clearBtn = $('#clearFiltersBtn');
+        if (hasActiveFilters()) {
+            $clearBtn.removeClass('text-gray-600').addClass('text-orange-600');
+            $clearBtn.find('i').removeClass('fa-times').addClass('fa-filter');
+        } else {
+            $clearBtn.removeClass('text-orange-600').addClass('text-gray-600');
+            $clearBtn.find('i').removeClass('fa-filter').addClass('fa-times');
+        }
+    }
+
+    // Función para activar el modo de selección
+    function activateSelectionMode() {
+        isSelectionMode = true;
+        $('#btnEnviarProductos').hide();
+        $('#btnCancelarEnvio').show();
+        $('#btnDeleteProducts').show().css('display', 'flex');
+        $('#dynamicCategorizeBtnContainer').show();
+        $(".checkbox").show();
+        $('#selectAll').show();
+
+        // Quitar clases view-btn y edit-btn de los productos
+        $('#productGrid .view-btn, #productGrid .edit-btn').removeClass('view-btn edit-btn');
+
+        // Hacer que al hacer click en la tarjeta, se active su checkbox
+        $('#productGrid .card').off('click.selectProduct').on('click.selectProduct', function (e) {
+            if ($(e.target).is('.checkbox') || $(e.target).is('button') || $(e.target).closest('button').length) return;
+            const $checkbox = $(this).find('.checkbox');
+            $checkbox.trigger('click');
+        });
+        
+        // Guardar estado en localStorage
+        saveSelectionState();
+    }
+
+    // Función para restaurar el modo de selección después de cambiar de página
+    function restoreSelectionMode() {
+        if (!isSelectionMode) return;
+        
+        console.log('Restaurando modo de selección, productos seleccionados:', checkedProducts);
+        
+        // Mostrar checkboxes y botones de selección
+        $(".checkbox").show();
+        $('#btnEnviarProductos').hide();
+        $('#btnCancelarEnvio').show();
+        $('#btnDeleteProducts').show().css('display', 'flex');
+        $('#dynamicCategorizeBtnContainer').show();
+        $('#selectAll').show();
+
+        // Quitar clases view-btn y edit-btn de los productos
+        $('#productGrid .view-btn, #productGrid .edit-btn').removeClass('view-btn edit-btn');
+
+        // Restaurar el comportamiento de click en tarjetas
+        $('#productGrid .card').off('click.selectProduct').on('click.selectProduct', function (e) {
+            if ($(e.target).is('.checkbox') || $(e.target).is('button') || $(e.target).closest('button').length) return;
+            const $checkbox = $(this).find('.checkbox');
+            $checkbox.trigger('click');
+        });
+
+        // Restaurar checkboxes marcados
+        $('#productGrid .card .checkbox').each(function() {
+            const productId = $(this).data('product-id');
+            if (checkedProducts.includes(productId)) {
+                $(this).prop('checked', true);
+            }
+        });
+
+        updateSelectAllBtnText();
+        
+        console.log('Modo de selección restaurado correctamente');
+    }
+
+    // Función para desactivar el modo de selección
+    function deactivateSelectionMode() {
+        isSelectionMode = false;
+        mostrarBotones();
+        checkedProducts = [];
+        // Desmarcar todos los checkboxes visibles
+        $('#productGrid .card:visible .checkbox').prop('checked', false);
+        $(".checkbox").hide();
+        updateSelectAllBtnText();
+
+        // Regresar las clases según el perfil
+        if (currentPrivilege === ROLE_PERU) {
+            $('#productGrid .card').addClass('view-btn').removeClass('edit-btn');
+        } else if (currentPrivilege === ROLE_CHINA) {
+            $('#productGrid .card').addClass('edit-btn').removeClass('view-btn');
+        }
+        
+        // Limpiar localStorage
+        localStorage.removeItem('catalogoSelectionMode');
+        localStorage.removeItem('catalogoCheckedProducts');
+    }
+
+    // Función para guardar el estado de selección en localStorage
+    function saveSelectionState() {
+        if (isSelectionMode) {
+            localStorage.setItem('catalogoSelectionMode', 'true');
+            localStorage.setItem('catalogoCheckedProducts', JSON.stringify(checkedProducts));
+        }
+    }
+
+    // Función para cargar el estado de selección desde localStorage
+    function loadSelectionState() {
+        const savedMode = localStorage.getItem('catalogoSelectionMode');
+        const savedProducts = localStorage.getItem('catalogoCheckedProducts');
+        
+        console.log('Cargando estado de selección:', { savedMode, savedProducts });
+        
+        if (savedMode === 'true') {
+            isSelectionMode = true;
+            if (savedProducts) {
+                checkedProducts = JSON.parse(savedProducts);
+            }
+            
+            console.log('Estado de selección cargado:', { isSelectionMode, checkedProducts });
+            
+            // Restaurar la UI inmediatamente si estamos en modo selección
+            setTimeout(() => {
+                if (isSelectionMode) {
+                    restoreSelectionMode();
+                }
+            }, 100);
+            
+            return true;
+        }
+        return false;
+    }
+
+    // Función para limpiar el estado de selección después de acciones exitosas
+    function clearSelectionState() {
+        checkedProducts = [];
+        isSelectionMode = false;
+        localStorage.removeItem('catalogoSelectionMode');
+        localStorage.removeItem('catalogoCheckedProducts');
+        deactivateSelectionMode();
+    }
 
 });

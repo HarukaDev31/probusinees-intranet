@@ -232,6 +232,11 @@ class CatalogoModel extends CI_Model
     public function getCatalogo($filters = [])
     {
         try {
+            // Parámetros de paginación
+            $page = isset($filters['page']) ? (int)$filters['page'] : 1;
+            $per_page = isset($filters['per_page']) ? (int)$filters['per_page'] : 12;
+            $offset = ($page - 1) * $per_page;
+            
             $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,aditional_image1_url,aditional_image2_url,aditional_video1_url,precio_peru,precio_usd,prices_range,status,created_at,category_id,url_tienda,url_alibaba');
             $this->db->from($this->table);
             // Excluir productos donde prices_range es NULL
@@ -263,6 +268,11 @@ class CatalogoModel extends CI_Model
             if (!empty($filters['categoria']) && $filters['categoria'] != '0') {
                 $this->db->where('category_id', $filters['categoria']);
             }
+            
+            // Contar total de registros filtrados
+            $total_query = clone $this->db;
+            $total_records = $total_query->count_all_results('', false);
+            
             // Filtro por nombre, precio u orden (sort)
             if (!empty($filters['sort'])) {
                 switch ($filters['sort']) {
@@ -284,6 +294,9 @@ class CatalogoModel extends CI_Model
                 $this->db->order_by('created_at', 'DESC');
             }
 
+            // Aplicar paginación
+            $this->db->limit($per_page, $offset);
+            
             $query = $this->db->get();
             if ($this->db->error()['code'] == 0) {
                 $result = $query->result();
@@ -315,7 +328,18 @@ class CatalogoModel extends CI_Model
                     });
                 }
 
-                return array('status' => true, 'data' => $result,'total'=>count($result));
+                $total_pages = ceil($total_records / $per_page);
+                
+                return array(
+                    'status' => true, 
+                    'data' => $result,
+                    'total' => $total_records,
+                    'per_page' => $per_page,
+                    'current_page' => $page,
+                    'total_pages' => $total_pages,
+                    'has_next_page' => $page < $total_pages,
+                    'has_prev_page' => $page > 1
+                );
             } else {
                 log_message('error', 'Error al obtener el catálogo: ' . $this->db->error()['message']);
                 return array('status' => false, 'message' => 'Error al obtener el catálogo');
@@ -327,6 +351,11 @@ class CatalogoModel extends CI_Model
     public function getCatalogoCompletados($filters = [])
     {
         try {
+            // Parámetros de paginación
+            $page = isset($filters['page']) ? (int)$filters['page'] : 1;
+            $per_page = isset($filters['per_page']) ? (int)$filters['per_page'] : 12;
+            $offset = ($page - 1) * $per_page;
+            
             $this->db->select('id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,precio_usd,status,created_at,category_id');
             $this->db->from($this->table);
             $this->db->where('status', 'COTIZADO');
@@ -350,9 +379,27 @@ class CatalogoModel extends CI_Model
                 $this->db->where('category_id', $filters['categoria']);
             }
 
+            // Contar total de registros filtrados
+            $total_query = clone $this->db;
+            $total_records = $total_query->count_all_results('', false);
+            
+            // Aplicar paginación
+            $this->db->limit($per_page, $offset);
+            
             $query = $this->db->get();
             if ($this->db->error()['code'] == 0) {
-                return array('status' => true, 'data' => $query->result(),'total'=>count($query->result()));
+                $total_pages = ceil($total_records / $per_page);
+                
+                return array(
+                    'status' => true, 
+                    'data' => $query->result(),
+                    'total' => $total_records,
+                    'per_page' => $per_page,
+                    'current_page' => $page,
+                    'total_pages' => $total_pages,
+                    'has_next_page' => $page < $total_pages,
+                    'has_prev_page' => $page > 1
+                );
             } else {
                 log_message('error', 'Error al obtener el catálogo: ' . $this->db->error()['message']);
                 return array('status' => false, 'message' => 'Error al obtener el catálogo');
@@ -363,6 +410,11 @@ class CatalogoModel extends CI_Model
     }
     public function getCatalogoSeleccionados($filters = []){
         try {
+            // Parámetros de paginación
+            $page = isset($filters['page']) ? (int)$filters['page'] : 1;
+            $per_page = isset($filters['per_page']) ? (int)$filters['per_page'] : 12;
+            $offset = ($page - 1) * $per_page;
+            
             // Verifica el perfil del usuario
             if (isset($this->user) && $this->user->No_Grupo == $this->ROLE_PERU) {
                 $this->db->select('catalogo_producto.id,cod_producto,nombre,precio,moq,main_image_url,precio_peru,prices_range,status,
@@ -408,9 +460,27 @@ class CatalogoModel extends CI_Model
                 $this->db->where('category_id', $filters['categoria']);
             }
 
+            // Contar total de registros filtrados
+            $total_query = clone $this->db;
+            $total_records = $total_query->count_all_results('', false);
+            
+            // Aplicar paginación
+            $this->db->limit($per_page, $offset);
+            
             $query = $this->db->get();
             if ($this->db->error()['code'] == 0) {
-                return array('status' => true, 'data' => $query->result(),'total'=>count($query->result()));
+                $total_pages = ceil($total_records / $per_page);
+                
+                return array(
+                    'status' => true, 
+                    'data' => $query->result(),
+                    'total' => $total_records,
+                    'per_page' => $per_page,
+                    'current_page' => $page,
+                    'total_pages' => $total_pages,
+                    'has_next_page' => $page < $total_pages,
+                    'has_prev_page' => $page > 1
+                );
             } else {
                 log_message('error', 'Error al obtener el catálogo: ' . $this->db->error()['message']);
                 return array('status' => false, 'message' => 'Error al obtener el catálogo');
