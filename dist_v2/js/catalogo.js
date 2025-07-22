@@ -22,7 +22,7 @@ const ROLE_CHINA = "CatalogoChina";
 // Variables de paginación
 var currentPage = 1;
 var totalPages = 1;
-var perPage = 12;
+var perPage = 50;
 var totalRecords = 0;
 
     // Variables de filtros
