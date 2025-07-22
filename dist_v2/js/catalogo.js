@@ -1212,7 +1212,7 @@ $(document).ready(async function () {
         //change productsGrid to flex column
         const $grid = $('#productGrid');
         $grid.removeClass('grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-5 w-full');
-        $grid.addClass('flex flex-col gap-5 items-center grid-cols-2');
+        $grid.addClass('grid gap-5 items-center grid-cols-2');
         $grid.find('.card').removeClass('w-full').addClass('w-50');
         $grid.find('.card-img').removeClass('w-full').addClass('w-[15rem] h-[15rem]');
         $grid.find('.card-content').removeClass('flex-col justify-between').addClass('flex-row justify-center');
@@ -1222,8 +1222,8 @@ $(document).ready(async function () {
         e.preventDefault();
         //change productsGrid to grid
         const $grid = $('#productGrid');
-        $grid.removeClass('flex flex-col gap-5 items-center');
-        $grid.addClass('grid  gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 w-full');
+        $grid.removeClass('grid grid-cols-2 gap-5 items-center');
+        $grid.addClass('grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-5 w-full');
         $grid.find('.card').removeClass('w-50').addClass('w-full');
         $grid.find('.card-img').removeClass('w-[15rem] h-[15rem]').addClass('w-full');
         $grid.find('.card-content').removeClass('flex-row justify-center').addClass('flex-col justify-between');
