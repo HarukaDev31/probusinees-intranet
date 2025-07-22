@@ -192,11 +192,17 @@ class ContenedorConsolidado extends CI_Controller
 			$subdata   = [];
 			if ($this->user->No_Grupo == "Documentacion") {
 				$subdata[] = $row->mes;
-				$subdata[] = $row->No_Pais;
+				// $subdata[] = $row->No_Pais;
 				$subdata[] = $row->empresa;
+				$subdata[] = "<div>Carga Consolidada #" . $row->carga . "</div>";
 				$subdata[] = $row->tipo_contenedor;
 				$subdata[] = $row->canal_control;
-				$subdata[] = $row->fecha_levante;
+				$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
+				$subdata[] = date("d/m/Y", strtotime($row->fecha_arribo));
+				$subdata[] = date("d/m/Y", strtotime($row->fecha_declaracion));
+				$subdata[] = date("d/m/Y", strtotime($row->fecha_levante));
+				$subdata[] = $row->fecha_levante ? (strtotime($row->fecha_levante) - strtotime($row->fecha_arribo)) / (60 * 60 * 24) : 0;
+				$subdata[] = $row->numero_dua;
 				$subdata[] = $row->ajuste_valor;
 				$subdata[] = $row->multa;
 				$subdata[] = $row->valor_fob;

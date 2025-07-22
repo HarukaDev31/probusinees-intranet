@@ -292,11 +292,16 @@ Search for
                         <tr>
                             <!--th mes,pais,empresa,T.ctn,canal,desaduanaje,ajuste,multa,fob,flete,c.destino,observaciones,ver-->
                             <th>Mes</th>
-                            <th>País</th>
                             <th>Empresa</th>
+                            <th>Carga</th>
                             <th>T. Ctn</th>
                             <th>Canal</th>
-                            <th>Desaduanaje</th>
+                            <th>F. Cierre</th>
+                            <th>F. Arribo</th>
+                            <th>F. Declaración</th>
+                            <th>F. Levante</th>
+                            <th>Días de levante</th>
+                            <th>N. Dua</th>
                             <th>Ajuste</th>
                             <th>Multa</th>
                             <th>FOB</th>
