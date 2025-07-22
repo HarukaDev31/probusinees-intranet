@@ -1211,8 +1211,8 @@ $(document).ready(async function () {
         e.preventDefault();
         //change productsGrid to flex column
         const $grid = $('#productGrid');
-        $grid.removeClass('grid sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-5 w-full');
-        $grid.addClass('flex flex-col gap-5 items-center');
+        $grid.removeClass('grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-5 w-full');
+        $grid.addClass('flex flex-col gap-5 items-center grid-cols-2');
         $grid.find('.card').removeClass('w-full').addClass('w-50');
         $grid.find('.card-img').removeClass('w-full').addClass('w-[15rem] h-[15rem]');
         $grid.find('.card-content').removeClass('flex-col justify-between').addClass('flex-row justify-center');
