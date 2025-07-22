@@ -791,13 +791,13 @@
 <template id="productTemplate">
 
 <?php if ($this->user->No_Grupo == "CatalogoPeru") { ?>
-    <div class="card view-btn rounded-lg cursor-pointer flex flex-col w-full my-0 shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:bg-gray-100 transition-shadow group relative"> <!--status badge-->
+    <div class="card view-btn w-100 rounded-lg cursor-pointer flex flex-col w-full my-0 shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:bg-gray-100 transition-shadow group relative"> <!--status badge-->
         <!--checkbox-->
         <input type="checkbox" class="checkbox hidden h-6 w-6 absolute top-2 right-2 
         accent-orange-500
         cursor-pointer checkbox" style="z-index: 100;" />
 <?php } else { ?>
-    <div class="card edit-btn rounded-lg cursor-pointer flex flex-col w-full my-0 shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:bg-gray-100 transition-shadow group relative"> <!--status badge-->
+    <div class="card edit-btn  w-100 rounded-lg cursor-pointer flex flex-col w-full my-0 shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:bg-gray-100 transition-shadow group relative"> <!--status badge-->
         <!--checkbox-->
         <input type="checkbox" class="checkbox hidden h-6 w-6 absolute top-2 left-2 
         accent-orange-500
