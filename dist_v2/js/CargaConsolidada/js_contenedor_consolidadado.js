@@ -2459,12 +2459,6 @@ async function viewFormularioAduana() {
       `<option value="${naviera.name}">${naviera.name}</option>`
     );
   }
-  //disavle .input-aduana}
-  if (sectionsDisabled) {
-    $(".input-aduana").prop("disabled", true);
-    $(".btn-guardar-aduana").hide();
-    $(".upload-button-aduana").hide();
-  }
   // Control channel color indicator
   function updateChannelIndicator() {
     const channel = $("#controlChannel").val();
