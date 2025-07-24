@@ -783,6 +783,14 @@ class ContenedorConsolidadoModel extends CI_Model
             }
             $tarifa = $monto / (($volumen <= 0 ? 1 : $volumen) < 1.00 ? 1 : ($volumen <= 0 ? 1 : $volumen));
             $peso = $sheet->getCell('I9')->getOldCalculatedValue();
+            $highestRow = $sheet->getHighestRow();
+            $qtyItem = 0;
+            for ($row = 36; $row <= $highestRow; $row++) {
+                $cellValue = $sheet->getCell('A' . $row)->getValue();
+                if (is_numeric($cellValue) && $cellValue > 0) {
+                    $qtyItem++;
+                }
+            }
             return [
                 'nombre' => $nombre,
                 'documento' => $documento,
@@ -796,7 +804,8 @@ class ContenedorConsolidadoModel extends CI_Model
                 'tarifa' => $tarifa,
                 'peso' => $peso,
                 'fob' => $fob,
-                'impuestos' => $impuestos
+                'impuestos' => $impuestos,
+                'qty_item' => $qtyItem
             ];
         } catch (Exception $e) {
             return $e->getMessage();
@@ -4107,6 +4116,17 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 AND estados_proveedor = "LOADED"
             )
         ) as total_logistica', false);
+            // Subconsulta para total_qty_items
+            $this->db->select('(
+                SELECT COALESCE(SUM(qty_item), 0)
+                FROM ' . $this->table_contenedor_cotizacion . '
+                WHERE id IN (
+                    SELECT DISTINCT id_cotizacion
+                    FROM ' . $this->table_contenedor_cotizacion_proveedores . '
+                    WHERE id_contenedor = ' . $idContenedor . '
+                )
+                AND estado_cotizador = "CONFIRMADO"
+            ) as total_qty_items', false);
             $this->db->select('(SELECT COALESCE(SUM(monto), 0)
             FROM ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . ' 
             JOIN ' . $this->table_pagos_concept . ' ON ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . '.id_concept = ' . $this->table_pagos_concept . '.id
@@ -4141,6 +4161,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     'cbm_total_pendiente' => $result->cbm_total_pendiente,
                     'total_logistica' => $result->total_logistica,
                     'total_logistica_pagado' => round($result->total_logistica_pagado, 2),
+                    'qty_items' => $result->total_qty_items,
                     'bl_file_url' => $result2->bl_file_url,
                     'carga' => $cargaRow ? $cargaRow->carga : '',
                     'lista_embarque_url' => $result2->lista_embarque_url
@@ -4154,6 +4175,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         'cbm_total_pendiente' => 0,
                         'total_logistica' => 0,
                         'total_logistica_pagado' => 0,
+                        'qty_items' => 0,
                         'cbm_total' => 0,
                         'bl_file_url' => '',
                         'carga' => '',
@@ -4224,6 +4246,17 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             )
             AND estado_cotizador = "CONFIRMADO"
         ) as total_logistica', false);
+            // Subconsulta para total_qty_items
+            $this->db->select('(
+                SELECT COALESCE(SUM(qty_item), 0)
+                FROM ' . $this->table_contenedor_cotizacion . '
+                WHERE id IN (
+                    SELECT DISTINCT id_cotizacion
+                    FROM ' . $this->table_contenedor_cotizacion_proveedores . '
+                    WHERE id_contenedor = ' . $idContenedor . '
+                )
+                AND estado_cotizador = "CONFIRMADO"
+            ) as total_qty_items', false);
             //get coalesce sum from pagos where id_contenedor = $idContenedor and id_concept= 'LOGISTICA'
             $this->db->select('(SELECT COALESCE(SUM(monto), 0)
             FROM ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . ' 
@@ -4252,6 +4285,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     'cbm_total_pendiente' => $result->cbm_total_pendiente,
                     'total_logistica' => $result->total_logistica,
                     'total_logistica_pagado' => round($result->total_logistica_pagado, 2),
+                    'qty_items' => $result->total_qty_items,
                     'bl_file_url' => $result2->bl_file_url,
                     'lista_embarque_url' => $result2->lista_embarque_url
                 ];
@@ -4264,6 +4298,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         'cbm_total_pendiente' => 0,
                         'total_logistica' => 0,
                         'total_logistica_pagado' => 0,
+                        'qty_items' => 0,
                         'cbm_total' => 0,
                         'bl_file_url' => '',
                         'lista_embarque_url' => ''

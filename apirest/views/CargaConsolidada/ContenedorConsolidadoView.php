@@ -292,23 +292,22 @@ Search for
                         <tr>
                             <!--th mes,pais,empresa,T.ctn,canal,desaduanaje,ajuste,multa,fob,flete,c.destino,observaciones,ver-->
                             <th>Mes</th>
-                            <th>Empresa</th>
-                            <th>Carga</th>
-                            <th>T. Ctn</th>
+                            <th style="min-width: 12em;">Empresa</th>
+                            <th style="min-width: 12em;">Carga</th>
+                            <th style="min-width: 4em;">T. Ctn</th>
                             <th>Canal</th>
                             <th>F. Cierre</th>
                             <th>F. Arribo</th>
                             <th>F. Declaración</th>
                             <th>F. Levante</th>
                             <th>Días de levante</th>
-                            <th>N. Dua</th>
+                            <th style="min-width: 8em;">N. Dua</th>
                             <th>Ajuste</th>
                             <th>Multa</th>
                             <th>FOB</th>
                             <th>Flete</th>
                             <th>C. Destino</th>
-                            <th>Observaciones</th>
-                            <th>Ver</th>
+                            <th>Acciones</th>
 
                         </tr>
                     </thead>
@@ -1087,7 +1086,7 @@ Search for
                 <div class="col-xl-12 list-cmb row mb-2 gap-xs-3 gap-md-0 mx-100 py-3"
                     style="border-bottom: #DFDFDF solid 2px">
                     <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
-                    <div class="d-flex align-items-center col-sm-3"
+                    <div class="d-flex align-items-center col-sm-2"
                         style="border-right: #DFDFDF solid 2px; width:10%; padding:15px 10px">
                         <span>Consolidado </span>
                         <div class="col-4 col-md-4 px-0">
@@ -1154,6 +1153,18 @@ Search for
                         </div>
                     </div>
                     <?php } ?>
+                    <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
+                    <div
+                        class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
+                        <!-- icon with dollar icon-->
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>Total Qty Items:</span>
+                        <div class="">
+                            <strong><span type="number" id="txt-CBM_Total_Qty_Items" class="cbm_score"
+                                    disabled></span></strong>
+                        </div>
+                    </div>
+                    <?php } ?>    
                 </div>
                 <div class="row tabs">
                     <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
@@ -1186,6 +1197,9 @@ Search for
                                 <th>Whatsapp</th>
                                 <th>T. Cliente</th>
                                 <th>Volumen</th>
+                                <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
+                                <th>Qty Item</th>
+                                <?php } ?>
                                 <th>Fob</th>
                                 <th>Logistica</th>
                                 <th>Impuesto</th>
@@ -1379,6 +1393,18 @@ Search for
                         <strong><span id="txt-CBM_Cliente_Total_Logistica_Pagado" class="cbm_score"></span></strong>
                     </div>
                 </div>
+                <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
+                <div
+                    class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
+                    <!-- icon with dollar icon-->
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Total Qty Items:</span>
+                    <div class="">
+                        <strong><span type="number" id="txt-CBM_Cliente_Total_Qty_Items" class="cbm_score"
+                                disabled></span></strong>
+                    </div>
+                </div>
+                <?php } ?> 
             </div>
             <div class="row tabs">
                 <div data-table="general"
@@ -1410,6 +1436,9 @@ Search for
                         <th>T. Cliente</th>
                         <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
                         <th>Volumen</th>
+                        <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
+                        <th>Qty Item</th>
+                        <?php } ?>
                         <th>Fob</th>
                         <th>Logistica</th>
                         <th>Impuesto</th>

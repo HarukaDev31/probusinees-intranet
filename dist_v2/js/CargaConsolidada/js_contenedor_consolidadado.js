@@ -873,6 +873,7 @@ async function getClientesHeader() {
   $("#txt-CBM_Cliente_Total_Logistica").html(result.total_logistica);
   $("#txt-CBM_Cliente_Total_Logistica_Pagado").html(result.total_logistica_pagado);
   $("#txt-CBM_Cliente_Total_China").html(result.cbm_total_china);
+  $("#txt-CBM_Cliente_Total_Qty_Items").html(result.qty_items);
   console.log(result);
   spinner.hide();
 }
@@ -4595,6 +4596,7 @@ async function getTableCotizacionEmbarqueHeaders() {
   $("#txt-CBM_Total_Pendiente").html(result.cbm_total_pendiente);
   $("#txt-CBM_Total_Logistica").html(result.total_logistica);
   $("#txt-CBM_Total_Pagado").html(result.total_logistica_pagado);
+  $("#txt-CBM_Total_Qty_Items").html(result.qty_items);
   //if result.lista_embarque_url is not null add button to download else file input with button to upload remember remove and add event listener
   if (result.lista_embarque_url) {
     $("#packing-list-container").empty();
@@ -6501,6 +6503,7 @@ $(document).ready(async function () {
 
           },
           complete: function () {
+            enableHorizontalAutoScrollForAllTables();
             $(".width_full").val($("#hidden-sCorrelativoCotizacion").val());
           },
         },
@@ -6659,6 +6662,7 @@ $(document).ready(async function () {
     limpiarFiltroDataTable("table-contenedor");
     limpiarInputBuscadorPersonalizado("search-table");
     configurarBuscador('table-contenedor', 'search-table-carga', 'table-contenedor_filter'); //completados
+    enableHorizontalAutoScrollForAllTables();
   } else {
     url = base_url + "CargaConsolidada/ContenedorConsolidado/index";
     limpiarFiltroDataTable("table-contenedor");
@@ -6790,6 +6794,7 @@ $(document).ready(async function () {
     }
     isMobile.addEventListener("change", handleRowClickByDevice);
     handleRowClickByDevice();
+    enableHorizontalAutoScrollForAllTables();
   }
 
 
