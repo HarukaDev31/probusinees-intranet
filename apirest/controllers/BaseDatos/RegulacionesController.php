@@ -8,7 +8,6 @@ class RegulacionesController extends CI_Controller {
         $this->load->model('BaseDatos/RegulacionesModel');
         $this->load->helper('url');
         $this->load->library('session');
-        $this->load->library('input');
         
         // Verificar sesión de usuario (opcional)
         // if (!$this->session->userdata('logged_in')) {

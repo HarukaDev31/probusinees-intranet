@@ -5041,7 +5041,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 //set currency format with dollar symbol
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '17')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 //IF COBROCELL IS GREATER THAN 5000 SET THE VALUE TO $initialcolumn17  TO roundup100/ distroCell ELSE SET roundup50/distroCell
-                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '17', "=IF(" . $LastColumnLetter . "15>5000,100*" . $distroCell . ",50*" . $distroCell . ")");
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '17', "=IF(" . $LastColumnLetter . "15>5000,100,50)");
                 //initial18 is roundup($cfrCell+$seguroCell,2)
                 $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '18', "=" . $cfrCell . '+' . $seguroCell . "");
                 //initial19 is roundup($cfrvCell+$seguroCell,2)

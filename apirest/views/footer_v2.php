@@ -323,6 +323,9 @@
 <?php if (isset($js_productos) && $js_productos==true) : ?>
 <script src="<?php echo base_url() . 'assets/js/BaseDatos/js_productos.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
+<?php if (isset($js_regulaciones) && $js_regulaciones==true) : ?>
+<script src="<?php echo base_url() . 'assets/js/BaseDatos/js_regulaciones.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
 <script> 
 if (typeof userJS === 'undefined') {
   var userJS = JSON.parse('<?php echo json_encode($this->user) ?>');
