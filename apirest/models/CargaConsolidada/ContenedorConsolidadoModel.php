@@ -5041,7 +5041,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 //set currency format with dollar symbol
                 $objPHPExcel->getActiveSheet()->getStyle($InitialColumn . '17')->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 //IF COBROCELL IS GREATER THAN 5000 SET THE VALUE TO $initialcolumn17  TO roundup100/ distroCell ELSE SET roundup50/distroCell
-                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '17', "=IF(" . $LastColumnLetter . "15>5000,100,50)");
+                $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '17', "=IF(" . $LastColumnLetter . "15>5000,100*" . $distroCell . ",50*" . $distroCell . ")");
                 //initial18 is roundup($cfrCell+$seguroCell,2)
                 $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '18', "=" . $cfrCell . '+' . $seguroCell . "");
                 //initial19 is roundup($cfrvCell+$seguroCell,2)
@@ -6122,6 +6122,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $telefono = preg_replace('/\s+/', '', $telefono);
                 $this->phoneNumberId = $telefono ? $telefono . '@c.us' : '';
                 $totalPagos = $query->row()->total_pagos;
+
                 $volumen = $query->row()->volumen_final;
                 $nombre = $query->row()->nombre;
                 $logisticaFinal = $query->row()->logistica_final;
@@ -6129,14 +6130,12 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $total = $logisticaFinal + $impuestosFinal;
                 $totalAPagar = $total - $totalPagos;
                 $idContenedor = $query->row()->id_contenedor;
-                $this->db->select('fecha_arribo, carga');
+                $this->db->select('fecha_arribo');
                 $this->db->from($this->table);
                 $this->db->where('id', $idContenedor);
                 $query = $this->db->get();
-                $carga = $query->row()->carga;
                 $fechaArribo = $query->row()->fecha_arribo;
-                $message = "📦 *Consolidado #" . $carga . "*\n" .
-                    "Hola " . $nombre . " 😁 un gusto saludarte! \n" .
+                $message = "Hola " . $nombre . " 😁 un gusto saludarte! \n" .
                     "A continuación te envio la cotización final de tu importación📋📦.\n" .
                     "🙋‍♂️PAGO PENDIENTE: \n" .
                     "☑️Costo CBM: $" . number_format($logisticaFinal, 2) . "\n" .
