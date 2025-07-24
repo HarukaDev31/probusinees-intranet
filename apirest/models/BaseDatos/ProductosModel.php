@@ -3,76 +3,38 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class ProductosModel extends CI_Model {
 
-    private $table = 'productos';
-    private $categorias_table = 'categorias_productos';
-
+    private $table = 'productos_importados_excel';
     public function __construct() {
         parent::__construct();
         $this->load->database();
     }
 
     /**
-     * Obtener productos con paginación y filtros
+     * Obtener todos los productos de todos los proveedores (sin paginación, sin agrupamiento)
+     * Si se pasa $carga_id, filtra por esa campaña/carga
      */
-    public function getProductos($start = 0, $length = 10, $filters = [], $order_column = 0, $order_dir = 'asc') {
-        $columns = ['id', 'codigo', 'nombre', 'categoria', 'precio', 'stock', 'estado', 'fecha_creacion'];
-        
-        // Query base con JOIN a categorías
-        $this->db->select('p.*, c.nombre as categoria');
-        $this->db->from($this->table . ' p');
-        $this->db->join($this->categorias_table . ' c', 'p.categoria_id = c.id', 'left');
-        
-        // Aplicar filtros
-        if (!empty($filters['search'])) {
-            $this->db->group_start();
-            $this->db->like('p.codigo', $filters['search']);
-            $this->db->or_like('p.nombre', $filters['search']);
-            $this->db->or_like('p.descripcion', $filters['search']);
-            $this->db->or_like('c.nombre', $filters['search']);
-            $this->db->group_end();
+    public function getProductos($idContenedor = 0, $tipoProducto = 0) {
+        log_message('error', 'getProductos: ' . $idContenedor . ' - ' . $tipoProducto);
+        $this->db->select('p.*,c.carga as campana');
+        $this->db->from($this->table.' p');
+        $this->db->join('carga_consolidada_contenedor c', 'c.id = p.idContenedor','left');
+        if ($idContenedor != 0) {
+            $this->db->where('p.idContenedor', $idContenedor);
         }
-        
-        if (!empty($filters['categoria'])) {
-            $this->db->where('p.categoria_id', $filters['categoria']);
+        if ($tipoProducto != 0) {
+            $this->db->where('p.tipo', $tipoProducto);
         }
-        
-        if (!empty($filters['estado'])) {
-            $this->db->where('p.estado', $filters['estado']);
-        }
-        
-        // Contar total filtrado
-        $filtered_query = clone $this->db;
-        $total_filtered = $filtered_query->count_all_results('', false);
-        
-        // Aplicar ordenamiento
-        if (isset($columns[$order_column])) {
-            $order_column_name = $columns[$order_column] === 'categoria' ? 'c.nombre' : 'p.' . $columns[$order_column];
-            $this->db->order_by($order_column_name, $order_dir);
-        }
-        
-        // Aplicar paginación
-        $this->db->limit($length, $start);
-        
         $query = $this->db->get();
-        $data = $query->result();
-        
-        // Contar total de registros
-        $total_records = $this->db->count_all($this->table);
-        
-        return [
-            'data' => $data,
-            'total' => $total_records,
-            'filtered' => $total_filtered
-        ];
+        return $query->result();
     }
 
     /**
      * Obtener producto por ID
      */
     public function getProductoById($id) {
-        $this->db->select('p.*, c.nombre as categoria_nombre');
+        $this->db->select('p.*');
         $this->db->from($this->table . ' p');
-        $this->db->join($this->categorias_table . ' c', 'p.categoria_id = c.id', 'left');
+        $this->db->join('carga_consolidada_contenedor cc', 'cc.id = p.idContenedor', 'left');
         $this->db->where('p.id', $id);
         
         $query = $this->db->get();
@@ -205,5 +167,22 @@ class ProductosModel extends CI_Model {
         $stats['agotados'] = $this->db->count_all_results($this->table);
         
         return $stats;
+    }
+
+    /**
+     * Obtener productos por campaña y tipo (usando tablas de consolidado)
+     */
+    public function getProductosByCampana($idContenedor = 0, $tipoProducto = 0) {
+        $this->db->select('p.id, p.nombre, p.foto, p.caracteristicas, p.rubro, p.tipo, p.unidad, p.precio, p.subpartida, c.carga as campana');
+        $this->db->from('contenedor_consolidado_cotizacion_proveedores p');
+        $this->db->join('carga_consolidada_contenedor c', 'c.id = p.id_contenedor');
+        if ($idContenedor != 0) {
+            $this->db->where('c.idContenedor', $idContenedor);
+        }
+        if ($tipoProducto != 0) {
+            $this->db->where('p.tipo', $tipoProducto);
+        }
+        $query = $this->db->get();
+        return $query->result();
     }
 } 

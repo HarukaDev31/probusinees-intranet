@@ -2082,7 +2082,7 @@ async function showDocumentacionDocumentacionContainer(id) {
                           </div>
                   `
           : `
-                      <input type="file" id="file-input-${file.id}" class="file-input" accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt"/>
+                      <input type="file" id="file-input-${file.id}" class="file-input" accept=".pdf, .docx, .xlsx, .xls, .doc, .xlsm, .csv, .xlsb, .xltx, .xlt,.xlsm"/>
                       <labelf for="file-inputo" class="file-label d-flex">
                           <i class="fas fa-upload"></i>
                           <div class="file-group-text">
@@ -2120,7 +2120,7 @@ async function showDocumentacionDocumentacionContainer(id) {
               <p class="text-sm text-gray-400">Formatos: xlsx</p>
             </div>
           </div>
-          <input type="file" id="fileInput" class="hidden" accept=".xlsx">
+          <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xlsm,.xls">
         </div>
         <div id="fileList" class="space-y-2"></div>
         <div class="flex justify-between mt-6">
@@ -2175,6 +2175,7 @@ async function showDocumentacionDocumentacionContainer(id) {
               Array.from(files).forEach(file => {
                 if (file.name.endsWith('.xlsx')) {
                   const fileSize = (file.size / 1024).toFixed(0) + ' KB';
+                  console.log(file.name,fileSize);
                   const $fileItem = $(`
                     <div class="flex items-center justify-between bg-gray-50 p-3 rounded">
                       <div class="flex items-center">

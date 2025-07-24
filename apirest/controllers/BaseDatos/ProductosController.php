@@ -1,19 +1,23 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+require_once APPPATH . 'traits/FileTrait.php';
 
 class ProductosController extends CI_Controller {
+    use FileTrait;
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('BaseDatos/ProductosModel');
-        $this->load->helper('url');
         $this->load->library('session');
-        $this->load->library('input');
+        $this->load->model('BaseDatos/ProductosModel');
+        $this->load->library('upload');
+        $this->load->helper('url');
         
-        // Verificar sesión de usuario (opcional)
-        // if (!$this->session->userdata('logged_in')) {
-        //     redirect('login');
-        // }
+        // Configurar FileTrait para archivos de oficina
+        $this->setAllowedExtensionsImagesOfficeFiles();
+        
+        if (!isset($this->session->userdata['usuario'])) {
+            redirect('');
+        }
     }
 
     /**
@@ -28,44 +32,34 @@ class ProductosController extends CI_Controller {
         $this->load->view('BaseDatos/ProductosView', $data);
         $this->load->view('footer_v2', $data);
     }
-
+ 
     /**
      * Obtener listado de productos para DataTables
      */
     public function getProductos() {
-        $start = $this->input->post('start') ?: 0;
-        $length = $this->input->post('length') ?: 10;
-        $search = $this->input->post('search')['value'] ?? '';
-        $order_column = $this->input->post('order')[0]['column'] ?? 0;
-        $order_dir = $this->input->post('order')[0]['dir'] ?? 'asc';
-        
-        // Filtros adicionales
-        $categoria = $this->input->post('categoria') ?? '';
-        $estado = $this->input->post('estado') ?? '';
-        
-        $filters = [
-            'categoria' => $categoria,
-            'estado' => $estado,
-            'search' => $search
-        ];
-        
-        $result = $this->ProductosModel->getProductos($start, $length, $filters, $order_column, $order_dir);
-        
+        $idContenedor = $this->input->post('idContenedor');
+        $tipoProducto = $this->input->post('tipo');
+        $productos = $this->ProductosModel->getProductos($idContenedor, $tipoProducto);
+
         $data = [];
-        foreach ($result['data'] as $row) {
+        $index = 1;
+        foreach ($productos as $row) {
             $actions = $this->generateActionButtons($row);
-            
+            //id |idContenedor|item|nombre_comercial                       |foto|caracteristicas                                                                                                                                                                                                                                                |rubro                        |tipo_producto|precio_exw|subpartida   |link                                                                                                                                                                                                                                                           |unidad_comercial|arancel_sunat|arancel_tlc|antidumping|correlativo              |etiquetado|doc_especial|created_at         |updated_at         |deleted_at|
             $data[] = [
-                'id' => $row->id,
-                'codigo' => $row->codigo,
-                'nombre' => $row->nombre,
-                'categoria' => $row->categoria,
-                'precio' => number_format($row->precio, 2),
-                'stock' => $row->stock,
-                'estado' => $this->getEstadoBadge($row->estado),
-                'fecha_creacion' => date('d/m/Y H:i', strtotime($row->fecha_creacion)),
-                'acciones' => $actions
+                $index,
+                $row->nombre_comercial,
+                $row->foto,
+                $row->caracteristicas,
+                $row->rubro,
+                $row->tipo_producto,
+                $row->unidad_comercial,
+                $row->precio_exw,
+                $row->subpartida,
+                "#".$row->campana,
+                $actions
             ];
+            $index++;
         }
         
         $response = [
@@ -226,6 +220,27 @@ class ProductosController extends CI_Controller {
         
         $response = ['success' => true, 'message' => 'Exportación completada'];
         echo json_encode($response);
+    }
+
+    /**
+     * Obtener productos por campaña y tipo (usando tablas de consolidado)
+     */
+    public function getProductosByCampana() {
+        $idContenedor = $this->input->post('idContenedor');
+        $tipoProducto = $this->input->post('tipoProducto');
+        $this->load->model('BaseDatos/ProductosModel');
+        $productos = $this->ProductosModel->getProductosByCampana($idContenedor, $tipoProducto);
+        echo json_encode($productos);
+    }
+
+    /**
+     * Obtener campañas/cargas para el filtro (usando tabla carga_consolidada_contenedor)
+     */
+    public function getCampanas() {
+        $this->load->database();
+        $query = $this->db->select('id, carga')->from('carga_consolidada_contenedor')->order_by('carga', 'desc')->get();
+        $result = $query->result();
+        echo json_encode(['status' => 'success', 'data' => $result]);
     }
 
     /**

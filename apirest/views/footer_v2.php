@@ -251,6 +251,7 @@
 <?php if (isset($js_perfil_usuario) && $js_perfil_usuario==true) : ?>
 <script src="<?php echo base_url() . 'dist_v2/js/PanelAcceso/perfil_usuario.js?ver=' . $iControlVersionDashboard; ?>"></script>
 <?php endif; ?>
+
 <?php if (isset($js_usuario) && $js_usuario==true) : ?>
 <script src="<?php echo base_url("plugins_v2/select2/js/select2.full.min.js"); ?>"></script>
 <script src="<?php echo base_url() . 'dist_v2/js/PanelAcceso/usuario.js?ver=' . $iControlVersionDashboard; ?>"></script>
@@ -319,6 +320,9 @@
 <script src="<?php echo base_url() . 'dist/js/Configuracion/tarifas_cotizaciones.js'?>"></script>
 <?php endif;
 ?>
+<?php if (isset($js_productos) && $js_productos==true) : ?>
+<script src="<?php echo base_url() . 'assets/js/BaseDatos/js_productos.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<?php endif; ?>
 <script> 
 if (typeof userJS === 'undefined') {
   var userJS = JSON.parse('<?php echo json_encode($this->user) ?>');
