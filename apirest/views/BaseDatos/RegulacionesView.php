@@ -231,7 +231,7 @@
         <div class="tab-content hidden" id="permiso">
             <div class="grid lg:grid-cols-3 gap-6">
                 <!-- Left Column - Permit Details -->
-                <div class="lg:col-span-2 space-y-6">
+                <div class="lg:col-span-3 space-y-6">
                     <!-- Permit Information Card -->
                     <div class="bg-white rounded-lg shadow-sm p-6">
                         <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
@@ -329,122 +329,15 @@
 
                 </div>
 
-                <!-- Right Column - Help & Actions -->
-                <div class="space-y-6">
-                    <!-- Help Information Card -->
-                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg shadow-sm p-6 border border-green-200">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="fas fa-question-circle text-green-600 mr-2"></i>
-                            Información de Ayuda
-                        </h2>
-
-                        <div class="space-y-4 text-sm">
-                            <div>
-                                <h3 class="font-semibold text-gray-700 mb-2">T. Producto:</h3>
-                                <p class="text-gray-600">Le salga un historial de productos ya agregados para que los una</p>
-                            </div>
-
-                            <div>
-                                <h3 class="font-semibold text-gray-700 mb-2">T. Regulación:</h3>
-                                <p class="text-gray-600 mb-2">Le sale las siguientes opciones:</p>
-                                <ul class="list-disc list-inside text-gray-600 space-y-1 ml-2">
-                                    <li>Antidumping</li>
-                                    <li>Permiso</li>
-                                    <li>Etiquetado</li>
-                                    <li>Doc. Especiales</li>
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h3 class="font-semibold text-gray-700 mb-2">Documentos:</h3>
-                                <p class="text-gray-600">Puede agregar documentos relacionados al permiso</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions Card -->
-                    <div class="bg-white rounded-lg shadow-sm p-6">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="fas fa-bolt text-yellow-600 mr-2"></i>
-                            Acciones del Permiso
-                        </h2>
-
-                        <div class="space-y-3">
-                            <button class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
-                                <i class="fas fa-save mr-2"></i>Guardar Permiso
-                            </button>
-                            <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                                <i class="fas fa-file-pdf mr-2"></i>Generar PDF
-                            </button>
-                            <button class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
-                                <i class="fas fa-paper-plane mr-2"></i>Enviar Solicitud
-                            </button>
-                            <button class="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
-                                <i class="fas fa-eye mr-2"></i>Vista Previa
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Cost Summary Card -->
-                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-sm p-6 border border-blue-200">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="fas fa-calculator text-blue-600 mr-2"></i>
-                            Resumen de Costos
-                        </h2>
-
-                        <div class="space-y-2 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Costo base:</span>
-                                <span class="font-semibold">S/. 90.00</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Tramitador:</span>
-                                <span class="font-semibold">S/. 50.00</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">IGV (18%):</span>
-                                <span class="font-semibold">S/. 25.20</span>
-                            </div>
-                            <hr class="my-2">
-                            <div class="flex justify-between text-base">
-                                <span class="font-semibold">Total:</span>
-                                <span class="font-bold text-green-600">S/. 165.20</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Status Card -->
-                    <div class="bg-white rounded-lg shadow-sm p-6">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="fas fa-tasks text-indigo-600 mr-2"></i>
-                            Estado del Permiso
-                        </h2>
-
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">Estado actual:</span>
-                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
-                                    En Proceso
-                                </span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">Progreso:</span>
-                                <span class="text-sm font-semibold">60%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-blue-600 h-2 rounded-full" style="width: 60%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+               
             </div>
         </div>
 
         <!-- Etiquetado tab content -->
         <div class="tab-content hidden" id="etiquetado">
             <div class="grid lg:grid-cols-3 gap-6">
-                <!-- Left Column - Labeling Details -->
-                <div class="lg:col-span-2 space-y-6">
+                    <!-- Left Column - Labeling Details -->
+                    <div class="lg:col-span-3 space-y-6">
                     <!-- Labeling Information Card -->
                     <div class="bg-white rounded-lg shadow-sm p-6">
                         <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
@@ -521,120 +414,6 @@
                     </div>
                 </div>
 
-                <!-- Right Column - Help & Actions -->
-                <div class="space-y-6">
-                    <!-- Labeling Requirements Card -->
-                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg shadow-sm p-6 border border-purple-200">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="fas fa-clipboard-list text-purple-600 mr-2"></i>
-                            Requisitos de Etiquetado
-                        </h2>
-
-                        <div class="space-y-3 text-sm">
-                            <div class="flex items-start">
-                                <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
-                                <span class="text-gray-700">Nombre del producto</span>
-                            </div>
-                            <div class="flex items-start">
-                                <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
-                                <span class="text-gray-700">País de origen</span>
-                            </div>
-                            <div class="flex items-start">
-                                <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
-                                <span class="text-gray-700">Composición del material</span>
-                            </div>
-                            <div class="flex items-start">
-                                <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
-                                <span class="text-gray-700">Instrucciones de cuidado</span>
-                            </div>
-                            <div class="flex items-start">
-                                <i class="fas fa-check-circle text-green-600 mt-1 mr-2"></i>
-                                <span class="text-gray-700">Tallas disponibles</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions Card -->
-                    <div class="bg-white rounded-lg shadow-sm p-6">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="fas fa-bolt text-yellow-600 mr-2"></i>
-                            Acciones de Etiquetado
-                        </h2>
-
-                        <div class="space-y-3">
-                            <button class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
-                                <i class="fas fa-tags mr-2"></i>Generar Etiquetas
-                            </button>
-                            <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                                <i class="fas fa-file-pdf mr-2"></i>Exportar PDF
-                            </button>
-                            <button class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
-                                <i class="fas fa-save mr-2"></i>Guardar Etiquetado
-                            </button>
-                            <button class="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
-                                <i class="fas fa-eye mr-2"></i>Vista Previa
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Label Templates Card -->
-                    <div class="bg-white rounded-lg shadow-sm p-6">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="fas fa-layer-group text-indigo-600 mr-2"></i>
-                            Plantillas de Etiquetas
-                        </h2>
-
-                        <div class="space-y-3">
-                            <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium">Calzado Deportivo</span>
-                                    <i class="fas fa-download text-blue-600"></i>
-                                </div>
-                            </div>
-                            <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium">Calzado Formal</span>
-                                    <i class="fas fa-download text-blue-600"></i>
-                                </div>
-                            </div>
-                            <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium">Calzado Infantil</span>
-                                    <i class="fas fa-download text-blue-600"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Compliance Status Card -->
-                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg shadow-sm p-6 border border-green-200">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="fas fa-shield-check text-green-600 mr-2"></i>
-                            Estado de Cumplimiento
-                        </h2>
-
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">Etiquetado:</span>
-                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                                    Completo
-                                </span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">Imágenes:</span>
-                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
-                                    Pendiente
-                                </span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">Descripciones:</span>
-                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                                    Completo
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -642,7 +421,7 @@
         <div class="tab-content hidden" id="documentos">
             <div class="grid lg:grid-cols-3 gap-6">
                 <!-- Left Column - Special Documents Details -->
-                <div class="lg:col-span-2 space-y-6">
+                <div class="lg:col-span-3 space-y-6">
                     <!-- Special Documents Information Card -->
                     <div class="bg-white rounded-lg shadow-sm p-6">
                         <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
@@ -719,126 +498,7 @@
                     </div>
                 </div>
 
-                <!-- Right Column - Help & Actions -->
-                <div class="space-y-6">
-                    <!-- Document Types Card -->
-                    <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg shadow-sm p-6 border border-orange-200">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="fas fa-list-check text-orange-600 mr-2"></i>
-                            Tipos de Documentos
-                        </h2>
-
-                        <div class="space-y-3 text-sm">
-                            <div class="flex items-start">
-                                <i class="fas fa-certificate text-blue-600 mt-1 mr-2"></i>
-                                <span class="text-gray-700">Certificados de calidad</span>
-                            </div>
-                            <div class="flex items-start">
-                                <i class="fas fa-file-medical text-green-600 mt-1 mr-2"></i>
-                                <span class="text-gray-700">Registros sanitarios</span>
-                            </div>
-                            <div class="flex items-start">
-                                <i class="fas fa-shield-check text-purple-600 mt-1 mr-2"></i>
-                                <span class="text-gray-700">Certificados de seguridad</span>
-                            </div>
-                            <div class="flex items-start">
-                                <i class="fas fa-leaf text-green-600 mt-1 mr-2"></i>
-                                <span class="text-gray-700">Certificados ambientales</span>
-                            </div>
-                            <div class="flex items-start">
-                                <i class="fas fa-globe text-blue-600 mt-1 mr-2"></i>
-                                <span class="text-gray-700">Certificados de origen</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions Card -->
-                    <div class="bg-white rounded-lg shadow-sm p-6">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="fas fa-bolt text-yellow-600 mr-2"></i>
-                            Acciones de Documentos
-                        </h2>
-
-                        <div class="space-y-3">
-                            <button class="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors">
-                                <i class="fas fa-file-upload mr-2"></i>Subir Lote
-                            </button>
-                            <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                                <i class="fas fa-compress-arrows-alt mr-2"></i>Comprimir Todo
-                            </button>
-                            <button class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
-                                <i class="fas fa-save mr-2"></i>Guardar Documentos
-                            </button>
-                            <button class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
-                                <i class="fas fa-paper-plane mr-2"></i>Enviar para Revisión
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Document Status Card -->
-                    <div class="bg-white rounded-lg shadow-sm p-6">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="fas fa-tasks text-indigo-600 mr-2"></i>
-                            Estado de Documentos
-                        </h2>
-
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">Certificados:</span>
-                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
-                                    Pendiente
-                                </span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">Registros:</span>
-                                <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
-                                    Faltante
-                                </span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-600">Validación:</span>
-                                <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
-                                    No iniciado
-                                </span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
-                                <div class="bg-orange-600 h-2 rounded-full" style="width: 25%"></div>
-                            </div>
-                            <div class="text-center text-sm text-gray-600">25% Completado</div>
-                        </div>
-                    </div>
-
-                    <!-- Required Documents Checklist -->
-                    <div class="bg-gradient-to-r from-red-50 to-pink-50 rounded-lg shadow-sm p-6 border border-red-200">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="fas fa-clipboard-check text-red-600 mr-2"></i>
-                            Documentos Requeridos
-                        </h2>
-
-                        <div class="space-y-2 text-sm">
-                            <div class="flex items-center">
-                                <input type="checkbox" class="mr-2 text-blue-600">
-                                <span class="text-gray-700">Certificado CE</span>
-                            </div>
-                            <div class="flex items-center">
-                                <input type="checkbox" class="mr-2 text-blue-600">
-                                <span class="text-gray-700">Manual de usuario</span>
-                            </div>
-                            <div class="flex items-center">
-                                <input type="checkbox" class="mr-2 text-blue-600" checked>
-                                <span class="text-gray-700">Ficha técnica</span>
-                            </div>
-                            <div class="flex items-center">
-                                <input type="checkbox" class="mr-2 text-blue-600">
-                                <span class="text-gray-700">Certificado de batería</span>
-                            </div>
-                            <div class="flex items-center">
-                                <input type="checkbox" class="mr-2 text-blue-600">
-                                <span class="text-gray-700">Registro SUNAT</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+               
             </div>
         </div>
     </div>
