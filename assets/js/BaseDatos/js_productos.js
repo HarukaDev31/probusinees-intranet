@@ -210,8 +210,7 @@ function initProductosTable() {
     }
 
     productosTable = $('#productosTable').DataTable({
-        processing: true,
-        serverSide: true,
+     
         ajax: {
             url: base_url + 'BaseDatos/ProductosController/getProductos',
             type: 'POST',

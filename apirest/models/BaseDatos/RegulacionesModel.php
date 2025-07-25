@@ -1,9 +1,19 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+require_once APPPATH . 'traits/FileTrait.php';
 
 class RegulacionesModel extends CI_Model {
-
-    private $table = 'regulaciones';
+    use FileTrait;
+    private $table_rubros = 'bd_productos_rubro';
+    private $table_entidades = 'bd_entidades_reguladoras';
+    private $table_regulaciones_antidumping = 'bd_productos_regulaciones_antidumping';
+    private $table_regulaciones_antidumping_media = 'bd_productos_regulaciones_antidumping_media';
+    private $table_regulaciones_permiso = 'bd_productos_regulaciones_permiso';
+    private $table_regulaciones_permiso_media = 'bd_productos_regulaciones_permiso_media';
+    private $table_regulaciones_etiquetado = 'bd_productos_regulaciones_etiquetado';
+    private $table_regulaciones_etiquetado_media = 'bd_productos_regulaciones_etiquetado_media';
+    private $table_regulaciones_documentos_especiales = 'bd_productos_regulaciones_documentos_especiales';
+    private $table_regulaciones_documentos_especiales_media = 'bd_productos_regulaciones_documentos_especiales_media';
 
     public function __construct() {
         parent::__construct();
@@ -11,228 +21,387 @@ class RegulacionesModel extends CI_Model {
     }
 
     /**
-     * Obtener regulaciones con paginación y filtros
+     * Obtener datos de regulaciones antidumping
      */
-    public function getRegulaciones($start = 0, $length = 10, $filters = [], $order_column = 0, $order_dir = 'asc') {
-        $columns = ['id', 'codigo', 'titulo', 'tipo', 'pais', 'entidad_emisora', 'fecha_vigencia', 'estado', 'fecha_creacion'];
-        
-        // Query base
-        $this->db->select('*');
-        $this->db->from($this->table);
-        
-        // Aplicar filtros
-        if (!empty($filters['search'])) {
-            $this->db->group_start();
-            $this->db->like('codigo', $filters['search']);
-            $this->db->or_like('titulo', $filters['search']);
-            $this->db->or_like('descripcion', $filters['search']);
-            $this->db->or_like('entidad_emisora', $filters['search']);
-            $this->db->group_end();
-        }
-        
-        if (!empty($filters['tipo'])) {
-            $this->db->where('tipo', $filters['tipo']);
-        }
-        
-        if (!empty($filters['estado'])) {
-            $this->db->where('estado', $filters['estado']);
-        }
-        
-        if (!empty($filters['pais'])) {
-            $this->db->where('pais', $filters['pais']);
-        }
-        
-        // Contar total filtrado
-        $filtered_query = clone $this->db;
-        $total_filtered = $filtered_query->count_all_results('', false);
-        
-        // Aplicar ordenamiento
-        if (isset($columns[$order_column])) {
-            $this->db->order_by($columns[$order_column], $order_dir);
-        }
-        
-        // Aplicar paginación
-        $this->db->limit($length, $start);
-        
+    public function getAntidumpingData() {
+        $this->db->select('ra.id, ra.descripcion_producto, ra.partida, ra.antidumping, ra.observaciones, r.nombre as rubro_nombre, ra.created_at');
+        $this->db->from($this->table_regulaciones_antidumping . ' ra');
+        $this->db->join($this->table_rubros . ' r', 'r.id = ra.id_rubro', 'left');
+        $this->db->order_by('ra.id', 'DESC');
         $query = $this->db->get();
-        $data = $query->result();
+        return $query->result_array();
+    }
+
+    /**
+     * Obtener datos de regulaciones de permisos
+     */
+    public function getPermisoData() {
+        $this->db->select('rp.id, rp.nombre, rp.c_permiso, rp.c_tramitador, rp.observaciones, er.nombre as entidad_nombre, r.nombre as rubro_nombre, rp.created_at');
+        $this->db->from($this->table_regulaciones_permiso . ' rp');
+        $this->db->join($this->table_entidades . ' er', 'er.id = rp.id_entidad_reguladora', 'left');
+        $this->db->join($this->table_rubros . ' r', 'r.id = rp.id_rubro', 'left');
+        $this->db->order_by('rp.id', 'DESC');
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+
+    /**
+     * Obtener datos de regulaciones de etiquetado
+     */
+    public function getEtiquetadoData() {
+        $this->db->select('re.id, re.observaciones, r.nombre as rubro_nombre, re.created_at');
+        $this->db->from($this->table_regulaciones_etiquetado . ' re');
+        $this->db->join($this->table_rubros . ' r', 'r.id = re.id_rubro', 'left');
+        $this->db->order_by('re.id', 'DESC');
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+
+    /**
+     * Obtener datos de documentos especiales
+     */
+    public function getDocumentosData() {
+        $this->db->select('rd.id, rd.observaciones, r.nombre as rubro_nombre, rd.created_at');
+        $this->db->from($this->table_regulaciones_documentos_especiales . ' rd');
+        $this->db->join($this->table_rubros . ' r', 'r.id = rd.id_rubro', 'left');
+        $this->db->order_by('rd.id', 'DESC');
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+
+    /**
+     * Obtener entidades reguladoras
+     */
+    public function getEntidadesReguladoras() {
+        $this->db->select('id, nombre');
+        $this->db->from($this->table_entidades);
+        $this->db->order_by('nombre', 'ASC');
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+
+    /**
+     * Obtener rubros
+     */
+    public function getRubros() {
+        $this->db->select('id, nombre');
+        $this->db->from($this->table_rubros);
+        $this->db->order_by('nombre', 'ASC');
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+
+    /**
+     * Guardar regulación antidumping
+     */
+    private function saveAntidumpingRegulacion($data, $files = []) {
+        $this->db->trans_start();
         
-        // Contar total de registros
-        $total_records = $this->db->count_all($this->table);
-        
-        return [
-            'data' => $data,
-            'total' => $total_records,
-            'filtered' => $total_filtered
+        // Mapear los nombres de campos del FormData a los nombres de la BD
+        $regulacionData = [
+            'id_rubro' => isset($data['id_rubro']) ? $data['id_rubro'] : 1,
+            'descripcion_producto' => isset($data['antidumping-description']) ? $data['antidumping-description'] : (isset($data['descripcion_producto']) ? $data['descripcion_producto'] : ''),
+            'partida' => isset($data['antidumping-partida']) ? $data['antidumping-partida'] : (isset($data['partida']) ? $data['partida'] : ''),
+            'antidumping' => isset($data['antidumping-antidumping']) ? $data['antidumping-antidumping'] : (isset($data['antidumping']) ? $data['antidumping'] : 0),
+            'observaciones' => isset($data['antidumping-observaciones']) ? $data['antidumping-observaciones'] : (isset($data['observaciones']) ? $data['observaciones'] : '')
         ];
+        
+        // Debug: log los datos recibidos
+        log_message('debug', 'Datos antidumping recibidos: ' . json_encode($data));
+        log_message('debug', 'Datos mapeados: ' . json_encode($regulacionData));
+        
+        $this->db->insert($this->table_regulaciones_antidumping, $regulacionData);
+        $regulacionId = $this->db->insert_id();
+        
+        // Guardar archivos si existen
+        if (!empty($files)) {
+            foreach ($files as $file) {
+                $uploadPath = 'uploads/regulaciones/antidumping/';
+                $fileName = time() . '_' . $file['name'];
+                $fullPath = $uploadPath . $fileName;
+                
+                // Crear directorio si no existe
+                if (!is_dir($uploadPath)) {
+                    mkdir($uploadPath, 0777, true);
+                }
+                
+                // Mover archivo
+                if (move_uploaded_file($file['tmp_name'], $fullPath)) {
+                    $mediaData = [
+                        'id_regulacion' => $regulacionId,
+                        'extension' => pathinfo($file['name'], PATHINFO_EXTENSION),
+                        'peso' => $file['size'],
+                        'nombre_original' => $file['name'],
+                        'ruta' => $fullPath
+                    ];
+                    $this->db->insert($this->table_regulaciones_antidumping_media, $mediaData);
+                }
+            }
+        }
+        
+        $this->db->trans_complete();
+        return $this->db->trans_status() ? $regulacionId : false;
     }
 
     /**
-     * Obtener regulación por ID
+     * Guardar regulación de permiso
      */
-    public function getRegulacionById($id) {
-        $this->db->where('id', $id);
-        $query = $this->db->get($this->table);
-        return $query->row();
+    private function savePermisoRegulacion($data, $files = []) {
+        $this->db->trans_start();
+        
+        // Mapear los nombres de campos del FormData a los nombres de la BD
+        $regulacionData = [
+            'id_rubro' => isset($data['id_rubro']) ? $data['id_rubro'] : 1,
+            'id_entidad_reguladora' => isset($data['permiso-entidad']) ? $data['permiso-entidad'] : (isset($data['id_entidad_reguladora']) ? $data['id_entidad_reguladora'] : 1),
+            'nombre' => isset($data['permiso-nombre']) ? $data['permiso-nombre'] : (isset($data['nombre']) ? $data['nombre'] : ''),
+            'c_permiso' => isset($data['permiso-costo']) ? $data['permiso-costo'] : (isset($data['c_permiso']) ? $data['c_permiso'] : 0),
+            'c_tramitador' => isset($data['permiso-tramitador']) ? $data['permiso-tramitador'] : (isset($data['c_tramitador']) ? $data['c_tramitador'] : 0),
+            'observaciones' => isset($data['permiso-observaciones']) ? $data['permiso-observaciones'] : (isset($data['observaciones']) ? $data['observaciones'] : '')
+        ];
+        
+        // Debug: log los datos recibidos
+        log_message('debug', 'Datos permiso recibidos: ' . json_encode($data));
+        log_message('debug', 'Datos mapeados: ' . json_encode($regulacionData));
+        
+        $this->db->insert($this->table_regulaciones_permiso, $regulacionData);
+        $regulacionId = $this->db->insert_id();
+        
+        // Guardar archivos si existen
+        if (!empty($files)) {
+            foreach ($files as $file) {
+                $uploadPath = 'uploads/regulaciones/permiso/';
+                $fileName = time() . '_' . $file['name'];
+                $fullPath = $uploadPath . $fileName;
+                
+                // Crear directorio si no existe
+                if (!is_dir($uploadPath)) {
+                    mkdir($uploadPath, 0777, true);
+                }
+                
+                // Mover archivo
+                if (move_uploaded_file($file['tmp_name'], $fullPath)) {
+                    $mediaData = [
+                        'id_regulacion' => $regulacionId,
+                        'extension' => pathinfo($file['name'], PATHINFO_EXTENSION),
+                        'peso' => $file['size'],
+                        'nombre_original' => $file['name'],
+                        'ruta' => $fullPath
+                    ];
+                    $this->db->insert($this->table_regulaciones_permiso_media, $mediaData);
+                }
+            }
+        }
+        
+        $this->db->trans_complete();
+        return $this->db->trans_status() ? $regulacionId : false;
     }
 
     /**
-     * Crear nueva regulación
+     * Guardar regulación de etiquetado
      */
-    public function createRegulacion($data) {
-        return $this->db->insert($this->table, $data);
+    private function saveEtiquetadoRegulacion($data, $files = []) {
+        $this->db->trans_start();
+        
+        // Mapear los nombres de campos del FormData a los nombres de la BD
+        $regulacionData = [
+            'id_rubro' => isset($data['id_rubro']) ? $data['id_rubro'] : 1,
+            'observaciones' => isset($data['etiquetado-observaciones']) ? $data['etiquetado-observaciones'] : (isset($data['observaciones']) ? $data['observaciones'] : '')
+        ];
+        
+        // Debug: log los datos recibidos
+        log_message('debug', 'Datos etiquetado recibidos: ' . json_encode($data));
+        log_message('debug', 'Datos mapeados: ' . json_encode($regulacionData));
+        
+        $this->db->insert($this->table_regulaciones_etiquetado, $regulacionData);
+        $regulacionId = $this->db->insert_id();
+        
+        // Guardar archivos si existen
+        if (!empty($files)) {
+            foreach ($files as $file) {
+                $uploadPath = 'uploads/regulaciones/etiquetado/';
+                $fileName = time() . '_' . $file['name'];
+                $fullPath = $uploadPath . $fileName;
+                
+                // Crear directorio si no existe
+                if (!is_dir($uploadPath)) {
+                    mkdir($uploadPath, 0777, true);
+                }
+                
+                // Mover archivo
+                if (move_uploaded_file($file['tmp_name'], $fullPath)) {
+                    $mediaData = [
+                        'id_regulacion' => $regulacionId,
+                        'extension' => pathinfo($file['name'], PATHINFO_EXTENSION),
+                        'peso' => $file['size'],
+                        'nombre_original' => $file['name'],
+                        'ruta' => $fullPath
+                    ];
+                    $this->db->insert($this->table_regulaciones_etiquetado_media, $mediaData);
+                }
+            }
+        }
+        
+        $this->db->trans_complete();
+        return $this->db->trans_status() ? $regulacionId : false;
     }
 
     /**
-     * Actualizar regulación
+     * Guardar regulación de documentos especiales
      */
-    public function updateRegulacion($id, $data) {
-        $this->db->where('id', $id);
-        return $this->db->update($this->table, $data);
+    private function saveDocumentosEspecialesRegulacion($data, $files = []) {
+        $this->db->trans_start();
+        
+        // Mapear los nombres de campos del FormData a los nombres de la BD
+        $regulacionData = [
+            'id_rubro' => isset($data['id_rubro']) ? $data['id_rubro'] : 1,
+            'observaciones' => isset($data['documentos-observaciones']) ? $data['documentos-observaciones'] : (isset($data['observaciones']) ? $data['observaciones'] : '')
+        ];
+        
+        // Debug: log los datos recibidos
+        log_message('debug', 'Datos documentos especiales recibidos: ' . json_encode($data));
+        log_message('debug', 'Datos mapeados: ' . json_encode($regulacionData));
+        
+        $this->db->insert($this->table_regulaciones_documentos_especiales, $regulacionData);
+        $regulacionId = $this->db->insert_id();
+        
+        // Guardar archivos si existen
+        if (!empty($files)) {
+            foreach ($files as $file) {
+                $uploadPath = 'uploads/regulaciones/documentos_especiales/';
+                $fileName = time() . '_' . $file['name'];
+                $fullPath = $uploadPath . $fileName;
+                
+                // Crear directorio si no existe
+                if (!is_dir($uploadPath)) {
+                    mkdir($uploadPath, 0777, true);
+                }
+                
+                // Mover archivo
+                if (move_uploaded_file($file['tmp_name'], $fullPath)) {
+                    $mediaData = [
+                        'id_regulacion' => $regulacionId,
+                        'extension' => pathinfo($file['name'], PATHINFO_EXTENSION),
+                        'peso' => $file['size'],
+                        'nombre_original' => $file['name'],
+                        'ruta' => $fullPath
+                    ];
+                    $this->db->insert($this->table_regulaciones_documentos_especiales_media, $mediaData);
+                }
+            }
+        }
+        
+        $this->db->trans_complete();
+        return $this->db->trans_status() ? $regulacionId : false;
+    }
+
+    /**
+     * Guardar nueva regulación (método principal)
+     */
+    public function saveRegulacion($postData, $files) {
+        $results = [];
+        
+        // Procesar cada tipo de regulación
+        foreach ($postData as $tipo => $data) {
+            if ($tipo === 'producto' || $tipo === 'id_rubro' || $tipo === 'created_at') {
+                continue; // Saltar campos generales
+            }
+            
+            $tipoFiles = [];
+            if (isset($files[$tipo]['archivos'])) {
+                $tipoFiles = $files[$tipo]['archivos'];
+            }
+            
+            switch ($tipo) {
+                case 'antidumping':
+                    $results['antidumping'] = $this->saveAntidumpingRegulacion($data, $tipoFiles);
+                    break;
+                case 'permiso':
+                    $results['permiso'] = $this->savePermisoRegulacion($data, $tipoFiles);
+                    break;
+                case 'etiquetado':
+                    $results['etiquetado'] = $this->saveEtiquetadoRegulacion($data, $tipoFiles);
+                    break;
+                case 'documentos':
+                    $results['documentos'] = $this->saveDocumentosEspecialesRegulacion($data, $tipoFiles);
+                    break;
+            }
+        }
+        
+        return $results;
     }
 
     /**
      * Eliminar regulación
      */
-    public function deleteRegulacion($id) {
-        $this->db->where('id', $id);
-        return $this->db->delete($this->table);
-    }
-
-    /**
-     * Obtener países únicos
-     */
-    public function getPaises() {
-        $this->db->distinct();
-        $this->db->select('pais');
-        $this->db->from($this->table);
-        $this->db->where('pais IS NOT NULL');
-        $this->db->where('pais !=', '');
-        $this->db->order_by('pais', 'asc');
+    public function deleteRegulacion($id, $tipo) {
+        $this->db->trans_start();
         
-        $query = $this->db->get();
-        return $query->result();
-    }
-
-    /**
-     * Obtener todas las regulaciones (para exportar)
-     */
-    public function getAllRegulaciones() {
-        $this->db->select('*');
-        $this->db->from($this->table);
-        $this->db->order_by('titulo', 'asc');
-        
-        $query = $this->db->get();
-        return $query->result();
-    }
-
-    /**
-     * Obtener regulaciones próximas a vencer
-     */
-    public function getRegulacionesProximasVencer($dias = 30) {
-        $fecha_limite = date('Y-m-d', strtotime('+' . $dias . ' days'));
-        
-        $this->db->select('*');
-        $this->db->from($this->table);
-        $this->db->where('fecha_vencimiento <=', $fecha_limite);
-        $this->db->where('fecha_vencimiento >=', date('Y-m-d'));
-        $this->db->where('estado', 'vigente');
-        $this->db->order_by('fecha_vencimiento', 'asc');
-        
-        $query = $this->db->get();
-        return $query->result();
-    }
-
-    /**
-     * Marcar regulación como revisada
-     */
-    public function marcarRevisada($id, $observaciones = '') {
-        $data = [
-            'ultima_revision' => date('Y-m-d H:i:s'),
-            'observaciones' => $observaciones
-        ];
-        
-        $this->db->where('id', $id);
-        return $this->db->update($this->table, $data);
-    }
-
-    /**
-     * Obtener estadísticas de regulaciones
-     */
-    public function getEstadisticas() {
-        $stats = [];
-        
-        // Total de regulaciones
-        $stats['total'] = $this->db->count_all($this->table);
-        
-        // Regulaciones vigentes
-        $this->db->where('estado', 'vigente');
-        $stats['vigentes'] = $this->db->count_all_results($this->table);
-        
-        // Regulaciones en revisión
-        $this->db->reset_query();
-        $this->db->where('estado', 'en_revision');
-        $stats['en_revision'] = $this->db->count_all_results($this->table);
-        
-        // Regulaciones próximas a vencer (30 días)
-        $this->db->reset_query();
-        $fecha_limite = date('Y-m-d', strtotime('+30 days'));
-        $this->db->where('fecha_vencimiento <=', $fecha_limite);
-        $this->db->where('fecha_vencimiento >=', date('Y-m-d'));
-        $this->db->where('estado', 'vigente');
-        $stats['proximas_vencer'] = $this->db->count_all_results($this->table);
-        
-        // Regulaciones por tipo
-        $this->db->reset_query();
-        $this->db->select('tipo, COUNT(*) as cantidad');
-        $this->db->from($this->table);
-        $this->db->group_by('tipo');
-        $query = $this->db->get();
-        $stats['por_tipo'] = $query->result();
-        
-        // Regulaciones por país
-        $this->db->reset_query();
-        $this->db->select('pais, COUNT(*) as cantidad');
-        $this->db->from($this->table);
-        $this->db->where('pais IS NOT NULL');
-        $this->db->where('pais !=', '');
-        $this->db->group_by('pais');
-        $this->db->limit(10); // Top 10 países
-        $query = $this->db->get();
-        $stats['por_pais'] = $query->result();
-        
-        return $stats;
-    }
-
-    /**
-     * Verificar si el código de regulación ya existe
-     */
-    public function existeCodigo($codigo, $id_excluir = null) {
-        $this->db->where('codigo', $codigo);
-        
-        if ($id_excluir) {
-            $this->db->where('id !=', $id_excluir);
+        switch ($tipo) {
+            case 'antidumping':
+                $this->db->where('id_regulacion', $id);
+                $this->db->delete($this->table_regulaciones_antidumping_media);
+                $this->db->where('id', $id);
+                $this->db->delete($this->table_regulaciones_antidumping);
+                break;
+            case 'permiso':
+                $this->db->where('id_regulacion', $id);
+                $this->db->delete($this->table_regulaciones_permiso_media);
+                $this->db->where('id', $id);
+                $this->db->delete($this->table_regulaciones_permiso);
+                break;
+            case 'etiquetado':
+                $this->db->where('id_regulacion', $id);
+                $this->db->delete($this->table_regulaciones_etiquetado_media);
+                $this->db->where('id', $id);
+                $this->db->delete($this->table_regulaciones_etiquetado);
+                break;
+            case 'documentos':
+                $this->db->where('id_regulacion', $id);
+                $this->db->delete($this->table_regulaciones_documentos_especiales_media);
+                $this->db->where('id', $id);
+                $this->db->delete($this->table_regulaciones_documentos_especiales);
+                break;
         }
         
-        $query = $this->db->get($this->table);
-        return $query->num_rows() > 0;
+        $this->db->trans_complete();
+        return $this->db->trans_status();
     }
 
     /**
-     * Buscar regulaciones por palabra clave
+     * Obtener regulación por ID
      */
-    public function buscarPorPalabraClave($keyword) {
-        $this->db->select('*');
-        $this->db->from($this->table);
-        $this->db->group_start();
-        $this->db->like('titulo', $keyword);
-        $this->db->or_like('descripcion', $keyword);
-        $this->db->or_like('observaciones', $keyword);
-        $this->db->group_end();
-        $this->db->where('estado', 'vigente');
-        $this->db->order_by('fecha_vigencia', 'desc');
+    public function getRegulacionById($id, $tipo) {
+        switch ($tipo) {
+            case 'antidumping':
+                $this->db->select('ra.*, r.nombre as rubro_nombre');
+                $this->db->from($this->table_regulaciones_antidumping . ' ra');
+                $this->db->join($this->table_rubros . ' r', 'r.id = ra.id_rubro', 'left');
+                $this->db->where('ra.id', $id);
+                break;
+            case 'permiso':
+                $this->db->select('rp.*, er.nombre as entidad_nombre, r.nombre as rubro_nombre');
+                $this->db->from($this->table_regulaciones_permiso . ' rp');
+                $this->db->join($this->table_entidades . ' er', 'er.id = rp.id_entidad_reguladora', 'left');
+                $this->db->join($this->table_rubros . ' r', 'r.id = rp.id_rubro', 'left');
+                $this->db->where('rp.id', $id);
+                break;
+            case 'etiquetado':
+                $this->db->select('re.*, r.nombre as rubro_nombre');
+                $this->db->from($this->table_regulaciones_etiquetado . ' re');
+                $this->db->join($this->table_rubros . ' r', 'r.id = re.id_rubro', 'left');
+                $this->db->where('re.id', $id);
+                break;
+            case 'documentos':
+                $this->db->select('rd.*, r.nombre as rubro_nombre');
+                $this->db->from($this->table_regulaciones_documentos_especiales . ' rd');
+                $this->db->join($this->table_rubros . ' r', 'r.id = rd.id_rubro', 'left');
+                $this->db->where('rd.id', $id);
+                break;
+            default:
+                return null;
+        }
         
         $query = $this->db->get();
-        return $query->result();
+        return $query->row_array();
     }
-} 
+}

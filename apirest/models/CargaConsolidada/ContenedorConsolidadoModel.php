@@ -80,6 +80,11 @@ class ContenedorConsolidadoModel extends CI_Model
     private $table_pagos_concept = "cotizacion_coordinacion_pagos_concept";
     private $table_contenedor_consolidado_cotizacion_coordinacion_pagos = "contenedor_consolidado_cotizacion_coordinacion_pagos";
     private $table_consolidado_cron = "contenedor_consolidado_cotizacion_crons";
+    private $table_bd_productos = "bd_productos";
+    private $table_bd_productos_rubro = "bd_productos_rubro";
+    private $table_bd_productos_regulaciones = "bd_productos_regulaciones";
+    private $table_bd_productos_regulaciones_tipo = "bd_productos_regulaciones_tipo";
+    
     public function __construct()
     {
         try {
@@ -7432,8 +7437,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         $caracteristicas .= $sheet->getCell("D$j2")->getValue() . " ";
                     }
                     $caracteristicas = trim($caracteristicas);
-                    $rubro = $sheet->getCell("E$i")->getValue();
-                    $tipo_producto = $sheet->getCell("F$i")->getValue();
+                    $rubro =trim($sheet->getCell("E$i")->getValue());
+                    $tipo_producto =trim($sheet->getCell("F$i")->getValue());
                     $precio_exw = $sheet->getCell("G$i")->getValue();
                     $subpartida = $sheet->getCell("H$i")->getValue();
                     $link = $sheet->getCell("I$i")->getValue();
@@ -7444,15 +7449,26 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     $correlativo = $sheet->getCell("N$i")->getValue();
                     $etiquetado = $sheet->getCell("O$i")->getValue();
                     $doc_especial = $sheet->getCell("P$i")->getValue();
-
+                    //GET RUBRO IF EXISTS IN TABLE USE THIS ID ELSE INSERT AND GET ID
+                    $this->db->select('id');
+                    $this->db->from($this->table_bd_productos_rubro);
+                    $this->db->where('nombre', $rubro);
+                    $query = $this->db->get();
+                    $rubro_id = $query->row()->id;
+                    if (!$rubro_id) {
+                        $this->db->insert($this->table_bd_productos_rubro, [
+                            'nombre' => $rubro
+                        ]);
+                        $rubro_id = $this->db->insert_id();
+                    }
                     // Guardar en la base de datos
-                    $this->db->insert('productos_importados_excel', [
+                    $this->db->insert($this->table_bd_productos, [
                         'idContenedor' => $idContenedor,
                         'item' => $item,
                         'nombre_comercial' => $nombre_comercial,
                         'foto' => $foto,
                         'caracteristicas' => $caracteristicas,
-                        'rubro' => $rubro,
+                        'id_rubro' => $rubro_id,
                         'tipo_producto' => $tipo_producto,
                         'precio_exw' => $precio_exw,
                         'subpartida' => $subpartida,
@@ -7468,7 +7484,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 }
                 $row = $endRow + 1;
             }
-            unlink($filePath);
         } catch (Exception $e) {
             log_message('error', 'Error en importarProductosDesdeExcel: ' . $e->getMessage());
             return false;

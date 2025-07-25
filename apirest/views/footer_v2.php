@@ -325,6 +325,8 @@
 <?php endif; ?>
 <?php if (isset($js_regulaciones) && $js_regulaciones==true) : ?>
 <script src="<?php echo base_url() . 'assets/js/BaseDatos/js_regulaciones.js?ver=' . $iControlVersionDashboard; ?>"></script>
+<script src="<?php echo base_url() . 'dist_v2/js/utils/file_uploader.js?ver=' . $iControlVersionDashboard; ?>"></script>
+
 <?php endif; ?>
 <script> 
 if (typeof userJS === 'undefined') {

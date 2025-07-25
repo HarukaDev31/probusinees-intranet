@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class ProductosModel extends CI_Model {
 
-    private $table = 'productos_importados_excel';
+    private $table = 'bd_productos';
     public function __construct() {
         parent::__construct();
         $this->load->database();
@@ -14,10 +14,10 @@ class ProductosModel extends CI_Model {
      * Si se pasa $carga_id, filtra por esa campaña/carga
      */
     public function getProductos($idContenedor = 0, $tipoProducto = 0) {
-        log_message('error', 'getProductos: ' . $idContenedor . ' - ' . $tipoProducto);
-        $this->db->select('p.*,c.carga as campana');
+        $this->db->select('p.*,c.carga as campana, r.nombre as rubro');
         $this->db->from($this->table.' p');
         $this->db->join('carga_consolidada_contenedor c', 'c.id = p.idContenedor','left');
+        $this->db->join('bd_productos_rubro r', 'r.id = p.id_rubro','left');
         if ($idContenedor != 0) {
             $this->db->where('p.idContenedor', $idContenedor);
         }

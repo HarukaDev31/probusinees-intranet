@@ -126,74 +126,59 @@
         </div>
     </section>
 </main>
-<main class="bg-gradient-to-br from-indigo-50 via-white to-cyan-50 min-h-screen font-inter hidden" id="product-container">
-    <!-- Animated Background Elements -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-      <div class="floating-bg absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
-      <div class="floating-bg absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-cyan-400/20 to-blue-400/20 rounded-full blur-3xl"></div>
-      <div class="floating-bg absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full blur-3xl"></div>
-    </div>
-
-    <div class="min-h-screen p-4 sm:p-6 lg:p-8">
-      <!-- Header -->
-      <div class="max-w-7xl mx-auto mb-8 relative z-10">
-        <div class="flex items-center justify-between mb-8">
-          <div class="flex items-center space-x-4">
-            <button id="back-btn" class="flex items-center text-gray-600 hover:text-gray-800 transition-all duration-300 hover:scale-105 group">
-              <svg class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-              </svg>
+<main class="bg-gray-50 min-h-screen hidden" id="product-container">
+    <div class="container mx-auto p-6 max-w-6xl">
+        <!-- Header con navegación -->
+        <div class="bg-white rounded-lg shadow-sm mb-6 p-6">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+                <div class="flex items-center">
+                    <button id="back-btn" class="flex items-center text-gray-600 hover:text-gray-800 transition-all duration-300 hover:scale-105 group mr-6">
+                        <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform"></i>
               <span class="font-medium" id="back-btn-text">Regresar</span>
             </button>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+                            <i class="fas fa-box-open text-blue-600 mr-3 text-2xl"></i>
+                            <span id="product-name-text">Detalle del Producto</span>
+                        </h1>
+                        <p class="text-gray-600 text-sm">Información completa del producto seleccionado</p>
+                    </div>
           </div>
+
+                <!-- Botones de acción -->
           <div class="flex items-center space-x-4">
-            <button id="product-link" class="flex items-center bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 px-6 py-3 rounded-xl hover:bg-white hover:shadow-lg transition-all duration-300 hover:scale-105 font-medium">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-              </svg>
+                    <button id="product-link" class="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-all duration-300 font-medium">
+                        <i class="fas fa-external-link-alt mr-2"></i>
               Link Producto
             </button>
-            <button id="alibaba-link" class="flex items-center bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-xl hover:shadow-lg transition-all duration-300 hover:scale-105 font-medium">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-              </svg>
-              <span id="alibaba-link-text">www.alibaba.com/pe/</span>
+                    <button id="alibaba-link" class="flex items-center bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-all duration-300 font-medium">
+                        <i class="fas fa-link mr-2"></i>
+                        <span id="alibaba-link-text">Alibaba</span>
             </button>
           </div>
-        </div>
-
-        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
-          <div class="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 px-8 py-8 relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-r from-blue-600/50 to-transparent"></div>
-            <div class="relative z-10">
-              <h1 class="text-3xl font-bold text-white flex items-center">
-                <svg class="w-8 h-8 mr-4 drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                <span id="product-name-text">CAJA DE MANTENIMIENTO PARA IMPRESO</span>
-              </h1>
             </div>
           </div>
 
-          <div class="p-8 lg:p-12">
-            <div class="grid grid-cols-1 xl:grid-cols-2 gap-12 mb-12">
-              <!-- Tributos Aduanero Section -->
-              <div class="space-y-8">
-                <div class="flex items-center space-x-3 border-b border-gray-200 pb-4">
-                  <div class="w-2 h-8 bg-gradient-to-b from-red-500 to-red-600 rounded-full"></div>
-                  <h2 class="text-xl font-bold text-gray-800">Tributos Aduanero</h2>
-                  <span class="text-red-500 text-sm font-medium bg-red-50 px-2 py-1 rounded-full">Requerido</span>
-                </div>
-                
+        <!-- Contenido principal -->
+        <div class="bg-white rounded-lg shadow-sm p-8 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Tributos Aduaneros -->
                 <div class="space-y-6">
-                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="group">
-                      <label class="block text-sm font-semibold text-gray-700 mb-3">Arancel Sunat</label>
-                      <input type="text" id="arancel-sunat" value="0%" class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white font-medium" placeholder="Ingrese porcentaje">
+                    <div class="mb-6 flex justify-between items-center">
+                        <h2 class="text-xl font-bold text-blue-700 flex items-center gap-2">
+                            <i class="fas fa-calculator"></i> Tributos Aduaneros
+                        </h2>
                     </div>
-                    <div class="group">
-                      <label class="block text-sm font-semibold text-gray-700 mb-3">Disponibilidad</label>
-                      <select class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white font-medium">
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Arancel Sunat</label>
+                                <input type="text" id="arancel-sunat" value="0%" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Ingrese porcentaje">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Disponibilidad</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                         <option value="OK">✅ OK</option>
                         <option value="Pendiente">⏳ Pendiente</option>
                         <option value="No disponible">❌ No disponible</option>
@@ -201,14 +186,14 @@
                     </div>
                   </div>
 
-                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="group">
-                      <label class="block text-sm font-semibold text-gray-700 mb-3">Arancel TLC</label>
-                      <input type="text" id="arancel-tlc" value="0%" class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white font-medium" placeholder="Ingrese porcentaje">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Arancel TLC</label>
+                                <input type="text" id="arancel-tlc" value="0%" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Ingrese porcentaje">
                     </div>
-                    <div class="group">
-                      <label class="block text-sm font-semibold text-gray-700 mb-3">Estado</label>
-                      <select class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white font-medium">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                         <option value="OK">✅ OK</option>
                         <option value="Pendiente">⏳ Pendiente</option>
                         <option value="Rechazado">❌ Rechazado</option>
@@ -216,46 +201,40 @@
                     </div>
                   </div>
 
-                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="group">
-                      <label class="block text-sm font-semibold text-gray-700 mb-3">Correlativo</label>
-                      <div class="flex items-center space-x-4">
-                        <input type="text" id="correlativo" class="flex-1 px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white font-medium">
-                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Correlativo</label>
+                                <input type="text" id="correlativo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Antidumping</label>
+                                <input type="number" id="antidumping" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                      </div>
                       </div>
                     </div>
-                    <div class="group">
-                      <label class="block text-sm font-semibold text-gray-700 mb-3">Antidumping</label>
-                      <div class="flex items-center space-x-4">
-                        <input type="number" id="antidumping" value="0" class="flex-1 px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white font-medium">
-                        
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Requisito Aduanero Section -->
-              <div class="space-y-8">
-                <div class="flex items-center space-x-3 border-b border-gray-200 pb-4">
-                  <div class="w-2 h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
-                  <h2 class="text-xl font-bold text-gray-800">Requisito Aduanero</h2>
-                  <span class="text-red-500 text-sm font-medium bg-red-50 px-2 py-1 rounded-full">Requerido</span>
                 </div>
                 
+                <!-- Requisitos Aduaneros -->
                 <div class="space-y-6">
-                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="group">
-                      <label class="block text-sm font-semibold text-gray-700 mb-3">Tipo de producto</label>
-                      <select id="product-type" class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white font-medium">
+                    <div class="mb-6 flex justify-between items-center">
+                        <h2 class="text-xl font-bold text-blue-700 flex items-center gap-2">
+                            <i class="fas fa-clipboard-check"></i> Requisitos Aduaneros
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de producto</label>
+                                <select id="product-type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                         <option value="LIBRE">🟢 Libre</option>
                         <option value="RESTRINGIDO">🟡 Restringido</option>
                         <option value="PROHIBIDO">🔴 Prohibido</option>
                       </select>
                     </div>
-                    <div class="group">
-                      <label class="block text-sm font-semibold text-gray-700 mb-3">Etiquetado</label>
-                      <select id="labeling" class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white font-medium">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Etiquetado</label>
+                                <select id="labeling" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                         <option value="NORMAL">📋 Normal</option>
                         <option value="ESPECIAL">⭐ Especial</option>
                         <option value="NO_REQUERIDO">❌ No requerido</option>
@@ -263,36 +242,25 @@
                     </div>
                   </div>
 
-                  <div class="group">
-                    <label class="block text-sm font-semibold text-gray-700 mb-3">Documento especial</label>
-                    <div class="flex items-center space-x-4">
-                      <select id="special-document" class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-gray-50/50 hover:bg-white font-medium">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Documento especial</label>
+                            <select id="special-document" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                         <option value="NO">No</option>
                         <option value="SI">Si</option>
                       </select>
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Observations Section with Toggle Switch -->
-            <div class="border-t-2 border-gray-100 pt-12">
-              <div class="flex items-center justify-between mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
-                <div class="flex items-center space-x-4">
-                  <div class="w-2 h-8 bg-gradient-to-b from-purple-500 to-purple-600 rounded-full"></div>
-                  <div>
-                    <h2 class="text-xl font-bold text-gray-800 flex items-center">
-                      Observaciones de Aduana
-                      <span class="text-red-500 text-sm font-medium bg-red-50 px-2 py-1 rounded-full ml-3">Requerido</span>
+            <!-- Observaciones -->
+            <div class="mt-8 border-t border-gray-200 pt-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-blue-700 flex items-center gap-2">
+                        <i class="fas fa-comment-alt"></i> Observaciones de Aduana
                     </h2>
-                    <p class="text-gray-600 text-sm mt-1">Activar para agregar observaciones detalladas</p>
-                  </div>
-                </div>
-                
-                <!-- Modern Toggle Switch -->
                 <div class="flex items-center space-x-4">
-                  <span id="observations-toggle-text">No</span>
+                        <span id="observations-toggle-text" class="text-sm font-medium text-gray-700">No</span>
                   <label class="toggle-switch">
                     <input type="checkbox" id="observations-toggle">
                     <span class="slider"></span>
@@ -301,18 +269,16 @@
                 </div>
               </div>
               
-              <div id="observations-section" class="space-y-6" style="display: none;">
-                <div class="relative group">
-                  <textarea id="observations" rows="5" maxlength="500" class="w-full px-6 py-5 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 resize-none bg-gradient-to-br from-gray-50/50 to-white hover:shadow-lg font-medium text-gray-700" placeholder="Ingrese las observaciones de aduana detalladas...">El vista de aduanas observa la medida del producto</textarea>
-                  <div class="absolute bottom-4 right-4 flex items-center space-x-3">
-                    <span id="char-counter" class="text-sm font-medium text-gray-500 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">50/500</span>
+                <div id="observations-section" class="space-y-4" style="display: none;">
+                    <div class="relative">
+                        <textarea id="observations" rows="5" maxlength="500" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none" placeholder="Ingrese las observaciones de aduana detalladas...">El vista de aduanas observa la medida del producto</textarea>
+                        <div class="absolute bottom-2 right-2">
+                            <span id="char-counter" class="text-sm font-medium text-gray-500 bg-white px-2 py-1 rounded">50/500</span>
                   </div>
                 </div>
                 
-                <div class="flex items-start space-x-4 text-sm text-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-100">
-                  <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                  </svg>
+                    <div class="flex items-start space-x-3 text-sm text-gray-700 bg-blue-50 p-4 rounded-lg border border-blue-100">
+                        <i class="fas fa-info-circle text-blue-600 flex-shrink-0 mt-0.5"></i>
                   <div>
                     <p class="font-semibold text-blue-800 mb-1">Información importante</p>
                     <p>Las observaciones serán revisadas por el departamento de aduanas antes de la aprobación final. Asegúrese de proporcionar información precisa y detallada.</p>
@@ -321,24 +287,19 @@
               </div>
             </div>
 
-            <!-- Enhanced Action Buttons -->
-            <div class="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-6 mt-12 pt-8 border-t-2 border-gray-100">
-              <button id="cancel-btn" class="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-semibold hover:scale-105 hover:shadow-lg">
+            <!-- Botones de acción -->
+            <div class="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-4 mt-8 pt-6 border-t border-gray-200">
+                <button id="cancel-btn" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-medium">
                 Cancelar
               </button>
-              <button id="save-btn" class="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold flex items-center justify-center hover:scale-105 hover:shadow-xl shadow-lg">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"></path>
-                </svg>
+                <button id="save-btn" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-300 font-medium flex items-center justify-center">
+                    <i class="fas fa-save mr-2"></i>
                 Guardar Cambios
               </button>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </body>
-</div>
+</main>
 <style>
      .toggle-switch {
         position: relative;
