@@ -114,8 +114,12 @@ class PedidosCurso extends CI_Controller
                 $fecha_hoy = date('Y-m-d');
                 $fecha_fin = isset($row->Fe_Fin) ? $row->Fe_Fin : null;
                 $tipo_curso = isset($row->tipo_curso) ? $row->tipo_curso : null; // 1 = En vivo
+                $select_disabled = 'disabled';
+                if ($tipo_curso == 1 && $fecha_fin && strtotime($fecha_hoy) > strtotime($fecha_fin)) {
+                    $select_disabled = ''; // habilitar el select si corresponde constancia
+                }
 
-                $estado_pago = '<select disabled style="padding:0.8em 0.5em;border-radius:0.5em; width:100%;font-size:1.2em;text-align:center"';
+                $estado_pago = '<select ' . $select_disabled . ' style="padding:0.8em 0.5em;border-radius:0.5em; width:100%;font-size:1.2em;text-align:center"';
                 $estado = 'pendiente';
                 if ($row->total_pagos == 0) {
                     $estado_pago .= 'class="bg-[#7E7E7E] select-estado-pago text-white">';

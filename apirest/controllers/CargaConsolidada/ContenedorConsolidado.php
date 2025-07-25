@@ -200,31 +200,45 @@ class ContenedorConsolidado extends CI_Controller
 				$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
 				$subdata[] = date("d/m/Y", strtotime($row->fecha_arribo));
 				$subdata[] = date("d/m/Y", strtotime($row->fecha_declaracion));
-				$subdata[] = date("d/m/Y", strtotime($row->fecha_levante));
-				$subdata[] = $row->fecha_levante ? (strtotime($row->fecha_levante) - strtotime($row->fecha_arribo)) / (60 * 60 * 24) : 0;
+				if (
+					empty($row->fecha_levante) ||
+					$row->fecha_levante == "0000-00-00" ||
+					$row->fecha_levante == null
+				) {
+					$subdata[] = "00/00/0000";
+				} else {
+					$subdata[] = date("d/m/Y", strtotime($row->fecha_levante));
+				}
+				if (	
+					!empty($row->fecha_levante) && $row->fecha_levante != "0000-00-00" && $row->fecha_levante != null &&
+					!empty($row->fecha_arribo) && $row->fecha_arribo != "0000-00-00" && $row->fecha_arribo != null
+				) {
+					$dias_levante = (strtotime($row->fecha_levante) - strtotime($row->fecha_arribo)) / (60 * 60 * 24);
+					$subdata[] = $dias_levante;
+				} else {
+					$subdata[] = "0";
+				}
 				$subdata[] = $row->numero_dua;
-				$subdata[] = $row->ajuste_valor;
-				$subdata[] = $row->multa;
-				$subdata[] = $row->valor_fob;
-				$subdata[] = $row->valor_flete;
-				$subdata[] = $row->costo_destino;
+				$subdata[] = "$" . $row->ajuste_valor;
+				$subdata[] = "$" . $row->multa;
+				$subdata[] = "$" . $row->valor_fob;
+				$subdata[] = "$" . $row->valor_flete;
+				$subdata[] = "$" . $row->costo_destino;
 				//icon mail
-				$divObservacion = "
+				$divAcciones = "
 			<div class='d-flex justify-center items-center' style='position: relative; display: flex; justify-content: center; align-items: center;'>
 			<div class='relative'>	
 			<i class='fas fa-envelope text-lg' style='cursor:pointer;' onclick='showObservaciones(" . $row->id . ")'></i>";
 
 				if ($row->file_count > 0) {
 					// Círculo rojo con el número de archivos, posicionado encima del icono
-					$divObservacion .= "<span class='absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs' style='position: absolute; z-index: 10;'>" . $row->file_count . "</span>";
+					$divAcciones .= "<span class='absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs' style='position: absolute; z-index: 10;'>" . $row->file_count . "</span>";
 				}
-				$divObservacion .= "
+				$divAcciones .= "
 			</div>
-			</div>";
-				$subdata[] = $divObservacion;
-				//icon eye
-				$divAcciones = '<i class="fas fa-eye text-primary view-eye" style="cursor:pointer; padding:10px;" onclick="viewSteps(' . $row->id . ',
-			' . $row->carga . ',true)"></i>';
+			<div class='ml-2'>
+				<i class='fas fa-eye text-primary view-eye' style='cursor:pointer; padding:10px;' onclick='viewSteps(" . $row->id . ", " . $row->carga . ", true)'></i>
+		</div>";
 				$subdata[] = $divAcciones;
 			} else {
 				$subdata[] = $row->tipo_carga == 'G. IMPORTACION' ? $row->tipo_carga : $row->tipo_carga . " #" . $row->carga;
@@ -432,6 +446,7 @@ class ContenedorConsolidado extends CI_Controller
 						$divFile .= '
 						<i class="fas fa-upload" style="cursor:pointer;" onclick="uploadCotizacionFile(' . $row->id_cotizacion . ')"></i>';
 					}
+					$subdata[] = $row->qty_item;
 					$subdata[] = $row->fob;
 					$subdata[] = $row->monto;
 					$subdata[] = $row->impuestos;
@@ -784,6 +799,7 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = ucwords(strtolower($row->name));
 					if ($this->user->No_Grupo != "Documentacion") {
 						$subdata[] = $row->volumen;
+						$subdata[] = $row->qty_item;
 						$subdata[] = $row->fob;
 						$subdata[] = $row->monto;
 						$subdata[] = $row->impuestos;
