@@ -6130,12 +6130,14 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $total = $logisticaFinal + $impuestosFinal;
                 $totalAPagar = $total - $totalPagos;
                 $idContenedor = $query->row()->id_contenedor;
-                $this->db->select('fecha_arribo');
+                $this->db->select('fecha_arribo, carga');
                 $this->db->from($this->table);
                 $this->db->where('id', $idContenedor);
                 $query = $this->db->get();
+                $carga = $query->row()->carga;
                 $fechaArribo = $query->row()->fecha_arribo;
-                $message = "Hola " . $nombre . " 😁 un gusto saludarte! \n" .
+                $message = "📦 *Consolidado #" . $carga . "*\n" .
+                    "Hola " . $nombre . " 😁 un gusto saludarte! \n" .
                     "A continuación te envio la cotización final de tu importación📋📦.\n" .
                     "🙋‍♂️PAGO PENDIENTE: \n" .
                     "☑️Costo CBM: $" . number_format($logisticaFinal, 2) . "\n" .
