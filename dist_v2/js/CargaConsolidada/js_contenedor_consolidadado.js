@@ -22,6 +22,8 @@ var originalNoteInpectionText = "";
 var shouldSaveDocumentacion = false;
 var originalVolumenDocumento = "";
 var originalValorDocumento = "";
+let cargaValue = '';
+let fCierreValue = '';
 var sectionsDisabled = false;
 var tableCotizacionTrackingPagos = null;
 var meses = [
@@ -2359,6 +2361,69 @@ async function deleteCotizacionFile(id) {
     }
   });
 }
+function moveCotizacionToConsolidado(idCotizacion) {
+    // Mostrar modal con select de consolidados habilitados
+    $('#modal-move-cotizacion').modal('show');
+    $('#selectConsolidado').empty();
+    $('#selectConsolidado').append('<option value="" disabled selected>Selecciona una carga consolidada</option>');
+    // Cargar cargas consolidadas disponibles haces un ajax
+    $.ajax({
+        url: base_url + 'CargaConsolidada/ContenedorConsolidado/getCargasConsolidadasDisponibles',
+        method: "GET",
+        success: function(data) {
+            const contenedores = JSON.parse(data);
+            contenedores.forEach(function(consolidado) {
+                $('#selectConsolidado').append(`<option value="${consolidado.id}">Carga consolidada #${consolidado.carga}</option>`);
+            });
+        }
+    });
+    // Configurar el botón de confirmación
+    $('#btn-confirm-move').off('click').on('click', function() {
+        // Validar que se haya seleccionado un contenedor
+        if (!$('#selectConsolidado').val()) {
+            Swal.fire("Error", "Debes seleccionar un contenedor consolidado.", "error");
+            return;
+        }
+        // Confirmar movimiento
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción moverá la cotización al contenedor consolidado seleccionado.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, mover",
+            cancelButtonText: "No, cancelar",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                url = base_url + "CargaConsolidada/ContenedorConsolidado/moveCotizacionToConsolidado";
+                // Al confirmar, hacer AJAX:
+                $.ajax({
+                  url: url,
+                  method: "POST",
+                  data: {
+                    idCotizacion: idCotizacion,
+                    idContenedorDestino: $('#selectConsolidado').val()
+                }, success: function(resp) {
+                    // Refrescar tabla y mostrar mensaje
+                    const result = JSON.parse(resp);
+                    if (result.status == "success") {
+                      Swal.fire("¡Éxito!", result.message, "success");
+                      reloadTableCotizacion();
+                    } else {
+                      Swal.fire("Error", result.message, "error");
+                    }
+                  }, error: function() {
+                    Swal.fire("Error", "Ocurrió un error al mover la cotización.", "error");
+                  }
+                });
+                // Cerrar modal
+                $('#modal-move-cotizacion').modal('hide');
+            } else {
+                // Si se cancela, simplemente cerrar el modal
+                $('#modal-move-cotizacion').modal('hide');
+            }
+        });
+    });
+}
 async function updateRotulado(idCotizacion, idProveedor) {
   url =
     base_url +
@@ -3411,7 +3476,7 @@ const openStepFunction = async (step, id) => {
                   orderable: false,
                 },
                 {
-                  targets: [0],
+                  targets: [1,2,3,4,6,13],
                   visible: false,
                 },
                 {
