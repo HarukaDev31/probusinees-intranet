@@ -1308,6 +1308,14 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                 throw new Exception('No se pudieron extraer datos del archivo de cotización');
             }
 
+            // Eliminar el campo 'fecha' si existe
+            if (isset($dataToInsert['fecha'])) {
+                unset($dataToInsert['fecha']);
+            }
+
+            // Añadir la fecha de modificación
+            $dataToInsert['updated_at'] = date('Y-m-d H:i:s');
+
             log_message('info', 'Datos extraídos del archivo: ' . json_encode($dataToInsert));
 
             // Actualizar la cotización principal
@@ -1343,6 +1351,33 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                 'message' => 'Error al procesar la cotización: ' . $e->getMessage()
             ];
         }
+    }
+
+    public function getCargasDisponibles()
+    {
+        $hoy = date('Y-m-d');
+        $this->db->select('*')
+            ->from($this->table)
+            ->where('DATE(f_cierre) >=', $hoy)
+            ->order_by('carga', 'desc');
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    public function moveCotizacionToConsolidado($idCotizacion, $idContenedorDestino) {
+        // Actualiza la cotización principal
+        $this->db->set('id_contenedor', $idContenedorDestino);
+        $this->db->set('estado_cotizador', 'CONFIRMADO');
+        $this->db->set('updated_at', date('Y-m-d H:i:s'));
+        $this->db->where('id', $idCotizacion);
+        $cotizacionUpdate = $this->db->update('contenedor_consolidado_cotizacion');
+
+        // Actualiza los proveedores asociados
+        $this->db->set('id_contenedor', $idContenedorDestino);
+        $this->db->where('id_cotizacion', $idCotizacion);
+        $proveedoresUpdate = $this->db->update('contenedor_consolidado_cotizacion_proveedores');
+
+        return $cotizacionUpdate && $proveedoresUpdate;
     }
 
     /**
@@ -1508,6 +1543,17 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             );
             $dataToInsert = $this->getCotizacionData($file);
             $dataToInsert['cotizacion_file_url'] = $fileUrl;
+
+            // Eliminar el campo 'fecha' si existe en la BD y actualizar el de 'updated_at'
+            $dataToInsert['updated_at'] = date('Y-m-d H:i:s');
+            $this->db->select('fecha')
+                ->from($this->table_contenedor_cotizacion)
+                ->where('id', $id);
+            $queryCreated = $this->db->get();
+            if ($queryCreated->num_rows() > 0 && $queryCreated->row()->fecha) {
+                unset($dataToInsert['fecha']);
+            }
+
             //disable foreign key check
             $this->db->query('SET FOREIGN_KEY_CHECKS = 0');
             $this->db->where('id', $id);
