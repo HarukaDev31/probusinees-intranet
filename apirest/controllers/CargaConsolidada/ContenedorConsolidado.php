@@ -447,7 +447,7 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata   = [];
 					$subdata[] = $index;
 					$subdata[] = $cargaConsolidado->carga;
-					$subdata[] = $cargaConsolidado->f_cierre;
+					$subdata[] = date("d/m/Y", strtotime($cargaConsolidado->f_cierre));
 					$subdata[] = $row->No_Nombres_Apellidos;
 					// Generar el código único
 					$fecha = !empty($row->fecha) ? date("dmy", strtotime($row->fecha)) : "";
