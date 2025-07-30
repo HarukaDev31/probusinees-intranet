@@ -2334,8 +2334,6 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             ->where('id_contenedor', $idContenedor)
             ->where('estado_cliente!=', null)
             ->get()->result();
-        // echo json_encode($dataSystem);
-
         try {
             // Create a mapping of item IDs to clients from the packing list
             $itemToClientMap = [];
@@ -2352,7 +2350,6 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                     $itemToClientMap[trim($itemId)] = trim($client);
                 }
             }
-            log_message('error', 'itemToClientMap: ' . json_encode($itemToClientMap));
             $sheetCount = $objPHPExcel->getSheetCount();
             //SE SHEET COUNT FIND A ROW CONTAIN "TOTAL" AND GET THE ROW -1  
             $totalRow = 0;
