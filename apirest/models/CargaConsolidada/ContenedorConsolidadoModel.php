@@ -7446,6 +7446,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
 
             $row = 3;
             $previousID=null;
+            // Obtener la colección de dibujos (imágenes) del Excel
+            $drawings = $sheet->getDrawingCollection();
             while ($row <= $highestRow ) {
                
                 // Detectar rango mergeado en la columna 1 (A)
@@ -7467,7 +7469,65 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     }
                     $previousID = $item;
                     $nombre_comercial = $sheet->getCell("B$i")->getValue();
-                    $foto = $sheet->getCell("C$i")->getValue();
+                    
+                    // Obtener imagen de la celda C$i
+                    $foto = '';
+                    foreach ($drawings as $drawing) {
+                        $coordinates = $drawing->getCoordinates();
+                        if ($coordinates == "C$i") {
+                            if ($drawing instanceof PHPExcel_Worksheet_MemoryDrawing) {
+                                // Es una imagen en memoria
+                                $mimeType = $drawing->getMimeType();
+                                $extension = strtolower(str_replace('image/', '', $mimeType));
+                                
+                                // Guardar la imagen en el servidor
+                                $path = 'assets/img/productos/';
+                                if (!is_dir($path)) {
+                                    mkdir($path, 0777, true);
+                                }
+                                $filename = $path . uniqid() . '.' . $extension;
+                                
+                                // Obtener los datos binarios usando la función de renderizado
+                                $renderingFunction = $drawing->getRenderingFunction();
+                                $imageResource = $drawing->getImageResource();
+                                
+                                // Usar la función de renderizado para obtener los datos
+                                $imageBinary = call_user_func($renderingFunction, $imageResource);
+                                file_put_contents($filename, $imageBinary);
+                                
+                                // Generar URL absoluta
+                                $foto = base_url($filename);
+                                break;
+                            } else {
+                                // Es una imagen desde archivo
+                                $drawingPath = $drawing->getPath();
+                                $hashPosition = strpos($drawingPath, '#');
+                                if ($hashPosition !== false) {
+                                    $extractedPart = substr($drawingPath, $hashPosition + 1);
+                                    $imagePath = 'assets/uploads/' . $extractedPart;
+                                    
+                                    if (file_exists($imagePath)) {
+                                        $imageData = file_get_contents($imagePath);
+                                        $path = 'assets/img/productos/';
+                                        if (!is_dir($path)) {
+                                            mkdir($path, 0777, true);
+                                        }
+                                        $filename = $path . uniqid() . '.jpg';
+                                        file_put_contents($filename, $imageData);
+                                        $foto = base_url($filename);
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Si no se encontró imagen, intentar obtener valor de texto
+                    if (empty($foto)) {
+                        $foto_valor = $sheet->getCell("C$i")->getValue();
+                        $foto = !empty($foto_valor) ? base_url($foto_valor) : '';
+                    }
+                    
                     //get caracteristicas from merge cells D$i:D$endRow
                     $caracteristicas = "";
                     for ($j2 = $i; $j2 <= $endRow; $j2++) {
