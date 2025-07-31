@@ -80,11 +80,11 @@ class ContenedorConsolidadoModel extends CI_Model
     private $table_pagos_concept = "cotizacion_coordinacion_pagos_concept";
     private $table_contenedor_consolidado_cotizacion_coordinacion_pagos = "contenedor_consolidado_cotizacion_coordinacion_pagos";
     private $table_consolidado_cron = "contenedor_consolidado_cotizacion_crons";
-    private $table_bd_productos = "bd_productos";
-    private $table_bd_productos_rubro = "bd_productos_rubro";
+    private $table_bd_productos = "productos_importados_excel";
+    private $table_bd_productos_rubro = "bd_productos";
     private $table_bd_productos_regulaciones = "bd_productos_regulaciones";
     private $table_bd_productos_regulaciones_tipo = "bd_productos_regulaciones_tipo";
-    
+
     public function __construct()
     {
         try {
@@ -420,7 +420,6 @@ class ContenedorConsolidadoModel extends CI_Model
         $query = $this->db->get();
         return $query->result();
     }
-
     public function getContenedorCotizacionProveedores($idContenedor)
     {
         //select from table_contenedor_cotizacion join usuario.ID_USUARIO id_usuario,in array json select proveedores from table_contenedor_cotizacion_proveedores where id_cotizacion= firstable.id_cotizacion
@@ -1364,7 +1363,8 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
         return $query->result();
     }
 
-    public function moveCotizacionToConsolidado($idCotizacion, $idContenedorDestino) {
+    public function moveCotizacionToConsolidado($idCotizacion, $idContenedorDestino)
+    {
         // Actualiza la cotización principal
         $this->db->set('id_contenedor', $idContenedorDestino);
         $this->db->set('estado_cotizador', 'CONFIRMADO');
@@ -1419,7 +1419,18 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             }
         }
 
-        // 4. Si parece ser una URL, intentar leer remotamente
+        // 4. Intentar leer desde el directorio de assets
+        $assetsPath = FCPATH . 'assets/' . ltrim($fileUrl, '/');
+        if (file_exists($assetsPath)) {
+            log_message('error', 'Leyendo archivo desde assets: ' . $assetsPath);
+            $content = file_get_contents($assetsPath);
+            if ($content !== false) {
+                log_message('error', 'Archivo leído exitosamente, tamaño: ' . strlen($content) . ' bytes');
+                return $content;
+            }
+        }
+
+        // 5. Si parece ser una URL, intentar leer remotamente
         if (filter_var($fileUrl, FILTER_VALIDATE_URL)) {
             log_message('error', 'Intentando leer archivo remoto: ' . $fileUrl);
 
@@ -1480,7 +1491,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             }
         }
 
-        // 5. Intentar con diferentes variaciones de ruta
+        // 6. Intentar con diferentes variaciones de ruta
         $possiblePaths = [
             APPPATH . '../' . $fileUrl,
             APPPATH . $fileUrl,
@@ -2127,7 +2138,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             ],
             'assets/images/agentecompra/'
         );
-     
+
         //find if exists file in table contenedor_consolidado_documentacion_files where id_folder=$idFolder and id_contenedor=$idContenedor
         //if exists delete
         $this->db->delete($this->table_contenedor_documentacion_files, ['id_folder' => $idFolder, 'id_contenedor' => $idContenedor]);
@@ -2136,9 +2147,9 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             'file_url' => $fileUrl,
             'id_contenedor' => $idContenedor
         ]);
-        if ($idFolder == 9 && isset($fileUrl) ) {
+        if ($idFolder == 9 && isset($fileUrl)) {
             $objPHPExcel = PHPExcel_IOFactory::load($file['tmp_name']);
-            $this->importarProductosDesdeExcel($objPHPExcel, $idContenedor);
+            $this->importarProductosDesdeExcel($objPHPExcel, $idContenedor, $file['tmp_name']);
         }
         if ($this->db->affected_rows() > 0) {
             return "success";
@@ -3087,7 +3098,6 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             return ['status' => "error", 'message' => $e->getMessage()];
         }
     }
-
     protected function procesarEstadoRotulado($cliente, $carga, $proveedores, $idCotizacion)
     {
         try {
@@ -5052,7 +5062,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     case $cbmTotalProductos < 1.00 && $cbmTotalProductos > 0.59:
                         $tarifaValue = 350;
                         break;
-                    case $cbmTotalProductos <= 2.09 && $cbmTotalProductos > 1.00: 
+                    case $cbmTotalProductos <= 2.09 && $cbmTotalProductos > 1.00:
                         $tarifaValue = 350;
                         break;
                     case $cbmTotalProductos <= 3.09 && $cbmTotalProductos > 2.09:
@@ -7462,24 +7472,69 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
 
         return strtr($string, $accents);
     }
-    public function importarProductosDesdeExcel($objPHPExcel, $idContenedor)
+    public function importarProductosDesdeExcel($objPHPExcel, $idContenedor, $tmpUrl = null)
     {
         try {
-            
             $this->load->library('PHPExcel');
-            $sheet = $objPHPExcel->getActiveSheet();
 
+            // Extraer el archivo Excel como ZIP para acceder a las imágenes
+            if ($tmpUrl) {
+                log_message("error", "Iniciando extracción del archivo: " . $tmpUrl);
+                $newFolder = 'assets/uploads/';
+                if (!file_exists($newFolder)) {
+                    mkdir($newFolder, 0777, true);
+                    log_message("error", "Directorio creado: " . $newFolder);
+                }
+
+                // Renombrar el archivo temporal a .zip
+                $zipPath = $newFolder . 'temp_' . uniqid() . '.zip';
+                log_message("error", "Intentando renombrar a: " . $zipPath);
+                if (rename($tmpUrl, $zipPath)) {
+                    $zip = new ZipArchive;
+                    $res = $zip->open($zipPath);
+                    if ($res === TRUE) {
+                        log_message("error", "Archivo ZIP abierto correctamente");
+                        $zip->extractTo($newFolder);
+                        $zip->close();
+                        // Eliminar el archivo ZIP temporal
+                        unlink($zipPath);
+                        log_message("error", "Archivo Excel extraído exitosamente");
+
+                        // Verificar si se extrajeron las imágenes
+                        $mediaPath = $newFolder . 'xl/media/';
+                        if (is_dir($mediaPath)) {
+                            $files = scandir($mediaPath);
+                            log_message("error", "Archivos encontrados en xl/media: " . (count($files) - 2)); // -2 para . y ..
+                            foreach ($files as $file) {
+                                if ($file != '.' && $file != '..') {
+                                    log_message("error", "Imagen encontrada: " . $file);
+                                }
+                            }
+                        } else {
+                            log_message("error", "Directorio xl/media no encontrado");
+                        }
+                    } else {
+                        log_message("error", "No se pudo abrir el archivo ZIP. Error: " . $res);
+                    }
+                } else {
+                    log_message("error", "No se pudo renombrar el archivo temporal");
+                }
+            } else {
+                log_message("error", "No se proporcionó tmpUrl para extracción");
+            }
+
+            $sheet = $objPHPExcel->getActiveSheet();
             $highestRow = $sheet->getHighestRow();
 
             // Obtener celdas combinadas (merge)
             $mergedCells = $sheet->getMergeCells();
 
-            // Función para saber si una celda está mergeada
+            // Función mejorada para saber si una celda está mergeada
             $getMergeRange = function ($row) use ($mergedCells) {
                 foreach ($mergedCells as $range) {
                     list($start, $end) = explode(':', $range);
-                    $startRow = preg_replace('/[A-Z]/', '', $start);
-                    $endRow = preg_replace('/[A-Z]/', '', $end);
+                    $startRow = (int)preg_replace('/[A-Z]/', '', $start);
+                    $endRow = (int)preg_replace('/[A-Z]/', '', $end);
                     if ($row >= $startRow && $row <= $endRow) {
                         return [$startRow, $endRow];
                     }
@@ -7488,145 +7543,187 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             };
 
             $row = 3;
-            $previousID=null;
+            $processedItems = []; // Para evitar duplicados
+
             // Obtener la colección de dibujos (imágenes) del Excel
             $drawings = $sheet->getDrawingCollection();
-            while ($row <= $highestRow ) {
-               
+
+            while ($row <= $highestRow) {
                 // Detectar rango mergeado en la columna 1 (A)
                 list($startRow, $endRow) = $getMergeRange($row);
                 log_message('error', 'Start Row: ' . $startRow . ' End Row: ' . $endRow);
-                // Leer valores de la fila/rango
-                if($sheet->getCell("A$row")->getValue() == null || $sheet->getCell("A$row")->getValue() == "" || $sheet->getCell("A$row")->getValue() == "-"){
+
+                // Verificar si hay contenido en la celda A
+                $cellValue = $sheet->getCell("A$startRow")->getValue();
+                if ($cellValue == null || $cellValue == "" || $cellValue == "-") {
                     break;
                 }
-                for ($i = $startRow; $i <= $endRow; $i++) {
-                
-                    $item = $sheet->getCell("A$startRow")->getValue();
-                  
-                    log_message('error', 'Row: ' . $i);
-                    log_message('error', 'Item: ' . $item);
-                    log_message('error', 'Previous ID: ' . $previousID);
-                    if ($previousID != null  && ($previousID == $item || $previousID == "")) {
-                        break;
-                    }
-                    $previousID = $item;
-                    $nombre_comercial = $sheet->getCell("B$i")->getValue();
-                    
-                    // Obtener imagen de la celda C$i
-                    $foto = '';
+
+                $item = trim($cellValue);
+                log_message('error', 'Processing Item: ' . $item . ' en rango ' . $startRow . '-' . $endRow);
+
+                // Evitar procesar el mismo item múltiples veces
+                if (in_array($item, $processedItems)) {
+                    log_message('error', 'Item ya procesado, saltando: ' . $item);
+                    $row = $endRow + 1;
+                    continue;
+                }
+
+                $processedItems[] = $item;
+
+                // Procesar solo una vez por rango mergeado
+                $nombre_comercial = trim($sheet->getCell("B$startRow")->getValue());
+
+                // Obtener imagen - buscar en todo el rango mergeado
+                $foto = '';
+                log_message("error", "Buscando imagen en rango C$startRow a C$endRow. Total de dibujos: " . count($drawings));
+
+                $imageFound = false;
+                for ($searchRow = $startRow; $searchRow <= $endRow && !$imageFound; $searchRow++) {
+                    log_message("error", "Buscando imagen en celda C$searchRow");
                     foreach ($drawings as $drawing) {
                         $coordinates = $drawing->getCoordinates();
-                        if ($coordinates == "C$i") {
-                            if ($drawing instanceof PHPExcel_Worksheet_MemoryDrawing) {
-                                // Es una imagen en memoria
-                                $mimeType = $drawing->getMimeType();
-                                $extension = strtolower(str_replace('image/', '', $mimeType));
-                                
-                                // Guardar la imagen en el servidor
-                                $path = 'assets/img/productos/';
-                                if (!is_dir($path)) {
-                                    mkdir($path, 0777, true);
-                                }
-                                $filename = $path . uniqid() . '.' . $extension;
-                                
-                                // Obtener los datos binarios usando la función de renderizado
-                                $renderingFunction = $drawing->getRenderingFunction();
-                                $imageResource = $drawing->getImageResource();
-                                
-                                // Usar la función de renderizado para obtener los datos
-                                $imageBinary = call_user_func($renderingFunction, $imageResource);
-                                file_put_contents($filename, $imageBinary);
-                                
-                                // Generar URL absoluta
-                                $foto = base_url($filename);
-                                break;
-                            } else {
-                                // Es una imagen desde archivo
-                                $drawingPath = $drawing->getPath();
-                                $hashPosition = strpos($drawingPath, '#');
-                                if ($hashPosition !== false) {
-                                    $extractedPart = substr($drawingPath, $hashPosition + 1);
-                                    $imagePath = 'assets/uploads/' . $extractedPart;
-                                    
+                        log_message("error", "Dibujo encontrado en coordenadas: " . $coordinates);
+
+                        if ($coordinates == "C$searchRow") {
+                            $drawingPath = $drawing->getPath();
+                            log_message("error", "Ruta del dibujo: " . $drawingPath);
+
+                            $hashPosition = strpos($drawingPath, '#');
+                            if ($hashPosition !== false) {
+                                $extractedPart = substr($drawingPath, $hashPosition + 1);
+                                log_message("error", "Parte extraída: " . $extractedPart);
+
+                                // Definir posibles ubicaciones de la imagen
+                                $possiblePaths = [
+                                    'assets/uploads/xl/media/' . $extractedPart,
+                                    'assets/uploads/' . $extractedPart,
+                                    'assets/uploads/media/' . $extractedPart
+                                ];
+
+                                foreach ($possiblePaths as $imagePath) {
+                                    log_message("error", "Buscando imagen en: " . $imagePath);
                                     if (file_exists($imagePath)) {
                                         $imageData = file_get_contents($imagePath);
-                                        $path = 'assets/img/productos/';
-                                        if (!is_dir($path)) {
-                                            mkdir($path, 0777, true);
+                                        if ($imageData !== false) {
+                                            // Crear directorio si no existe
+                                            $path = 'assets/img/productos/';
+                                            if (!is_dir($path)) {
+                                                mkdir($path, 0777, true);
+                                            }
+
+                                            // Obtener extensión original o usar jpg por defecto
+                                            $extension = pathinfo($extractedPart, PATHINFO_EXTENSION);
+                                            $extension = $extension ? $extension : 'jpg';
+
+                                            $filename = $path . uniqid() . '.' . $extension;
+                                            if (file_put_contents($filename, $imageData)) {
+                                                $foto = base_url($filename);
+                                                log_message("error", "Imagen guardada: " . $foto);
+                                                $imageFound = true;
+                                                break 2; // Salir de ambos foreach
+                                            }
                                         }
-                                        $filename = $path . uniqid() . '.jpg';
-                                        file_put_contents($filename, $imageData);
-                                        $foto = base_url($filename);
                                     }
                                 }
-                                break;
+                            } else {
+                                log_message("error", "La ruta no contiene fragmento: " . $drawingPath);
                             }
                         }
                     }
-                    
-                    // Si no se encontró imagen, intentar obtener valor de texto
-                    if (empty($foto)) {
-                        $foto_valor = $sheet->getCell("C$i")->getValue();
-                        $foto = !empty($foto_valor) ? base_url($foto_valor) : '';
-                    }
-                    
-                    //get caracteristicas from merge cells D$i:D$endRow
-                    $caracteristicas = "";
-                    for ($j2 = $i; $j2 <= $endRow; $j2++) {
-                        $caracteristicas .= $sheet->getCell("D$j2")->getValue() . " ";
-                    }
-                    $caracteristicas = trim($caracteristicas);
-                    $rubro =trim($sheet->getCell("E$i")->getValue());
-                    $tipo_producto =trim($sheet->getCell("F$i")->getValue());
-                    $precio_exw = $sheet->getCell("G$i")->getValue();
-                    $subpartida = $sheet->getCell("H$i")->getValue();
-                    $link = $sheet->getCell("I$i")->getValue();
-                    $unidad_comercial = $sheet->getCell("J$i")->getValue();
-                    $arancel_sunat = $sheet->getCell("K$i")->getValue();
-                    $arancel_tlc = $sheet->getCell("L$i")->getValue();
-                    $antidumping = $sheet->getCell("M$i")->getValue();
-                    $correlativo = $sheet->getCell("N$i")->getValue();
-                    $etiquetado = $sheet->getCell("O$i")->getValue();
-                    $doc_especial = $sheet->getCell("P$i")->getValue();
-                    //GET RUBRO IF EXISTS IN TABLE USE THIS ID ELSE INSERT AND GET ID
-                    $this->db->select('id');
-                    $this->db->from($this->table_bd_productos_rubro);
-                    $this->db->where('nombre', $rubro);
-                    $query = $this->db->get();
-                    $rubro_id = $query->row()->id;
-                    if (!$rubro_id) {
-                        $this->db->insert($this->table_bd_productos_rubro, [
-                            'nombre' => $rubro
-                        ]);
-                        $rubro_id = $this->db->insert_id();
-                    }
-                    // Guardar en la base de datos
-                    $this->db->insert($this->table_bd_productos, [
-                        'idContenedor' => $idContenedor,
-                        'item' => $item,
-                        'nombre_comercial' => $nombre_comercial,
-                        'foto' => $foto,
-                        'caracteristicas' => $caracteristicas,
-                        'id_rubro' => $rubro_id,
-                        'tipo_producto' => $tipo_producto,
-                        'precio_exw' => $precio_exw,
-                        'subpartida' => $subpartida,
-                        'link' => $link,
-                        'unidad_comercial' => $unidad_comercial,
-                        'arancel_sunat' => $arancel_sunat,
-                        'arancel_tlc' => $arancel_tlc,
-                        'antidumping' => $antidumping,
-                        'correlativo' => $correlativo,
-                        'etiquetado' => $etiquetado,
-                        'doc_especial' => $doc_especial
-                    ]);
                 }
+
+                // Si no se encontró imagen, intentar obtener valor de texto en la primera fila del rango
+                if (empty($foto)) {
+                    $foto_valor = $sheet->getCell("C$startRow")->getValue();
+                    $foto = !empty($foto_valor) ? base_url(trim($foto_valor)) : '';
+                    log_message("error", "No se encontró imagen, usando valor de texto: " . $foto_valor);
+                }
+
+                // Obtener características combinando todas las celdas del rango mergeado
+                $caracteristicas = "";
+                for ($j = $startRow; $j <= $endRow; $j++) {
+                    $cellContent = trim($sheet->getCell("D$j")->getValue());
+                    if (!empty($cellContent)) {
+                        $caracteristicas .= $cellContent . " ";
+                    }
+                }
+                $caracteristicas = trim($caracteristicas);
+
+                // Obtener el resto de datos (usar la primera fila del rango)
+                $rubro = trim($sheet->getCell("E$startRow")->getValue());
+                $tipo_producto = trim($sheet->getCell("F$startRow")->getValue());
+                $precio_exw = $sheet->getCell("G$startRow")->getValue();
+                $subpartida = $sheet->getCell("H$startRow")->getValue();
+                $link = $sheet->getCell("I$startRow")->getValue();
+                $unidad_comercial = $sheet->getCell("J$startRow")->getValue();
+                $arancel_sunat = $sheet->getCell("K$startRow")->getValue();
+                $arancel_tlc = $sheet->getCell("L$startRow")->getValue();
+                $antidumping = $sheet->getCell("M$startRow")->getValue();
+                $correlativo = $sheet->getCell("N$startRow")->getValue();
+                $etiquetado = $sheet->getCell("O$startRow")->getValue();
+                $doc_especial = $sheet->getCell("P$startRow")->getValue();
+
+                // Preparar datos para insertar
+                $data = [
+                    'idContenedor' => $idContenedor,
+                    'item' => $item,
+                    'nombre_comercial' => $nombre_comercial,
+                    'foto' => $foto,
+                    'caracteristicas' => $caracteristicas,
+                    'rubro' => $rubro,
+                    'tipo_producto' => $tipo_producto,
+                    'precio_exw' => $precio_exw,
+                    'subpartida' => $subpartida,
+                    'link' => $link,
+                    'unidad_comercial' => $unidad_comercial,
+                    'arancel_sunat' => $arancel_sunat,
+                    'arancel_tlc' => $arancel_tlc,
+                    'antidumping' => $antidumping,
+                    'correlativo' => $correlativo,
+                    'etiquetado' => $etiquetado,
+                    'doc_especial' => $doc_especial
+                ];
+
+                // Guardar en la base de datos
+                if ($this->db->insert($this->table_bd_productos, $data)) {
+                    log_message('error', 'Producto insertado correctamente: ' . $item);
+                } else {
+                    log_message('error', 'Error al insertar producto: ' . $item);
+                }
+
+                // Avanzar al siguiente rango
                 $row = $endRow + 1;
             }
+
+            // Limpiar archivos temporales
+            $tempDir = 'assets/uploads/xl/';
+            if (is_dir($tempDir)) {
+                $this->deleteDirectory($tempDir);
+                log_message("error", "Directorio temporal eliminado: " . $tempDir);
+            }
+
+            return true;
         } catch (Exception $e) {
             log_message('error', 'Error en importarProductosDesdeExcel: ' . $e->getMessage());
+            log_message('error', 'Stack trace: ' . $e->getTraceAsString());
             return false;
         }
+    }
+
+    // Función auxiliar para eliminar directorios recursivamente
+    private function deleteDirectory($dir)
+    {
+        if (!is_dir($dir)) {
+            return false;
+        }
+
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dir . DIRECTORY_SEPARATOR . $file;
+            is_dir($path) ? $this->deleteDirectory($path) : unlink($path);
+        }
+
+        return rmdir($dir);
     }
 }
