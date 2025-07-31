@@ -1156,8 +1156,8 @@ Search for
                     <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
                     <div
                         class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
-                        <!-- icon with dollar icon-->
-                        <i class="fas fa-dollar-sign"></i>
+                        <!-- icon with boxes icon-->
+                        <i class="nav-icon fas fa-boxes"></i>
                         <span>Total Qty Items:</span>
                         <div class="">
                             <strong><span type="number" id="txt-CBM_Total_Qty_Items" class="cbm_score"
@@ -1188,15 +1188,20 @@ Search for
                     <table id="table-cotizacion-prospectos" class="table table-hover dataTable no-footer hidden">
                         <thead class="thead-default">
                             <tr>
-                                <th>Asesor</th>
                                 <th>N°</th>
+                                <th>Carga</th>
+                                <th>F. Cierre</th>
+                                <th>Asesor</th>
+                                <th>COD</th>
                                 <th>Fecha</th>
+                                <th>Fecha de modificación</th>
                                 <th>Nombre</th>
                                 <th>DNI/RUC</th>
                                 <th>Correo</th>
                                 <th>Whatsapp</th>
                                 <th>T. Cliente</th>
                                 <th>Volumen</th>
+                                <th>Volumen China</th>
                                 <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
                                 <th>Qty Item</th>
                                 <?php } ?>
@@ -1396,8 +1401,8 @@ Search for
                 <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
                 <div
                     class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
-                    <!-- icon with dollar icon-->
-                    <i class="fas fa-dollar-sign"></i>
+                    <!-- icon with boxes icon-->
+                    <i class="nav-icon fas fa-boxes"></i>
                     <span>Total Qty Items:</span>
                     <div class="">
                         <strong><span type="number" id="txt-CBM_Cliente_Total_Qty_Items" class="cbm_score"
@@ -1787,7 +1792,7 @@ Search for
                         <?php } ?> &nbsp; <i class="fa fa-save"></i>
                     </div>
 
-                    <?php if ($this->user->No_Grupo == "GERENCIA" ) {   ?>
+                    <?php if ($this->user->No_Grupo == "GERENCIA" || $this->user->No_Grupo == "Coordinacion") {   ?>
 
                     <div id="btn-send-inspection">
                         <i class="fas fa-save"></i>
@@ -2317,6 +2322,28 @@ Search for
                         Save
                         <?php } ?> </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para mover cotización a otro consolidado -->
+    <div class="modal fade" id="modal-move-cotizacion" tabindex="-1" role="dialog" aria-labelledby="modalMoveCotizacionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalMoveCotizacionLabel">Mover cotización a otro consolidado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="selectConsolidado">Selecciona el consolidado destino:</label>
+                <select id="selectConsolidado" class="form-control"></select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-confirm-move">Mover cotización</button>
+            </div>
             </div>
         </div>
     </div>
