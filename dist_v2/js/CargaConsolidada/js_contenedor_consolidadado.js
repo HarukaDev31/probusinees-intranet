@@ -5363,7 +5363,7 @@ async function viewClientesDocumentacion(id, nombrecliente = null) {
 
   providers.forEach((provider) => {
     $(".documentos-clientes-tabs").append(`
-        <div class="tab-cliente-documentacion" data-id="${provider.id}">
+        <div class="tab-cliente-documentacion tab" data-id="${provider.id}">
           ${provider.code_supplier}
         </div>`);
   });
