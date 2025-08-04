@@ -79,13 +79,13 @@ class AdministracionModel extends CI_Model
         );
 
         // Filtros de fecha
-        if (!empty($this->input->post('Filtro_Fe_Inicio'))) {
-            $this->db->where($this->table_consolidado_cotizacion . '.fecha >=', $this->input->post('Filtro_Fe_Inicio'));
-        }
+        // if (!empty($this->input->post('Filtro_Fe_Inicio'))) {
+        //     $this->db->where($this->table_consolidado_cotizacion . '.fecha >=', $this->input->post('Filtro_Fe_Inicio'));
+        // }
 
-        if (!empty($this->input->post('Filtro_Fe_Fin'))) {
-            $this->db->where($this->table_consolidado_cotizacion . '.fecha <=', $this->input->post('Filtro_Fe_Fin'));
-        }
+        // if (!empty($this->input->post('Filtro_Fe_Fin'))) {
+        //     $this->db->where($this->table_consolidado_cotizacion . '.fecha <=', $this->input->post('Filtro_Fe_Fin'));
+        // }
 
         // Filtros opcionales adicionales
         if (!empty($this->input->post('estado'))) {
