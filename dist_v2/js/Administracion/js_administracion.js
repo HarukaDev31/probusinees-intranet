@@ -425,20 +425,6 @@ async function getTableHeaders(table) {
   }
   try {
     const formData = new FormData();
-    formData.append("Filtro_Fe_Inicio", $('#txt-Fe_Inicio').val() == "" ? ParseDateString(      //fin inicio 2 meses antes
-      new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      }), 'fecha', '/')
-      : $('#txt-Fe_Inicio').val());
-    formData.append("Filtro_Fe_Fin", $('#txt-Fe_Fin').val() == "" ? ParseDateString(
-      new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      }), 'fecha', '/')
-      : $('#txt-Fe_Fin').val());
 
     const response = await fetch(url,
       {
@@ -773,22 +759,6 @@ $(".tab-administracion").off("click").click(async function () {
           'data': function (data) {
             data.sMethod = $('#hidden-sMethod').val();
             data.estado_pago = $('#txt-ID_Estado_Cotizacion').val() ?? 0;
-            console.log($('#txt-Fe_Inicio').val());
-            data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio').val() == "" ?
-              //fin inicio 2 meses antes 
-              new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-              })
-              : $('#txt-Fe_Inicio').val();
-            data.Filtro_Fe_Fin = ($('#txt-Fe_Fin').val() == "" ?
-              new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-              })
-              : $('#txt-Fe_Fin').val());
             data.tipoTabla = "consolidado";
             data.campana = $('#txt-ID_Campana').val() || 0; // Get the selected campaign ID
           },

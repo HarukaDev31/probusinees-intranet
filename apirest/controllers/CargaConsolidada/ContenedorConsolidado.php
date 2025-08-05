@@ -954,6 +954,7 @@ class ContenedorConsolidado extends CI_Controller
 					<span>' . ($row->valor_doc ?? 0) . '</span></div>';
 
 					$subdata[] = $index;
+					$subdata[] = $row->No_Nombres_Apellidos;
 					$subdata[] = $row->nombre;
 					$subdata[] = $row->documento;
 					$subdata[] = $row->name;

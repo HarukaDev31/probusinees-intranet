@@ -1431,7 +1431,7 @@ Search for
                 <thead class="thead-default">
                     <tr>
                         <th>N°</th>
-                        <th>Nombre</th>
+                        <th style="min-width: 10em;">Nombre</th>
                         <th>DNI/RUC</th>
                         <th>Correo</th>
                         <th>Whatsapp</th>
@@ -1464,6 +1464,7 @@ Search for
                 <thead class="thead-default">
                     <tr>
                         <th>N°</th>
+                        <th>Asesor</th>
                         <th>Nombre</th>
                         <th>DNI/RUC</th>
                         <th>T. Cliente</th>
