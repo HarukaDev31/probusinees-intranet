@@ -109,7 +109,7 @@
                                 <div class="d-flex justify-content-around">
                                     <button
                                         class="bg-white py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block"
-                                        style="margin-top: .5rem;" id="cancelar-btn">Cancelar</button>
+                                        style="margin-top: .5rem;" id="cancelar-btn">Limpiar</button>
                                     <button
                                         class="bg-orange py-2 px-2 border border-transparent hover:border-orange-600 rounded btn-block"
                                         id="aplicar-btn-cotizacion">Aplicar</button>
