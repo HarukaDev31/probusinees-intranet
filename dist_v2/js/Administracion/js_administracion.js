@@ -11,12 +11,55 @@ var tableCursoPagos;
 async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
   // Obtener la instancia de DataTable
   var table = $("#" + tableId).DataTable();
-  console.log(table);
+
 
   // Escuchar el evento "input" en el buscador
   $("." + searchInputClass).on("input", function () {
     var searchTerm = $(this).val(); // Obtener el valor del buscador
-    table.search(searchTerm).draw(); // Aplicar la búsqueda y redibujar la tabla
+    
+    // Si el término de búsqueda contiene solo dígitos (puede ser parcial), crear una expresión regular más flexible
+    if (/^\d+(\.\d*)?$/.test(searchTerm)) {
+      var searchPatterns = [];
+      
+      // Si es un número sin decimales (o decimal incompleto)
+      if (!searchTerm.includes('.') || searchTerm.endsWith('.')) {
+        var baseNumber = searchTerm.replace('.', '');
+        
+        // Patrones para buscar el número en diferentes formatos
+        // Buscar como número simple (ej: 367 busca en 3670.20)
+        searchPatterns.push(baseNumber);
+        
+        // Buscar con posibles separadores de miles y decimales
+        // Crear un patrón flexible que permita separadores antes y después
+        var flexiblePattern = baseNumber.split('').join('[,.]?');
+        searchPatterns.push(flexiblePattern);
+        
+        // Patrón específico para encontrar números que empiecen con la secuencia buscada
+        searchPatterns.push(baseNumber + '[0-9,._]*');
+        
+      } else {
+        // Número decimal completo - usar lógica anterior
+        searchPatterns.push(searchTerm);
+        
+        var parts = searchTerm.split('.');
+        var integerPart = parts[0];
+        var decimalPart = parts[1];
+        
+        // Formatear con diferentes separadores de miles
+        if (integerPart.length > 3) {
+          var formattedWithDots = integerPart.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+          var formattedWithCommas = integerPart.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+          
+          searchPatterns.push(formattedWithCommas + '\\.' + decimalPart);
+          searchPatterns.push(formattedWithDots + '\\.' + decimalPart);
+        }
+      }
+      
+      var searchPattern = searchPatterns.join('|');
+      table.search(searchPattern, true, false).draw(); // regex=true, smart=false
+    } else {
+      table.search(searchTerm).draw(); // Búsqueda normal para texto
+    }
   });
 
   // Función para limpiar el buscador y el filtro
@@ -37,7 +80,7 @@ async function configurarBuscador(tableId, searchInputClass, infoContainerId) {
   });
 }
 function limpiarFiltrosTabla() {
-  $("#txt-Fe_Inicio").val(ParseDateString(new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
+  $("#txt-Fe_Inicio").val(ParseDateString(new Date(new Date().getFullYear(), 0, 1).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
   $("#txt-Fe_Fin").val(ParseDateString(new Date().toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
   $("#txt-ID_Estado_Cotizacion").val('0');
   $("#txt-ID_Campana").val('0');
@@ -671,7 +714,6 @@ $(".tab-administracion").off("click").click(async function () {
       });
     } else {
     }
-    getTableHeaders("consolidado");
     $("#table-pagos-consolidado").attr("style", "");
     $("#table-pagos-curso").hide();
     $("#table-pagos-curso_wrapper").hide();
@@ -684,7 +726,7 @@ $(".tab-administracion").off("click").click(async function () {
       $("#table-pagos-consolidado_wrapper").show();
       tableCursoPedidos.ajax.reload(null, false);
     } else {
-      $("#txt-Fe_Inicio").val(ParseDateString(new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
+      $("#txt-Fe_Inicio").val(ParseDateString(new Date(new Date().getFullYear(), 0, 1).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
       $("#txt-Fe_Fin").val(ParseDateString(new Date().toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
       $("#txt-ID_Estado_Cotizacion").val('0');
       $("#txt-ID_Campana").val('0');
@@ -728,7 +770,7 @@ $(".tab-administracion").off("click").click(async function () {
 
         ],
         'searching': true,
-        'bStateSave': true,
+        'bStateSave': false,
         "lengthChange": true,
         'processing': true,
         'serverSide': false,
@@ -761,6 +803,8 @@ $(".tab-administracion").off("click").click(async function () {
             data.estado_pago = $('#txt-ID_Estado_Cotizacion').val() ?? 0;
             data.tipoTabla = "consolidado";
             data.campana = $('#txt-ID_Campana').val() || 0; // Get the selected campaign ID
+            getTableHeaders("consolidado");
+
           },
         },
         'columnDefs': [
@@ -805,7 +849,7 @@ $(".tab-administracion").off("click").click(async function () {
       $("#table-pagos-curso_wrapper").show();
       tableCursoPagos.ajax.reload(null, false);
     } else {
-      $("#txt-Fe_Inicio").val(ParseDateString(new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
+      $("#txt-Fe_Inicio").val(ParseDateString(new Date(new Date().getFullYear(), 0, 1).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
       $("#txt-Fe_Fin").val(ParseDateString(new Date().toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })));
       $("#txt-ID_Estado_Cotizacion").val('0');
       $("#txt-ID_Campana").val('0');
@@ -871,24 +915,17 @@ $(".tab-administracion").off("click").click(async function () {
           data: function (data) {
             data.sMethod = $('#hidden-sMethod').val();
             data.estado_pago = $('#txt-ID_Estado_Cotizacion').val();
-            data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio').val() == "" ?
-              new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-              })
-              : $('#txt-Fe_Inicio').val();
-            data.Filtro_Fe_Fin = $('#txt-Fe_Fin').val() == "" ?
-              new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-              })
-              : $('#txt-Fe_Fin').val();
+            if ($('#txt-Fe_Inicio').val() != "") {
+              data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio').val();
+            }
+            if ($('#txt-Fe_Fin').val() != "") {
+              data.Filtro_Fe_Fin = $('#txt-Fe_Fin').val();
+            }
+    
             // Agregar tipoTabla para identificar el tipo de tabla
             data.tipoTabla = "pagos";
             data.campana = $('#txt-ID_Campana').val() || 0; // Get the selected campaign ID 
-
+            getTableHeaders("curso");
           },
         },
       });
@@ -1020,11 +1057,10 @@ $(document).ready(function () {
   $("#aplicar-btn-cotizacion").on("click", function () {
     if (currentTableCurso == "consolidado") {
       tableCursoPedidos.ajax.reload(null, false);
-      getTableHeaders("consolidado");
     }
     else if (currentTableCurso == "curso") {
       tableCursoPagos.ajax.reload(null, false);
-      getTableHeaders("curso");
+
     }
     $(".dropdown-menu").removeClass("show"); // Remove the show class from the dropdown menu
   });
@@ -1040,8 +1076,13 @@ $("#cancelar-btn").on("click", function () {
   limpiarFiltrosTabla();
   if (currentTableCurso === 'consolidado') {
     $("#cbo-filtro-estado_pago").val('0').trigger('change');
+    //set fecha inicio to null
+    $("#txt-Fe_Inicio").val(null);
+    $("#txt-Fe_Fin").val(null);
     tableCursoPedidos.ajax.reload(null, false); // Reload the consolidated payments table
   } else if (currentTableCurso === 'curso') {
+    $("#txt-Fe_Inicio").val(null);
+    $("#txt-Fe_Fin").val(null);
     $("#cbo-filtro-estado_pago").val('0').trigger('change');
     tableCursoPagos.ajax.reload(null, false); // Reload the course payments table
   }
