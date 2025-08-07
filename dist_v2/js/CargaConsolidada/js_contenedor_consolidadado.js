@@ -3771,6 +3771,20 @@ const openStepFunction = async (step, id) => {
         $("#table-clientes-general").attr("style", "");
         $("#table-clientes-variacion").hide();
         $("#table-clientes-pagos").hide();
+        var columnshide = [];
+        var columnsexport = [];
+        if(currentPrivilege == "Documentacion"){
+          columnshide = [1,2,3,4,5,6,12,13,14,15,16,17,18,19],
+          columnsexport = [-1,-2,-3,-4,-5,-6,-7,-8,-9];
+        }
+        if(currentPrivilege == "Coordinación"){
+          columnshide = [1,2,3,4,5,6,13],
+          columnsexport = [14,-1,-2,-3];
+        }
+        if(currentPrivilege == "Cotizador"){
+          columnshide = [1,2,3,4,5,6,13,-2,-3],
+          columnsexport = [14,-1,-2,-3];
+        }
 
         if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
           $("#table-clientes-general").show();
@@ -3788,7 +3802,15 @@ const openStepFunction = async (step, id) => {
                   text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
                   titleAttr: "Excel",
                   exportOptions: {
-                    columns: ":visible, :hidden",
+                    columns: function(idx, data, node) {
+                        // Usa la instancia global de la tabla
+                        if (typeof tableClientesGeneral !== "undefined" && tableClientesGeneral.settings) {
+                            var colDef = tableClientesGeneral.settings()[0].aoColumns[idx];
+                            return !colDef.exported;
+                        }
+                        // Si no está definida, exporta todo
+                        return true;
+                    },
                     format: {
                       body: function (data, row, column, node) {
                         // Handle multiple inputs in a div
@@ -3912,7 +3934,7 @@ const openStepFunction = async (step, id) => {
                   },
                 },
               ],
-            columnDefs: [
+              columnDefs: [
               {
                 targets: "no-hidden",
                 visible: false,
@@ -3929,6 +3951,14 @@ const openStepFunction = async (step, id) => {
               {
                 targets: "sorting_asc",
                 orderable: false,
+              },
+              {
+                targets: columnshide,
+                visible: false,
+              },
+              {
+                targets: columnsexport,
+                exported: true,
               },
             ],
             pageLength: 100, // Mostrar 100 elementos por página
