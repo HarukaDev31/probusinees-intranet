@@ -468,6 +468,13 @@ async function getTableHeaders(table) {
   }
   try {
     const formData = new FormData();
+    if ($('#txt-Fe_Inicio').val() != "") {
+      formData.append("Filtro_Fe_Inicio", $('#txt-Fe_Inicio').val());
+    }
+    if ($('#txt-Fe_Fin').val() != "") {
+      formData.append("Filtro_Fe_Fin", $('#txt-Fe_Fin').val());
+    }
+
 
     const response = await fetch(url,
       {
@@ -801,6 +808,12 @@ $(".tab-administracion").off("click").click(async function () {
           'data': function (data) {
             data.sMethod = $('#hidden-sMethod').val();
             data.estado_pago = $('#txt-ID_Estado_Cotizacion').val() ?? 0;
+            if ($('#txt-Fe_Inicio').val() != "") {  
+              data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio').val();
+            }
+            if ($('#txt-Fe_Fin').val() != "") {
+              data.Filtro_Fe_Fin = $('#txt-Fe_Fin').val();
+            }
             data.tipoTabla = "consolidado";
             data.campana = $('#txt-ID_Campana').val() || 0; // Get the selected campaign ID
             getTableHeaders("consolidado");
