@@ -416,6 +416,9 @@ class ContenedorConsolidado extends CI_Controller
 	{
 		$stepIndex = $this->input->post('stepIndex');
 		$idContenedor = $this->input->post('idContenedor');
+		$cargaConsolidado = $this->ContenedorConsolidadoModel->show($idContenedor);
+		$proveedoresData = $this->ContenedorConsolidadoModel->getContenedorCotizacionProveedores($idContenedor);
+		$cbm_total_china_sum = 0;
 		$tipoTabla = $this->input->post('tipoTabla');
 		if ($stepIndex == 1 && $this->user->No_Grupo != "Documentacion") {
 			$arrResponse = [];
@@ -429,13 +432,10 @@ class ContenedorConsolidado extends CI_Controller
 
 			}
 			$data  = [];
-			$index = 1;
-			$cargaConsolidado = $this->ContenedorConsolidadoModel->show($idContenedor);
+			$index = 1;		
 			foreach ($arrResponse as $row) {
 				if ($tipoTabla == "prospectos") {
 					// Obtener todos los proveedores de la cotización actual
-					$proveedoresData = $this->ContenedorConsolidadoModel->getContenedorCotizacionProveedores($idContenedor);
-					$cbm_total_china_sum = 0;
 					foreach ($proveedoresData as $cotizacion) {
 						if ($cotizacion->id == $row->id_cotizacion && !empty($cotizacion->proveedores)) {
 							$proveedores = json_decode($cotizacion->proveedores);
@@ -449,11 +449,7 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $cargaConsolidado->carga;
 					$subdata[] = date("d/m/Y", strtotime($cargaConsolidado->f_cierre));
 					$subdata[] = $row->No_Nombres_Apellidos;
-					// Generar el código único
-					$fecha = !empty($row->fecha) ? date("dmy", strtotime($row->fecha)) : "";
-					$nombre = strtoupper(substr(trim($row->nombre), 0, 3));
-					$codigoUnico = $cargaConsolidado->carga . $fecha . $nombre;
-					$subdata[] = $codigoUnico;					
+					$subdata[] = $row->COD;				
 					$subdata[] = date("d/m/Y", strtotime($row->fecha));
 					$subdata[] = empty($row->updated_at) || $row->updated_at == "0000-00-00" || $row->updated_at == null ? null : date("d/m/Y", strtotime($row->updated_at));
 					$subdata[] = ucwords(strtolower($row->nombre));
@@ -827,6 +823,12 @@ class ContenedorConsolidado extends CI_Controller
 				if ($tipoTabla == "general") {
 					$subdata   = [];
 					$subdata[] = $index;
+					$subdata[] = $cargaConsolidado->carga;
+					$subdata[] = date("d/m/Y", strtotime($cargaConsolidado->f_cierre));
+					$subdata[] = $row->No_Nombres_Apellidos;
+					$subdata[] = $row->COD;
+					$subdata[] = date("d/m/Y", strtotime($row->fecha));
+					$subdata[] = empty($row->updated_at) || $row->updated_at == "0000-00-00" || $row->updated_at == null ? null : date("d/m/Y", strtotime($row->updated_at));
 					$subdata[] = ucwords(strtolower($row->nombre));
 					$subdata[] = $row->documento;
 					$subdata[] = $row->correo;
@@ -834,11 +836,20 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = ucwords(strtolower($row->name));
 					if ($this->user->No_Grupo != "Documentacion") {
 						$subdata[] = $row->volumen;
+						$subdata[] = $row->volumen_china;
 						$subdata[] = $row->qty_item;
 						$subdata[] = $row->fob;
 						$subdata[] = $row->monto;
 						$subdata[] = $row->impuestos;
 						$subdata[] = $row->tarifa;
+					}else{
+						$subdata[] = null;
+						$subdata[] = null;
+						$subdata[] = null;
+						$subdata[] = null;
+						$subdata[] = null;
+						$subdata[] = null;
+						$subdata[] = null;
 					}
 
 					if ($this->user->No_Grupo == "Coordinación") {
@@ -857,6 +868,8 @@ class ContenedorConsolidado extends CI_Controller
 						<option value="FACTURADO" ' . ($row->estado_cliente == "FACTURADO" ? "selected" : "") . '>FACTURADO</option>
 					</select>';
 						$subdata[] = $selectEstadoCliente;
+					}else{
+						$subdata[] = '';
 					}
 					if ($this->user->No_Grupo == "Documentacion" || $this->user->No_Grupo == "Coordinación") {
 						$status = isset($row->status_cliente_doc) ? $row->status_cliente_doc : 'NO CARGA';
@@ -882,6 +895,8 @@ class ContenedorConsolidado extends CI_Controller
 						$select_status .= '</select>';
 						$rows[] = $select_status;
 						$subdata[] = $select_status;
+					}else{
+						$subdata[] = '';
 					}
 					if ($this->user->No_Grupo == "Coordinación") {
 						$divAcciones = '<div class="d-flex px-2" style="gap:20px;"><div class="d-flex"  onclick="viewClientesDocumentacion(' . $row->id_cotizacion . ', \'' . addslashes(trim($row->nombre)) . '\')">
@@ -899,7 +914,7 @@ class ContenedorConsolidado extends CI_Controller
 						$subdata[] = $btnView;
 					}
 
-					$data[]    = $subdata;
+					$data[] = $subdata;
 					$index++;
 				} else if ($tipoTabla == "variacion") {
 					$subdata       = [];
@@ -1037,6 +1052,8 @@ class ContenedorConsolidado extends CI_Controller
 				}
 			}
 			$output = [
+				'carga' => $cargaConsolidado->carga, // valor obtenido por el idContenedor
+				'f_cierre' => $cargaConsolidado->f_cierre, // valor obtenido por el idContenedor
 				"data" => $data,
 			];
 			echo json_encode($output);

@@ -1328,13 +1328,6 @@ Search for
                     Export
                     <?php } ?></button>
                 <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-exportar-carga">
-                    <button class="dropdown-item btn-block export-pdf-main-content"><i
-                            class="fa fa-file-pdf color_icon_pdf"></i>
-                        <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
-                        Exportar
-                        <?php } else { ?>
-                        Export
-                        <?php } ?> PDF</button>
                     <button class="dropdown-item btn-block export-excel-main-content"><i
                             class="fa fa-file-excel color_icon_excel"></i>
                         <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
@@ -1431,30 +1424,26 @@ Search for
                 <thead class="thead-default">
                     <tr>
                         <th>N°</th>
+                        <th>Carga</th>
+                        <th>F. Cierre</th>
+                        <th>Asesor</th>
+                        <th>Codigo</th>
+                        <th>Fecha</th>
+                        <th>Fecha Modificación</th>
                         <th style="min-width: 10em;">Nombre</th>
                         <th>DNI/RUC</th>
                         <th>Correo</th>
                         <th>Whatsapp</th>
-                        <!-- <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
-            <th>Asesor</th>
-          <?php } ?> -->
                         <th>T. Cliente</th>
-                        <?php if ($this->user->No_Grupo != "Documentacion") {  ?>
                         <th>Volumen</th>
-                        <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
+                        <th>Volumen China</th>
                         <th>Qty Item</th>
-                        <?php } ?>
                         <th>Fob</th>
                         <th>Logistica</th>
                         <th>Impuesto</th>
                         <th>Tarifa</th>
-                        <?php } ?>
-                        <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
                         <th style="min-width: 8em;">Estados</th>
-                        <?php } ?>
-                        <?php if ($this->user->No_Grupo == "Documentacion" || $this->user->No_Grupo == "Coordinación") {  ?>
                         <th style="min-width: 8em;">Status</th>
-                        <?php } ?>
                         <th>Acciones</th>
                         
                     </tr>

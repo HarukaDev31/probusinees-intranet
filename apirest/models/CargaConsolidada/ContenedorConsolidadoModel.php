@@ -278,38 +278,44 @@ class ContenedorConsolidadoModel extends CI_Model
     }
     public function getContenedorCotizacion($idContenedor)
     {
-        $this->db->select("*," . $this->table_contenedor_cotizacion . ".id AS id_cotizacion")
-            ->from($this->table_contenedor_cotizacion)
-            ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = ' . $this->table_contenedor_cotizacion . '.id_tipo_cliente', 'join')
-            ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = ' . $this->table_contenedor_cotizacion . '.id_usuario', 'left')
+        $this->db->select("
+            CC.*,
+            CC.id AS id_cotizacion,
+            U.No_Nombres_Apellidos,
+            CONCAT(
+                C.carga,
+                DATE_FORMAT(CC.fecha, '%d%m%y'),
+                UPPER(LEFT(TRIM(CC.nombre), 3))
+            ) AS COD
+        ")
+            ->from($this->table_contenedor_cotizacion . " AS CC")
+            ->join($this->table . ' AS C', 'C.id = CC.id_contenedor')
+            ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'join')
+            ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = CC.id_usuario', 'left')
             ->where('id_contenedor', $idContenedor)
             ->order_by('id_cotizacion', 'asc');
-        // Si el usuario es "Cotizador", filtrar por el id del usuario actual
+       // Si el usuario es "Cotizador", filtrar por el id del usuario actual
         if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
-            $this->db->where($this->table_contenedor_cotizacion . '.id_usuario', $this->user->ID_Usuario);
-            //order by fecha_confirmacion asc
-
+            $this->db->where('CC.id_usuario', $this->user->ID_Usuario);
         }
         if ($this->user->No_Grupo != "Cotizador") {
-            $this->db->where('estado_cotizador', 'CONFIRMADO');
-
+            $this->db->where('CC.estado_cotizador', 'CONFIRMADO');
             if ($this->input->post('Filtro_Estado') != "0") {
                 $fieldToFilter = [
-                    'Coordinación' => 'estado',
-                    'ContenedorAlmacen' => 'estado_china',
-                    'CatalogoChina' => 'estado_china',
-                    'Documentacion' => 'estado',
+                    'Coordinación' => 'CC.estado',
+                    'ContenedorAlmacen' => 'CC.estado_china',
+                    'CatalogoChina' => 'CC.estado_china',
+                    'Documentacion' => 'CC.estado',
                 ];
                 $this->db->where($fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
             }
         } else {
             if ($this->input->post('Filtro_Estado') != "0") {
-
-                $this->db->where('estado_cotizador', $this->input->post('Filtro_Estado'));
+                $this->db->where('CC.estado_cotizador', $this->input->post('Filtro_Estado'));
             }
         }
         if ($this->user->No_Grupo == "Cotizador") {
-            $this->db->order_by('fecha_confirmacion', 'asc');
+            $this->db->order_by('CC.fecha_confirmacion', 'asc');
         }
         $query = $this->db->get();
         return $query->result();
@@ -651,16 +657,27 @@ class ContenedorConsolidadoModel extends CI_Model
     }
     public function getContenedorClientes($idContenedor)
     {
-        $this->db->select("*," . $this->table_contenedor_cotizacion . ".id AS id_cotizacion")
-            ->from($this->table_contenedor_cotizacion)
-            ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = ' . $this->table_contenedor_cotizacion . '.id_tipo_cliente', 'join')
-            ->where('id_contenedor', $idContenedor)
-            //WHERE ESTADO NOT NULL
-            ->where('estado_cliente IS NOT NULL')
-            ->where('estado_cotizador', 'CONFIRMADO');
+        $this->db->select("
+            CC.*,
+            CC.id AS id_cotizacion,
+            TC.name AS name,
+            U.No_Nombres_Apellidos,
+            CONCAT(
+                C.carga,
+                DATE_FORMAT(CC.fecha, '%d%m%y'),
+                UPPER(LEFT(TRIM(CC.nombre), 3))
+            ) AS COD
+        ")
+        ->from($this->table_contenedor_cotizacion . " AS CC")
+        ->join($this->table . ' AS C', 'C.id = CC.id_contenedor')
+        ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'join')
+        ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = CC.id_usuario', 'left')
+        ->where('CC.id_contenedor', $idContenedor)
+        ->where('CC.estado_cliente IS NOT NULL')
+        ->where('CC.estado_cotizador', 'CONFIRMADO');
         $estado = $this->input->post('estado') ?? "0";
         if ($estado != "0") {
-            $this->db->where('estado_cliente', $estado);
+            $this->db->where('CC.estado_cliente', $estado);
         }
         $query = $this->db->get();
         return $query->result();
