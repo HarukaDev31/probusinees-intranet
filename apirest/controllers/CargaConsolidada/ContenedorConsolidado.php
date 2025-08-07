@@ -194,7 +194,7 @@ class ContenedorConsolidado extends CI_Controller
 				$subdata[] = $row->mes;
 				// $subdata[] = $row->No_Pais;
 				$subdata[] = $row->empresa;
-				$subdata[] = "<div>Carga Consolidada #" . $row->carga . "</div>";
+				$subdata[] = "<div>Consolidado #" . $row->carga . "</div>";
 				$subdata[] = $row->tipo_contenedor;
 				$color = 'bg-secondary'; // gris por defecto
 				switch (strtolower(trim($row->canal_control))) {
@@ -771,7 +771,7 @@ class ContenedorConsolidado extends CI_Controller
 					usort($arrData, function($a, $b) {
 						return $a->id - $b->id;
 					});
-					$divAcciones = '<div class="nav">';
+					$divAcciones = '<div class="nav min-w-[400px]">';
 					for ($i = 0; $i < 4; $i++) {
 						if (isset($arrData[$i])) {
 							$divAcciones .= '
@@ -1019,7 +1019,7 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = "Logistica";
 					$subdata[] = "$".round($row->monto+$row->impuestos,2);
 					$subdata[] = $row->total_pagos==0 ? "0" : "$".number_format($row->total_pagos, 2);
-					$divAcciones = '<div class="nav">';
+					$divAcciones = '<div class="nav min-w-[400px]">';
 					//if pagos_count is minor than 4 add button plus to add new payment
 					$arrData = $this->ContenedorConsolidadoModel->getPagosCoordination($row->id_cotizacion);
 					usort($arrData, function($a, $b) {
@@ -1164,7 +1164,7 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $row->name;	
 					$subdata[] = "$".($row->logistica_final+$row->impuestos_final);
 					$subdata[] =$row->total_pagos==0 ? "$0" : "$".  number_format($row->total_pagos, 2);
-					$divAcciones = '<div class="nav">';
+					$divAcciones = '<div class="nav min-w-[400px]">';
 					//if pagos_count is minor than 4 add button plus to add new payment
 					$arrData = $this->ContenedorConsolidadoModel->getPagosCoordination($row->id_cotizacion);
 					usort($arrData, function($a, $b) {
