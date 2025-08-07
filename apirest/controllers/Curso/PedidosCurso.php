@@ -99,6 +99,12 @@ class PedidosCurso extends CI_Controller
                 $select_usuario = '<select class="select-usuario-externo form-control" data-id-usuario="' . $row->ID_Usuario . '" data-id-pedido="' . $row->ID_Pedido_Curso . '">';
                 $select_usuario .= '<option value="1"' . ($row->Nu_Estado_Usuario_Externo == 1 ? ' selected' : '') . '>Pendiente</option>';
                 $select_usuario .= '<option class="bg-' . $arrEstadoRegistro['No_Class_Estado'] . '" value="2"' . ($row->Nu_Estado_Usuario_Externo == 2 ? ' selected' : '') . '>Creado</option>';
+                // Solo habilita "Constancia" si send_constancia es SENDED
+                if ($row->send_constancia == 'SENDED') {
+                    $select_usuario .= '<option value="3" selected>Constancia</option>';
+                } else {
+                    $select_usuario .= '<option value="3" disabled>Constancia</option>';
+                }
                 $select_usuario .= '</select>';
                 log_message('error', 'Nu_Estado_Usuario_Externo: ' . print_r($row->Nu_Estado_Usuario, true));
                 $rows[] = $select_usuario; //usuario

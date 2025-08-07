@@ -31,6 +31,7 @@ class ContenedorConsolidadoModel extends CI_Model
     private $roleCoordinacion = "Coordinación";
     private $roleContenedorAlmacen = "ContenedorAlmacen";
     private $roleCatalogoChina = "CatalogoChina";
+    private $rolesChina = ["CatalogoChina", "ContenedorAlmacen"];
     private $roleDocumentacion = "Documentacion";
     private $aNewContainer = "new-container";
     private $aNewConfirmado = "new-confirmado";
@@ -1699,7 +1700,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
     {
         //if no_grupo is  roleContenedorAlmacen
         try {
-            if ($this->user->No_Grupo == $this->roleContenedorAlmacen || $this->user->No_Grupo == $this->roleCatalogoChina) {
+            if (in_array($this->user->No_Grupo, $this->rolesChina)) {
                 $this->db->set('estado_china', $estado);
                 $this->db->where('id', $id);
                 $this->db->update($this->table);
