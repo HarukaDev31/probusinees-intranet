@@ -473,7 +473,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     'CatalogoChina' => 'estado_china',
                     'Documentacion' => 'estado',
                 ];
-                $this->db->where("main" . $fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
+                $this->db->where("main." . $fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
             }
             if ($filtroState != "0") {
                 $state = $this->db->escape_str($filtroState);
