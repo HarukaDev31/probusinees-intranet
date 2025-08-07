@@ -65,3 +65,8 @@ $route['orders/uploadCotizacion'] = 'OrdersController/uploadCotizacion';
 $route['orders/cotizacion/(:num)'] = 'OrdersController/cotizacion/$1';
 $route['orders/downloadCotizacion/(:num)'] = 'OrdersController/downloadOrderExcel/$1';
 $route['orders/deleteOrder'] = 'OrdersController/deleteOrder';
+
+// Rutas para API de Autenticación
+$route['api/auth/login'] = 'Api/AuthController/login';
+$route['api/auth/logout'] = 'Api/AuthController/logout';
+$route['api/auth/me'] = 'Api/AuthController/me';

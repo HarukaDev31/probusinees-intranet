@@ -119,6 +119,9 @@ var actionButtonsIds = {
     pdf: 'export-pdf-cotizacion-pagos',
     excel: 'export-excel-cotizacion-pagos',
   },
+  'table-clientes-general': {
+    excel: 'export-excel-clientes-general',
+  },
 
 };
 $("#uploadFinal").click(() => {
@@ -3380,7 +3383,6 @@ const openStepFunction = async (step, id) => {
                     columns: ":visible, :hidden",
                     format: {
                       body: function (data, row, column, node) {
-                        console.log("data", data);
                         // Check if the cell contains a select element
                         if ($(node).find('select').length > 0) {
                           const selectedText = $(node).find('select option:selected').text();
@@ -3769,6 +3771,20 @@ const openStepFunction = async (step, id) => {
         $("#table-clientes-general").attr("style", "");
         $("#table-clientes-variacion").hide();
         $("#table-clientes-pagos").hide();
+        var columnshide = [];
+        var columnsexport = [];
+        if(currentPrivilege == "Documentacion"){
+          columnshide = [1,2,3,4,5,6,12,13,14,15,16,17,18,19],
+          columnsexport = [-1,-2,-3,-4,-5,-6,-7,-8,-9];
+        }
+        if(currentPrivilege == "Coordinación"){
+          columnshide = [1,2,3,4,5,6,13],
+          columnsexport = [14,-1,-2,-3];
+        }
+        if(currentPrivilege == "Cotizador"){
+          columnshide = [1,2,3,4,5,6,13,-2,-3],
+          columnsexport = [14,-1,-2,-3];
+        }
 
         if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
           $("#table-clientes-general").show();
@@ -3780,8 +3796,145 @@ const openStepFunction = async (step, id) => {
             dom:
               "<'row'<'col-sm-12'tr>>" +
               "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
-            buttons: [],
-            columnDefs: [
+            buttons: [
+                {
+                  extend: "excel",
+                  text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+                  titleAttr: "Excel",
+                  exportOptions: {
+                    columns: function(idx, data, node) {
+                        // Usa la instancia global de la tabla
+                        if (typeof tableClientesGeneral !== "undefined" && tableClientesGeneral.settings) {
+                            var colDef = tableClientesGeneral.settings()[0].aoColumns[idx];
+                            return !colDef.exported;
+                        }
+                        // Si no está definida, exporta todo
+                        return true;
+                    },
+                    format: {
+                      body: function (data, row, column, node) {
+                        // Handle multiple inputs in a div
+                        if ($(node).find('input').length > 1) {
+                          const inputValues = [];
+                          $(node).find('input').each(function () {
+                            const value = $(this).val();
+                            if (value && value.trim()) {
+                              inputValues.push(value.trim());
+                            }
+                          });
+                          return inputValues.join('\n');
+                        }
+
+                        if ($(node).find('select').length > 1) {
+                          const selectValues = [];
+                          $(node).find('select').each(function () {
+                            const $select = $(this);
+                            // Try different approaches to get selected value
+                            let selectedText = '';
+
+                            // Method 1: Direct selected option text
+                            const selectedOption = $select.find('option:selected');
+                            if (selectedOption.length > 0) {
+                              selectedText = selectedOption.text().trim();
+                            }
+
+                            // Method 2: If method 1 fails, try getting by value
+                            if (!selectedText) {
+                              const selectedValue = $select.val();
+                              if (selectedValue) {
+                                const optionByValue = $select.find('option[value="' + selectedValue + '"]');
+                                if (optionByValue.length > 0) {
+                                  selectedText = optionByValue.text().trim();
+                                } else {
+                                  selectedText = selectedValue; // Use value as fallback
+                                }
+                              }
+                            }
+
+                            // Method 3: If still no text, try selectedIndex
+                            if (!selectedText && $select[0].selectedIndex >= 0) {
+                              const option = $select[0].options[$select[0].selectedIndex];
+                              if (option) {
+                                selectedText = option.text.trim();
+                              }
+                            }
+
+                            if (selectedText) {
+                              selectValues.push(selectedText);
+                            }
+                          });
+                        }
+
+                        // Handle single input
+                        if ($(node).find('input').length === 1) {
+                          const inputValue = $(node).find('input').val();
+                          return inputValue || '';
+                        }
+
+                        // Handle multiple selects (if needed)
+
+
+                        // Handle mixed inputs and selects
+                        if ($(node).find('input, select').length > 0) {
+                          const allValues = [];
+
+                          // Get all input values
+                          $(node).find('input').each(function () {
+                            const value = $(this).val();
+                            if (value && value.trim()) {
+                              allValues.push(value.trim());
+                            }
+                          });
+
+                          // Get all select values
+                          $(node).find('select').each(function () {
+                            const selectedText = $(this).find('option:selected').text();
+                            if (selectedText && selectedText.trim()) {
+                              allValues.push(selectedText.trim());
+                            }
+                          });
+
+                          return allValues.join('\n');
+                        }
+
+                        // Handle textareas (if you have them)
+                        if ($(node).find('textarea').length > 0) {
+                          const textareaValues = [];
+                          $(node).find('textarea').each(function () {
+                            const value = $(this).val();
+                            if (value && value.trim()) {
+                              textareaValues.push(value.trim());
+                            }
+                          });
+                          return textareaValues.join('\n');
+                        }
+
+                        // Handle divs with text content (as fallback)
+                        if ($(node).find('div').length > 1) {
+                          const divValues = [];
+                          $(node).find('div').each(function () {
+                            const text = $(this).text().trim();
+                            if (text) {
+                              divValues.push(text);
+                            }
+                          });
+                          if (divValues.length > 0) {
+                            return divValues.join('\n');
+                          }
+                        }
+
+                        // Default: return the cell data as is
+                        return data;
+                      }
+                    }
+                  },
+                  attr: {
+                    id: actionButtonsIds["table-clientes-general"].excel,
+                    class: "hidden",
+                  },
+                },
+              ],
+              columnDefs: [
               {
                 targets: "no-hidden",
                 visible: false,
@@ -3798,6 +3951,14 @@ const openStepFunction = async (step, id) => {
               {
                 targets: "sorting_asc",
                 orderable: false,
+              },
+              {
+                targets: columnshide,
+                visible: false,
+              },
+              {
+                targets: columnsexport,
+                exported: true,
               },
             ],
             pageLength: 100, // Mostrar 100 elementos por página
@@ -9124,7 +9285,8 @@ setupSingleFileUpload("single-file-upload", "file-input-prospecto", ['pdf', 'doc
 setupMultiFileUploadv2("multiple-file-upload-image", "file-input-inspeccion", ['png', 'jpg', 'jpeg', 'mp4'], false, '#remove-file-button-inspeccion');
 setupMultiFileUpload("multiple-file-upload-aduana", "file-input-aduana", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
 setupMultiFileUpload("multiple-file-upload-impuestos", "file-input-impuestos", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt']);
-setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt'], true);setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt'], true);
+setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt'], true);
+setupMultiFileUpload("multiple-file-upload", "file-input-documentacion", ['pdf', 'docx', 'xlsx', 'xls', 'doc', 'xlsm', 'csv', 'xlsb', 'xltx', 'xlt'], true);
 function exportDocumentHandler(type) {
   if (stepIndex === 1) {
     console.log("Exportando desde la tabla de cotizaciones");
@@ -9142,6 +9304,24 @@ function exportDocumentHandler(type) {
         tableCotizacionEmbarque.button(`#${actionButtonsIds['table-cotizacion-embarque'].pdf}`).trigger();
       } else {
         tableCotizacion.button(`#${actionButtonsIds['table-cotizacion'].pdf}`).trigger();
+      }
+    }
+  } else if (stepIndex === 2) {
+    console.log("Exportando desde la tabla de clientes");
+    console.log("Tipo de exportación:", type);
+    console.log("Tabla actual:", currentTableClientes);
+    // Exportar desde la tabla de clientes
+    if (type === 'excel') {
+      if (currentTableClientes === 'general') {
+        tableClientesGeneral.button(`#${actionButtonsIds['table-clientes-general'].excel}`).trigger();
+      } else {
+        tableClientes.button(`#${actionButtonsIds['table-clientes'].excel}`).trigger();
+      }
+    } else if (type === 'pdf') {
+      if (currentTableClientes === 'general') {
+        tableClientesGeneral.button(`#${actionButtonsIds['table-clientes-general'].pdf}`).trigger();
+      } else {
+        tableClientes.button(`#${actionButtonsIds['table-clientes'].pdf}`).trigger();
       }
     }
   }

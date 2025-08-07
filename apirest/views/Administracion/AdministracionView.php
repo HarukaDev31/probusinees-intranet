@@ -31,24 +31,6 @@
                             <!-- Menú Desplegable -->
                             <div class="dropdown-menu dropdown-menu-right px-3 py-3" aria-labelledby="btn-filtrar-carga">
                                 <div class="form-group">
-                                    <div class="d-flex align-items-center p-2">
-                                        <div class="d-flex" style="width:60%">Fecha Inicio</div>
-                                        <div style="width: 200px;">
-                                            <input type="text" id="txt-Fe_Inicio"
-                                                class="form-control text-center input-date input-report required"
-                                                >
-                                            <span class="help-block text-danger" id="error"></span>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center p-2">
-                                        <div class="d-flex" style="width:60%">Fecha Fin</div>
-                                        <div style="width: 200px;">
-                                            <input type="text" id="txt-Fe_Fin"
-                                            
-                                                class="form-control input-date input-report required">
-                                            <span class="help-block text-danger" id="error"></span>
-                                        </div>
-                                    </div>
                                     <?php if ($this->user->No_Grupo != "Coordinación") {  ?>
                                         <div class="d-flex align-items-center p-2" style="width:300px;">
                                             <div class="d-flex" style="width:60%">Estado</div>

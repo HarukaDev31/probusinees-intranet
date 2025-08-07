@@ -1,5 +1,8 @@
+// ========================================
+// CONFIGURACIÓN Y CONSTANTES
+// ========================================
 
-// Product data structure to store information for each product
+// Estructura de datos de productos
 const productData = {
   calzados: {
     name: "Calzados",
@@ -43,110 +46,55 @@ const productData = {
   },
 }
 
+// Constantes para límites de archivos
+const MAX_IMAGES_ANTIDUMPING = 5;
+const MAX_DOCS_PERMISO = 5;
+const MAX_IMAGES_ETIQUETADO = 5;
+const MAX_DOCS_ESPECIALES = 5;
+
+// ========================================
+// VARIABLES GLOBALES
+// ========================================
+
 // Estado de guardado de cada tab
-const tabStates = {
+let tabStates = {
   antidumping: false,
   permiso: false,
   etiquetado: false,
   documentos: false
 };
+
 let currentTab = 'antidumping';
-let tabDirty = false; // Si hay cambios sin guardar en el tab actual
+let tabDirty = false;
 let tabData = {
   antidumping: {},
   permiso: {},
   etiquetado: {},
   documentos: {}
 };
-const MAX_IMAGES_ANTIDUMPING = 5;
-const MAX_DOCS_PERMISO = 5;
-const MAX_IMAGES_ETIQUETADO = 5;
-const MAX_DOCS_ESPECIALES = 5;
 
+// Arrays de uploaders para cada sección
 var antidumpingUploaders = [];
 var permisoUploaders = [];
 var etiquetadoUploaders = [];
 var documentosUploaders = [];
-let antidumpingTable, permisoTable, etiquetadoTable, documentosTable;
 
-async function saveRegulaciones(formData) {
-  try {
-    // Obtener el producto seleccionado para determinar el id_rubro
-    const selectedProduct = $("#productSelector").val();
-    
-    // Mapeo de productos a IDs de rubro (ajusta según tus datos)
-    const productToRubroMap = {
-      'calzados': 1,
-      'motos-electricas': 2, 
-      'textiles': 3,
-      'electronicos': 4,
-      'juguetes': 5
-    };
-    
-    const idRubro = productToRubroMap[selectedProduct] || 1;
-    
-    // Agregar el id_rubro al FormData
-    formData.append('id_rubro', idRubro);
-    
-    // Agregar información del producto seleccionado
-    formData.append('producto', selectedProduct);
-    
-    // Agregar timestamp de creación
-    formData.append('created_at', new Date().toISOString());
-    
-    const response = await fetch(base_url + 'BaseDatos/RegulacionesController/saveRegulacion', {
-      method: 'POST',
-      body: formData
-    });
-    
-    const result = await response.json();
-    
-    if (result.success) {
-      showToast("Regulaciones guardadas correctamente", "success");
-      
-      // Recargar las datatables correspondientes
-      if (antidumpingTable) antidumpingTable.ajax.reload();
-      if (permisoTable) permisoTable.ajax.reload();
-      if (etiquetadoTable) etiquetadoTable.ajax.reload();
-      if (documentosTable) documentosTable.ajax.reload();
-      
-      // Limpiar el estado de los tabs
-      Object.keys(tabStates).forEach(tab => {
-        tabStates[tab] = false;
-        tabData[tab] = {};
-      });
-      updateStepper();
-      
-      // Volver a las tablas
-      $('#formulario-regulacion').addClass('hidden');
-      $('#datatables-container').removeClass('hidden');
-      
-    } else {
-      showToast(result.message || "Error al guardar regulaciones", "error");
-    }
-  } catch (error) {
-    console.error('Error al guardar regulaciones:', error);
-    showToast("Error de conexión al guardar regulaciones", "error");
-  }
-}
-function updateStepper() {
-  ["antidumping", "permiso", "etiquetado", "documentos"].forEach(tab => {
-    const circle = document.querySelector(`.stepper-circle[data-step="${tab}"]`);
-    if (tabStates[tab]) {
-      circle.classList.remove("bg-gray-300");
-      circle.classList.add("bg-green-500");
-    } else {
-      circle.classList.remove("bg-green-500");
-      circle.classList.add("bg-gray-300");
-    }
-  });
-  // Botón global habilitado si AL MENOS UN tab está completo
-  const atLeastOneComplete = Object.values(tabStates).some(Boolean);
-  document.getElementById("guardar-global-btn").disabled = !atLeastOneComplete;
+// Variables de DataTables
+let antidumpingTable, permisoTable, etiquetadoTable, documentosTable;
+let antidumpingDetailTable;
+let permisoDetailTable;
+let currentRubroId = null;
+let currentEntidadId = null;
+
+// ========================================
+// FUNCIONES DE UTILIDAD
+// ========================================
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 function showToast(msg, type = "info") {
-  // Usa la función showNotification si existe, si no, crea un toast simple
   if (typeof showNotification === "function") {
     showNotification(msg, type);
   } else {
@@ -156,60 +104,6 @@ function showToast(msg, type = "info") {
   }
 }
 
-function markTabDirty() {
-  tabDirty = true;
-}
-function markTabClean() {
-  tabDirty = false;
-}
-
-// Detectar cambios en inputs para marcar el tab como "dirty"
-$(document).on("input change", ".tab-content.active :input", markTabDirty);
-
-// Guardar por tab
-$(document).on("click", ".guardar-tab-btn", function () {
-  const tab = $(this).data("tab");
-  // Validar que el tab esté completo (puedes personalizar la validación por tab)
-  if (!isTabComplete(tab)) {
-    showToast("Completa todos los campos obligatorios antes de guardar.", "error");
-    return;
-  }
-  // Guardar los datos del tab (puedes personalizar qué datos guardar)
-  tabData[tab] = getTabData(tab);
-  tabStates[tab] = true;
-  markTabClean();
-  updateStepper();
-});
-
-// Cambio de tab con alerta si hay cambios sin guardar
-$(document).on("click", ".tab-btn", function (e) {
-  const nextTab = $(this).data("tab");
-  if (nextTab === currentTab) return;
-  if (tabDirty) {
-    e.preventDefault();
-    showConfirmModal(
-      "Tienes cambios sin guardar",
-      "Si cambias de sección perderás el avance no guardado. ¿Deseas continuar?",
-      () => {
-        // Sí, cambiar de tab
-        switchTab(nextTab);
-        markTabClean();
-      }
-    );
-    return;
-  }
-  switchTab(nextTab);
-});
-
-function switchTab(tab) {
-  $(".tab-btn").removeClass("active bg-blue-600 text-white").addClass("bg-gray-100 text-gray-700");
-  $(`.tab-btn[data-tab='${tab}']`).removeClass("bg-gray-100 text-gray-700").addClass("active bg-blue-600 text-white");
-  $(".tab-content").addClass("hidden").removeClass("active");
-  $(`#${tab}`).removeClass("hidden").addClass("active");
-  currentTab = tab;
-}
-
-// Modal de confirmación elegante
 function showConfirmModal(title, message, onConfirm) {
   const modal = $(`
     <div class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
@@ -228,1028 +122,1429 @@ function showConfirmModal(title, message, onConfirm) {
   modal.find(".confirm-modal-btn").click(() => { modal.remove(); onConfirm(); });
 }
 
-// Validación por tab (personaliza según tus campos obligatorios)
+// ========================================
+// GESTIÓN DE TABS
+// ========================================
+
+function markTabDirty() {
+  tabDirty = true;
+}
+
+function markTabClean() {
+  tabDirty = false;
+}
+
+function switchTab(tab) {
+  $(".tab-btn").removeClass("active bg-blue-600 text-white").addClass("bg-gray-100 text-gray-700");
+  $(`.tab-btn[data-tab='${tab}']`).removeClass("bg-gray-100 text-gray-700").addClass("active bg-blue-600 text-white");
+  $(".tab-content").addClass("hidden").removeClass("active");
+  $(`#${tab}`).removeClass("hidden").addClass("active");
+  currentTab = tab;
+}
+
+function updateStepper() {
+  ["antidumping", "permiso", "etiquetado", "documentos"].forEach(tab => {
+    const circle = document.querySelector(`.stepper-circle[data-step="${tab}"]`);
+    if (tabStates[tab]) {
+      circle.classList.remove("bg-gray-300");
+      circle.classList.add("bg-green-500");
+    } else {
+      circle.classList.remove("bg-green-500");
+      circle.classList.add("bg-gray-300");
+    }
+  });
+  
+  const atLeastOneComplete = Object.values(tabStates).some(Boolean);
+  document.getElementById("guardar-global-btn").disabled = !atLeastOneComplete;
+}
+
 function isTabComplete(tab) {
-  // Ejemplo: todos los inputs visibles y requeridos deben tener valor
+  const selectedRubro = $("#rubroSelector").val();
+  if (!selectedRubro) {
+    showToast("Debes seleccionar un rubro antes de guardar", "error");
+    return false;
+  }
+  
   let valid = true;
   $(`#${tab} :input[required]:visible`).each(function () {
     if (!$(this).val()) valid = false;
   });
-  // Puedes agregar validaciones adicionales por tab aquí
   return valid;
 }
 
-// Obtener datos del tab (personaliza según tus campos)
 function getTabData(tab) {
-  const data = {};
+  const formData = new FormData()
   
-  // Obtener el producto seleccionado para determinar el id_rubro
-  const selectedProduct = $("#productSelector").val();
-  const productToRubroMap = {
-    'calzados': 1,
-    'motos-electricas': 2, 
-    'textiles': 3,
-    'electronicos': 4,
-    'juguetes': 5
-  };
-  
-  // Agregar id_rubro a todos los tabs
-  data.id_rubro = productToRubroMap[selectedProduct] || 1;
-  
-  // Obtener datos de los campos del formulario
-  $(`#${tab} :input, #${tab} textarea, #${tab} select`).each(function () {
-    const name = $(this).attr("name");
-    if (name) {
-      data[name] = $(this).val();
-    }
-  });
-
-  // Agregar archivos de FileUploader según el tab
-  if (tab === 'antidumping' && antidumpingUploaders.length > 0) {
-    data.archivos = antidumpingUploaders.map(uploader => uploader.uploader.getFile()).filter(file => file);
-  } else if (tab === 'permiso' && permisoUploaders.length > 0) {
-    data.archivos = permisoUploaders.map(uploader => uploader.uploader.getFile()).filter(file => file);
-  } else if (tab === 'etiquetado' && etiquetadoUploaders.length > 0) {
-    data.archivos = etiquetadoUploaders.map(uploader => uploader.uploader.getFile()).filter(file => file);
-  } else if (tab === 'documentos' && documentosUploaders.length > 0) {
-    data.archivos = documentosUploaders.map(uploader => uploader.uploader.getFile()).filter(file => file);
+  const selectedRubro = $("#rubroSelector").val()
+  if (selectedRubro) {
+    formData.append('id_rubro', selectedRubro)
   }
-
-  return data;
+  
+  $(`#${tab} :input[name*="${tab}-"]`).each(function () {
+    const value = $(this).val()
+    if (value) {
+      formData.append(`${tab}[${$(this).attr('name')}]`, value)
+    }
+  })
+  
+  const uploaders = window[`${tab}Uploaders`] || []
+  uploaders.forEach((uploaderObj, index) => {
+    const file = uploaderObj.uploader.getFile()
+    if (file) {
+      formData.append(`${tab}[archivos][${index}]`, file)
+    }
+  })
+  
+  return formData
 }
 
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+// ========================================
+// GESTIÓN DE SUBTABLAS
+// ========================================
 
-// Guardar global
-$("#guardar-global-btn").click(async function () {
-  //si al menos una guardada, guardar global
-  if (!Object.values(tabStates).some(Boolean)) {
-    showToast("No hay datos para guardar", "error");
-    return;
-  }
-
-  const formData = new FormData();
-
-  // Agregar datos de cada tab guardado
-  Object.entries(tabData).forEach(([tab, data]) => {
-    if (tabStates[tab]) { // Solo agregar tabs que estén guardados
-      Object.entries(data).forEach(([key, value]) => {
-        if (key === 'archivos' && Array.isArray(value)) {
-          // Agregar archivos múltiples
-          value.forEach((file, index) => {
-            if (file) {
-              formData.append(`${tab}[archivos][${index}]`, file);
-            }
-          });
-        } else {
-          formData.append(`${tab}[${key}]`, value);
-        }
-      });
-    }
-  });
-
-  // Agregar información del producto seleccionado
-  const selectedProduct = $("#productSelector").val();
-  formData.append('producto', selectedProduct);
+function showSubtable(rubroId) {
+  currentRubroId = rubroId;
+  $('#antidumping-table .table-responsive').addClass('hidden');
+  $('#antidumping-detail-table .table-responsive ').removeClass('hidden'); 
   
-  // Agregar timestamp de creación
-  formData.append('created_at', new Date().toISOString());
-
-  await saveRegulaciones(formData);
-});
-
-$(document).ready(() => {
-  initializeDataTables();
-
-  // Event listeners para datatables
-  initializeDataTableEventListeners();
-
-  function initializeDataTables() {
-    console.log('initializeDataTables');
-    
-    // DataTable para Antidumping
-    if ($.fn.DataTable.isDataTable('#antidumpingTable')) {
-      antidumpingTable.ajax.reload();
-    } else {
-      antidumpingTable = $('#antidumpingTable').DataTable({
-        ajax: {
-          url: base_url + 'BaseDatos/RegulacionesController/getAntidumpingData',
-          type: 'POST',
-          data: function (d) {
-            // Aquí puedes agregar filtros adicionales si los necesitas
-          }
-        },
-        order: [[0, 'desc']],
-        paging: true,
-        lengthChange: true,
-        searching: true,
-        ordering: false,
-        info: true,
-        autoWidth: false,
-        responsive: false,
-        serverSide: false,
-        pagingType: "full_numbers",
-        oLanguage: {
-          sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-          sLengthMenu: "_MENU_",
-          sSearch: "Buscar por: ",
-          sSearchPlaceholder: "",
-          sZeroRecords: "No se encontraron registros",
-          sInfoEmpty: "No hay registros",
-          sLoadingRecords: "Cargando...",
-          sProcessing: "Procesando...",
-          oPaginate: {
-            sFirst: "<<",
-            sLast: ">>",
-            sPrevious: "<",
-            sNext: ">",
-          },
-        }
-      });
-    }
-
-    // DataTable para Permisos
-    if ($.fn.DataTable.isDataTable('#permisoTable')) {
-      permisoTable.ajax.reload();
-    } else {
-      permisoTable = $('#permisoTable').DataTable({
-        ajax: {
-          url: base_url + 'BaseDatos/RegulacionesController/getPermisoData',
-          type: 'POST',
-          data: function (d) {
-            // Aquí puedes agregar filtros adicionales si los necesitas
-          }
-        },
-        order: [[0, 'desc']],
-        paging: true,
-        lengthChange: true,
-        searching: true,
-        ordering: false,
-        info: true,
-        autoWidth: false,
-        responsive: false,
-        serverSide: false,
-        pagingType: "full_numbers",
-        oLanguage: {
-          sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-          sLengthMenu: "_MENU_",
-          sSearch: "Buscar por: ",
-          sSearchPlaceholder: "",
-          sZeroRecords: "No se encontraron registros",
-          sInfoEmpty: "No hay registros",
-          sLoadingRecords: "Cargando...",
-          sProcessing: "Procesando...",
-          oPaginate: {
-            sFirst: "<<",
-            sLast: ">>",
-            sPrevious: "<",
-            sNext: ">",
-          },
-        }
-      });
-    }
-
-    // DataTable para Etiquetado
-    if ($.fn.DataTable.isDataTable('#etiquetadoTable')) {
-      etiquetadoTable.ajax.reload();
-    } else {
-      etiquetadoTable = $('#etiquetadoTable').DataTable({
-        ajax: {
-          url: base_url + 'BaseDatos/RegulacionesController/getEtiquetadoData',
-          type: 'POST',
-          data: function (d) {
-            // Aquí puedes agregar filtros adicionales si los necesitas
-          }
-        },
-        order: [[0, 'desc']],
-        paging: true,
-        lengthChange: true,
-        searching: true,
-        ordering: false,
-        info: true,
-        autoWidth: false,
-        responsive: false,
-        serverSide: false,
-        pagingType: "full_numbers",
-        oLanguage: {
-          sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-          sLengthMenu: "_MENU_",
-          sSearch: "Buscar por: ",
-          sSearchPlaceholder: "",
-          sZeroRecords: "No se encontraron registros",
-          sInfoEmpty: "No hay registros",
-          sLoadingRecords: "Cargando...",
-          sProcessing: "Procesando...",
-          oPaginate: {
-            sFirst: "<<",
-            sLast: ">>",
-            sPrevious: "<",
-            sNext: ">",
-          },
-        }
-      });
-    }
-
-    // DataTable para Documentos Especiales
-    if ($.fn.DataTable.isDataTable('#documentosTable')) {
-      documentosTable.ajax.reload();
-    } else {
-      documentosTable = $('#documentosTable').DataTable({
-        ajax: {
-          url: base_url + 'BaseDatos/RegulacionesController/getDocumentosData',
-          type: 'POST',
-          data: function (d) {
-            // Aquí puedes agregar filtros adicionales si los necesitas
-          }
-        },
-        order: [[0, 'desc']],
-        paging: true,
-        lengthChange: true,
-        searching: true,
-        ordering: false,
-        info: true,
-        autoWidth: false,
-        responsive: false,
-        serverSide: false,
-        pagingType: "full_numbers",
-        oLanguage: {
-          sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
-          sLengthMenu: "_MENU_",
-          sSearch: "Buscar por: ",
-          sSearchPlaceholder: "",
-          sZeroRecords: "No se encontraron registros",
-          sInfoEmpty: "No hay registros",
-          sLoadingRecords: "Cargando...",
-          sProcessing: "Procesando...",
-          oPaginate: {
-            sFirst: "<<",
-            sLast: ">>",
-            sPrevious: "<",
-            sNext: ">",
-          },
-        }
-      });
-    }
-  }
-
-  function initializeDataTableEventListeners() {
-    // Botón Nueva Regulación
-    $('#btn-nueva-regulacion').click(function () {
-      $('#datatables-container').addClass('hidden');
-      $('#formulario-regulacion').removeClass('hidden');
-    });
-
-    // Botón Volver a Tablas
-    $('#btn-volver-tablas').click(function () {
-      $('#formulario-regulacion').addClass('hidden');
-      $('#datatables-container').removeClass('hidden');
-    });
-
-    // Tabs de regulaciones
-    $('.regulacion-tab-btn').click(function () {
-      const tab = $(this).data('tab');
-
-      // Actualizar botones
-      $('.regulacion-tab-btn').removeClass('active bg-blue-600 text-white').addClass('bg-gray-100 text-gray-700');
-      $(this).removeClass('bg-gray-100 text-gray-700').addClass('active bg-blue-600 text-white');
-
-      // Mostrar contenido correspondiente
-      $('.regulacion-content').addClass('hidden');
-      $(`#${tab}-table`).removeClass('hidden');
-    });
-
-    // Botones de refresh
-    $('.btn-refresh-table').click(function () {
-      const table = $(this).data('table');
-      switch (table) {
-        case 'antidumping':
-          antidumpingTable.ajax.reload();
-          break;
-        case 'permiso':
-          permisoTable.ajax.reload();
-          break;
-        case 'etiquetado':
-          etiquetadoTable.ajax.reload();
-          break;
-        case 'documentos':
-          documentosTable.ajax.reload();
-          break;
-      }
-    });
-
-    // Botones de editar
-    $(document).on('click', '.btn-edit', function () {
-      const id = $(this).data('id');
-      // Aquí puedes implementar la lógica para editar
-      console.log('Editar regulación ID:', id);
-    });
-
-    // Botones de eliminar
-    $(document).on('click', '.btn-delete', function () {
-      const id = $(this).data('id');
-      if (confirm('¿Está seguro de que desea eliminar esta regulación?')) {
-        // Aquí puedes implementar la lógica para eliminar
-        console.log('Eliminar regulación ID:', id);
-      }
-    });
-  }
-  // Initialize with default product
-  updateProductData("calzados")
-
-  // Product selector change
-  $("#productSelector").change(function () {
-    const selectedProduct = $(this).val()
-    updateProductData(selectedProduct)
-    showNotification(`Producto cambiado a: ${productData[selectedProduct].name}`, "info")
-  })
-
-  // Tab switching functionality
-  $(".tab-btn").click(function () {
-    const tabId = $(this).data("tab")
-
-    // Update button states
-    $(".tab-btn").removeClass("active bg-blue-600 text-white").addClass("bg-gray-100 text-gray-700")
-    $(this).removeClass("bg-gray-100 text-gray-700").addClass("active bg-blue-600 text-white")
-
-    // Show/hide content
-    $(".tab-content").addClass("hidden")
-    $(`#${tabId}`).removeClass("hidden")
-  })
-
-  // Function to update product data and status indicators
-  function updateProductData(productKey) {
-    const product = productData[productKey]
-
-    // Update product description in forms
-    $(".product-description").val(product.description)
-    $(".permit-name").attr("placeholder", `Permiso para ${product.name}`)
-
-    // Update status indicators
-    updateStatusIndicators(product)
-  }
-
-  function updateStatusIndicators(product) {
-    const tabs = ["antidumping", "permiso", "etiquetado", "documentos"]
-
-    tabs.forEach((tab) => {
-      const indicator = $(`.status-indicator[data-tab="${tab}"]`)
-      const data = product[tab]
-      const percentage = data.completed
-      const hasData = data.hasData
-
-      // Update percentage text
-      indicator.find(".text-xs.text-gray-600").text(`${percentage}%`)
-
-      // Update status dot color based on completion
-      const statusDot = indicator.find(".w-2.h-2.rounded-full")
-      statusDot.removeClass("bg-green-500 bg-yellow-500 bg-red-500 bg-gray-400")
-
-      if (percentage >= 80) {
-        statusDot.addClass("bg-green-500")
-      } else if (percentage >= 40) {
-        statusDot.addClass("bg-yellow-500")
-      } else if (percentage > 0) {
-        statusDot.addClass("bg-red-500")
-      } else {
-        statusDot.addClass("bg-gray-400")
-      }
-
-      // Add click functionality to status indicators
-      indicator.css("cursor", "pointer").click(() => {
-        // Switch to the corresponding tab
-        $(`.tab-btn[data-tab="${tab}"]`).click()
-      })
-    })
-  }
-
-  // Image upload functionality
-  $(".image-upload-container").click(function () {
-    if (!$(this).find("img").length) {
-      $("#imageUpload").click()
-    }
-  })
-
-  $("#imageUpload").change((e) => {
-    const files = e.target.files
-    const emptyContainers = $(".image-upload-container").filter(function () {
-      return !$(this).find("img").length
-    })
-
-    for (let i = 0; i < Math.min(files.length, emptyContainers.length); i++) {
-      const file = files[i]
-      const reader = new FileReader()
-
-      reader.onload = (e) => {
-        const container = $(emptyContainers[i])
-        const uploadDiv = container.find("div").first()
-
-        uploadDiv.html(`
-                    <img src="${e.target.result}" alt="Producto" class="max-h-full max-w-full object-contain">
-                `)
-
-        // Add remove button
-        if (!container.find(".group").length) {
-          container.addClass("group")
-          container.append(`
-                        <button class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity remove-image">
-                            <i class="fas fa-times text-xs"></i>
-                        </button>
-                    `)
-        }
-      }
-
-      reader.readAsDataURL(file)
-    }
-  })
-
-  // Remove image functionality
-  $(document).on("click", ".remove-image", function (e) {
-    e.stopPropagation()
-    const container = $(this).parent()
-    const uploadDiv = container.find("div").first()
-
-    uploadDiv.html(`
-            <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
-            <span class="text-sm text-gray-500">Subir imagen</span>
-        `)
-
-    container.removeClass("group")
-    $(this).remove()
-  })
-
-  // Form validation and interactions
-  $("input, select, textarea")
-    .on("focus", function () {
-      $(this).parent().addClass("focused")
-    })
-    .on("blur", function () {
-      $(this).parent().removeClass("focused")
-    })
-
-  // Auto-calculate total when prices change
-  function updateTotal() {
-    const declaredPrice = Number.parseFloat($('input[value="7.5"]').val()) || 0
-    const antidumping = Number.parseFloat($('input[value="0.63"]').val()) || 0
-    const total = declaredPrice + antidumping
-
-    $('.text-green-600:contains("$")')
-      .last()
-      .text(`$${total.toFixed(2)}`)
-  }
-
-  $('input[type="number"]').on("input", updateTotal)
-
-  // Smooth animations for cards
-  $(".bg-white").hover(
-    function () {
-      $(this).addClass("shadow-md").removeClass("shadow-sm")
-    },
-    function () {
-      $(this).addClass("shadow-sm").removeClass("shadow-md")
-    },
-  )
-
-  // Success notifications
-  $(".bg-green-600").click(() => {
-    showNotification("Información guardada exitosamente", "success")
-  })
-
-  $(".bg-red-600").click(() => {
-    if (confirm("¿Está seguro de que desea limpiar esta sección?")) {
-      showNotification("Sección limpiada", "error")
-    }
-  })
-
-  // Enhanced notification system
-  function showNotification(message, type) {
-    let bgColor, icon
-
-    switch (type) {
-      case "success":
-        bgColor = "bg-green-500"
-        icon = "fa-check-circle"
-        break
-      case "error":
-        bgColor = "bg-red-500"
-        icon = "fa-exclamation-circle"
-        break
-      case "info":
-        bgColor = "bg-blue-500"
-        icon = "fa-info-circle"
-        break
-      default:
-        bgColor = "bg-gray-500"
-        icon = "fa-bell"
-    }
-
-    const notification = $(`
-            <div class="fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform">
-                <div class="flex items-center">
-                    <i class="fas ${icon} mr-2"></i>
-                    <span>${message}</span>
-                </div>
-            </div>
-        `)
-
-    $("body").append(notification)
-
-    setTimeout(() => {
-      notification.removeClass("translate-x-full")
-    }, 100)
-
-    setTimeout(() => {
-      notification.addClass("translate-x-full")
-      setTimeout(() => {
-        notification.remove()
-      }, 300)
-    }, 3000)
-  }
-
-  // Document upload functionality for permits
-  $(".document-upload-container, .add-document-btn").click(() => {
-    $("#documentUpload").click()
-  })
-
-  $("#documentUpload").change((e) => {
-    const files = e.target.files
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      addDocumentToList(file)
-    }
-  })
-
-  function addDocumentToList(file) {
-    const fileSize = (file.size / 1024 / 1024).toFixed(2) // Convert to MB
-    const fileIcon = getFileIcon(file.type)
-
-    const documentItem = $(`
-        <div class="document-item flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
-            <div class="flex items-center">
-                <i class="${fileIcon} text-2xl text-blue-600 mr-3"></i>
-                <div>
-                    <p class="font-medium text-gray-800">${file.name}</p>
-                    <p class="text-sm text-gray-500">${fileSize} MB</p>
-                </div>
-            </div>
-            <div class="flex items-center space-x-2">
-                <button class="text-blue-600 hover:text-blue-800 transition-colors">
-                    <i class="fas fa-eye"></i>
-                </button>
-                <button class="text-red-600 hover:text-red-800 transition-colors remove-document">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        </div>
-    `)
-
-    $("#documentList").append(documentItem)
-  }
-
-  function getFileIcon(fileType) {
-    if (fileType.includes("pdf")) return "fas fa-file-pdf"
-    if (fileType.includes("word") || fileType.includes("document")) return "fas fa-file-word"
-    if (fileType.includes("image")) return "fas fa-file-image"
-    return "fas fa-file"
-  }
-
-  // Remove document functionality
-  $(document).on("click", ".remove-document", function () {
-    $(this)
-      .closest(".document-item")
-      .fadeOut(300, function () {
-        $(this).remove()
-      })
-  })
-
-  // Auto-calculate permit costs
-  function updatePermitTotal() {
-    const baseCost = Number.parseFloat($('#permiso input[value="90"]').val()) || 0
-    const processorCost = Number.parseFloat($('#permiso input[value="50"]').val()) || 0
-    const subtotal = baseCost + processorCost
-    const igv = subtotal * 0.18
-    const total = subtotal + igv
-
-    // Update the summary card
-    $('.text-green-600:contains("S/.")').text(`S/. ${total.toFixed(2)}`)
-  }
-
-  // Update costs when permit values change
-  $('#permiso input[type="number"]').on("input", updatePermitTotal)
-
-  // Label image upload functionality
-  $(".label-image-upload-container, .add-label-image-btn").click(() => {
-    $("#labelImageUpload").click()
-  })
-
-  $("#labelImageUpload").change((e) => {
-    const files = e.target.files
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      addLabelImageToList(file)
-    }
-  })
-
-  function addLabelImageToList(file) {
-    const reader = new FileReader()
-
-    reader.onload = (e) => {
-      const imageItem = $(`
-        <div class="label-image-item relative group">
-          <div class="aspect-square rounded-lg overflow-hidden border-2 border-gray-200">
-            <img src="${e.target.result}" alt="Etiqueta" class="w-full h-full object-cover">
+  let detailTableContainer = $('#antidumping-detail-table');
+  if (detailTableContainer.length === 0) {
+    const detailHtml = `
+      <div id="antidumping-detail-table" class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex justify-between items-center mb-6">
+          <div class="flex items-center gap-3">
+            <button id="btn-back-to-rubros" class="flex items-center text-gray-600 hover:text-gray-800 transition-all duration-300 hover:scale-105 group">
+              <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform"></i>
+              <span class="font-medium">Regresar</span>
+            </button>
           </div>
-          <button class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity remove-label-image">
-            <i class="fas fa-times text-xs"></i>
-          </button>
-          <div class="mt-2 text-xs text-gray-600 text-center truncate">${file.name}</div>
+          <div class="flex items-center space-x-2">
+            <button class="btn-refresh-detail-table bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg transition-all">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
         </div>
-      `)
-
-      $("#labelImageList").append(imageItem)
-    }
-
-    reader.readAsDataURL(file)
+        <div class="table-responsive">
+          <table id="antidumpingDetailTable" class="stripe hover w-full text-sm">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Descripción del Producto</th>
+                <th>Partida</th>
+                <th>P. Declarado</th>
+                <th>Antidumping</th>
+                <th>Rubro</th>
+                <th>Observaciones</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    $('#antidumping-table').append(detailHtml);
+    detailTableContainer = $('#antidumping-detail-table');
   }
-
-  // Remove label image functionality
-  $(document).on("click", ".remove-label-image", function (e) {
-    e.stopPropagation()
-    $(this)
-      .closest(".label-image-item")
-      .fadeOut(300, function () {
-        $(this).remove()
-      })
-  })
-
-  // Special document upload functionality
-  $(".special-document-upload-container, .add-special-document-btn").click(() => {
-    $("#specialDocumentUpload").click()
-  })
-
-  $("#specialDocumentUpload").change((e) => {
-    const files = e.target.files
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      addSpecialDocumentToList(file)
+  
+  detailTableContainer.removeClass('hidden');
+  
+  if (!$.fn.DataTable.isDataTable('#antidumpingDetailTable')) {
+    antidumpingDetailTable = $('#antidumpingDetailTable').DataTable({
+      ajax: {
+        url: base_url + 'BaseDatos/RegulacionesController/getAllAntidumpingData',
+        type: 'POST',
+        data: function (d) {
+          d.id_rubro = currentRubroId;
+        }
+      },
+      order: [[0, 'desc']],
+      paging: true,
+      lengthChange: true,
+      searching: true,
+      ordering: true,
+      info: true,
+      autoWidth: false,
+      responsive: false,
+      serverSide: false,
+      pagingType: "full_numbers",
+      oLanguage: {
+        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+        sLengthMenu: "_MENU_",
+        sSearch: "Buscar por: ",
+        sSearchPlaceholder: "",
+        sZeroRecords: "No se encontraron registros",
+        sInfoEmpty: "No hay registros",
+        sLoadingRecords: "Cargando...",
+        sProcessing: "Procesando...",
+        oPaginate: {
+          sFirst: "<<",
+          sLast: ">>",
+          sPrevious: "<",
+          sNext: ">",
+        },
+      }
+    });
+  } else {
+    antidumpingDetailTable.ajax.reload();
+  }
+  
+  $('#btn-back-to-rubros').off('click').on('click', function() {
+    hideSubtable();
+  });
+  
+  $('.btn-refresh-detail-table').off('click').on('click', function() {
+    antidumpingDetailTable.ajax.reload();
+  });
+  
+  $(document).off('click', '#antidumpingDetailTable .btn-edit').on('click', '#antidumpingDetailTable .btn-edit', function() {
+    const id = $(this).data('id');
+    console.log('Editar regulación antidumping ID:', id);
+  });
+  
+  $(document).off('click', '#antidumpingDetailTable .btn-delete').on('click', '#antidumpingDetailTable .btn-delete', function() {
+    const id = $(this).data('id');
+    if (confirm('¿Está seguro de que desea eliminar esta regulación antidumping?')) {
+      console.log('Eliminar regulación antidumping ID:', id);
     }
-  })
+  });
 
-  function addSpecialDocumentToList(file) {
-    const fileSize = (file.size / 1024 / 1024).toFixed(2) // Convert to MB
-    const fileIcon = getSpecialFileIcon(file.type, file.name)
+  // Event listener para botón de ver detalles
+  $(document).off('click', '#antidumpingDetailTable .btn-view').on('click', '#antidumpingDetailTable .btn-view', function() {
+    const id = $(this).data('id');
+    const observaciones = $(this).data('observaciones');
+    const imagenes = $(this).data('imagenes');
+    showAntidumpingDetails(id, observaciones, imagenes);
+  });
 
-    const documentItem = $(`
-      <div class="special-document-item flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
-        <div class="flex items-center">
-          <i class="${fileIcon} text-2xl text-orange-600 mr-3"></i>
+  // Event listener para botón de ver imagen en modal
+  $(document).off('click', '.view-image-btn').on('click', '.view-image-btn', function() {
+    const imageUrl = $(this).data('image-url');
+    const imageName = $(this).data('image-name');
+    showImageModal(imageUrl, imageName);
+  });
+}
+
+function hideSubtable() {
+  $('#antidumping-detail-table').addClass('hidden');
+  $('#antidumping-table .table-responsive').removeClass('hidden');
+}
+
+function showPermisoSubtable(entidadId) {
+  currentEntidadId = entidadId;
+  $('#permiso-table .table-responsive').addClass('hidden');
+  $('#permiso-detail-table .table-responsive ').removeClass('hidden'); 
+  
+  let detailTableContainer = $('#permiso-detail-table');
+  if (detailTableContainer.length === 0) {
+    const detailHtml = `
+      <div id="permiso-detail-table" class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex justify-between items-center mb-6">
+          <div class="flex items-center gap-3">
+            <button id="btn-back-to-entidades" class="flex items-center text-gray-600 hover:text-gray-800 transition-all duration-300 hover:scale-105 group">
+              <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform"></i>
+              <span class="font-medium">Regresar</span>
+            </button>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button class="btn-refresh-permiso-detail-table bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg transition-all">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table id="permisoDetailTable" class="stripe hover w-full text-sm">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre del Permiso</th>
+                <th>C. Permiso</th>
+                <th>C. Tramitador</th>
+                <th>Rubro</th>
+                <th>Observaciones</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    $('#permiso-table').append(detailHtml);
+    detailTableContainer = $('#permiso-detail-table');
+  }
+  
+  detailTableContainer.removeClass('hidden');
+  
+  if (!$.fn.DataTable.isDataTable('#permisoDetailTable')) {
+    permisoDetailTable = $('#permisoDetailTable').DataTable({
+      ajax: {
+        url: base_url + 'BaseDatos/RegulacionesController/getAllPermisoData',
+        type: 'POST',
+        data: function (d) {
+          d.entidad_id = currentEntidadId;
+        }
+      },
+      order: [[0, 'desc']],
+      paging: true,
+      lengthChange: true,
+      searching: true,
+      ordering: true,
+      info: true,
+      autoWidth: false,
+      responsive: false,
+      serverSide: false,
+      pagingType: "full_numbers",
+      oLanguage: {
+        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+        sLengthMenu: "_MENU_",
+        sSearch: "Buscar por: ",
+        sSearchPlaceholder: "",
+        sZeroRecords: "No se encontraron registros",
+        sInfoEmpty: "No hay registros",
+        sLoadingRecords: "Cargando...",
+        sProcessing: "Procesando...",
+        oPaginate: {
+          sFirst: "<<",
+          sLast: ">>",
+          sPrevious: "<",
+          sNext: ">",
+        },
+      }
+    });
+  } else {
+    permisoDetailTable.ajax.reload();
+  }
+  
+  $('#btn-back-to-entidades').off('click').on('click', function() {
+    hidePermisoSubtable();
+  });
+  
+  $('.btn-refresh-permiso-detail-table').off('click').on('click', function() {
+    permisoDetailTable.ajax.reload();
+  });
+  
+  $(document).off('click', '#permisoDetailTable .btn-edit').on('click', '#permisoDetailTable .btn-edit', function() {
+    const id = $(this).data('id');
+    console.log('Editar regulación permiso ID:', id);
+  });
+  
+  $(document).off('click', '#permisoDetailTable .btn-delete').on('click', '#permisoDetailTable .btn-delete', function() {
+    const id = $(this).data('id');
+    if (confirm('¿Está seguro de que desea eliminar esta regulación de permiso?')) {
+      console.log('Eliminar regulación permiso ID:', id);
+    }
+  });
+
+  // Event listener para botón de ver detalles
+  $(document).off('click', '#permisoDetailTable .btn-view').on('click', '#permisoDetailTable .btn-view', function() {
+    const id = $(this).data('id');
+    const observaciones = $(this).data('observaciones');
+    const documentos = $(this).data('documentos');
+    showPermisoDetails(id, observaciones, documentos);
+  });
+}
+
+function hidePermisoSubtable() {
+  $('#permiso-detail-table').addClass('hidden');
+  $('#permiso-table .table-responsive').removeClass('hidden');
+}
+
+// ========================================
+// FUNCIÓN PARA MOSTRAR DETALLES DE ANTIDUMPING
+// ========================================
+
+function showAntidumpingDetails(id, observaciones, imagenes) {
+  // Crear el modal de detalles
+  const modalHtml = `
+    <div id="antidumping-details-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center p-6 border-b">
+          <h3 class="text-xl font-bold text-gray-800">Detalles de Regulación Antidumping</h3>
+          <button id="close-details-modal" class="text-gray-500 hover:text-gray-700 text-2xl">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="p-6">
+          <!-- Sección de Observaciones -->
+          <div class="mb-8">
+            <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+              <i class="fas fa-comment-alt mr-2 text-blue-600"></i>
+              Observaciones
+            </h4>
+            <div class="bg-gray-50 rounded-lg p-4 border">
+              <p class="text-gray-800 whitespace-pre-wrap">${observaciones || 'No hay observaciones registradas'}</p>
+            </div>
+          </div>
+          
+          <!-- Sección de Imágenes -->
           <div>
-            <p class="font-medium text-gray-800">${file.name}</p>
-            <p class="text-sm text-gray-500">${fileSize} MB</p>
+            <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+              <i class="fas fa-images mr-2 text-green-600"></i>
+              Imágenes Adjuntas
+            </h4>
+            <div id="images-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              ${renderImages(imagenes)}
+            </div>
           </div>
         </div>
-        <div class="flex items-center space-x-2">
-          <button class="text-blue-600 hover:text-blue-800 transition-colors">
-            <i class="fas fa-eye"></i>
-          </button>
-          <button class="text-green-600 hover:text-green-800 transition-colors">
-            <i class="fas fa-check-circle"></i>
-          </button>
-          <button class="text-red-600 hover:text-red-800 transition-colors remove-special-document">
-            <i class="fas fa-trash"></i>
+        
+        <div class="flex justify-end p-6 border-t">
+          <button id="close-details-modal-btn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+            Cerrar
           </button>
         </div>
       </div>
-    `)
-
-    $("#specialDocumentList").append(documentItem)
-    updateDocumentProgress()
-  }
-
-  function getSpecialFileIcon(fileType, fileName) {
-    const extension = fileName.split(".").pop().toLowerCase()
-
-    if (fileType.includes("pdf") || extension === "pdf") return "fas fa-file-pdf"
-    if (fileType.includes("word") || extension === "doc" || extension === "docx") return "fas fa-file-word"
-    if (fileType.includes("excel") || extension === "xls" || extension === "xlsx") return "fas fa-file-excel"
-    if (fileType.includes("image") || ["jpg", "jpeg", "png", "gif"].includes(extension)) return "fas fa-file-image"
-    return "fas fa-file"
-  }
-
-  // Remove special document functionality
-  $(document).on("click", ".remove-special-document", function () {
-    $(this)
-      .closest(".special-document-item")
-      .fadeOut(300, function () {
-        $(this).remove()
-        updateDocumentProgress()
-      })
-  })
-
-  // Update document progress
-  function updateDocumentProgress() {
-    const totalDocuments = $("#specialDocumentList .special-document-item").length
-    const progress = Math.min((totalDocuments / 5) * 100, 100) // Assuming 5 documents needed
-
-    $(".bg-orange-600.h-2.rounded-full").css("width", `${progress}%`)
-    $(".text-center.text-sm.text-gray-600").text(`${Math.round(progress)}% Completado`)
-  }
-
-  // Checklist functionality
-  $('input[type="checkbox"]').change(() => {
-    const totalCheckboxes = $('input[type="checkbox"]').length
-    const checkedBoxes = $('input[type="checkbox"]:checked').length
-    const progress = (checkedBoxes / totalCheckboxes) * 100
-
-    // Update any progress indicators if needed
-    console.log(`Checklist progress: ${progress}%`)
-  })
-
-  // Initialize tooltips and help text
-  $("[title]").each(function () {
-    $(this).hover(
-      function () {
-        const tooltip = $(
-          `<div class="absolute bg-gray-800 text-white text-xs rounded py-1 px-2 z-10">${$(this).attr("title")}</div>`,
-        )
-        $(this).append(tooltip)
-        $(this).removeAttr("title")
-      },
-      function () {
-        $(this).find(".absolute").remove()
-      },
-    )
-  })
-
-  // IMPORTANTE: Asegúrate de que este archivo se cargue después de dist_v2/js/utils/file_uploader.js en tu HTML
-
-  // Inicialización de FileUploader para cada sección de subida de archivos
-  if (document.getElementById('imageUploadContainer')) {
-    const imageUploader = new FileUploader({
-      containerId: 'imageUploadContainer',
-      acceptedTypes: 'image/*',
-      maxSize: 5 * 1024 * 1024,
-      placeholderText: 'Arrastra o sube la imagen del producto',
-      showPreview: true
-    });
-    document.getElementById('imageUploadContainer').addEventListener('imageUploadContainer-change', (e) => {
-      // Aquí puedes acceder al archivo con e.detail.file
-      // Por ejemplo, actualizar una variable global o hacer una vista previa adicional
-    });
-  }
-
-  // --- SUBIDA DE DOCUMENTOS GENERALES ---
-  if (document.getElementById('documentUploadContainer')) {
-    const docUploader = new FileUploader({
-      containerId: 'documentUploadContainer',
-      acceptedTypes: 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      maxSize: 10 * 1024 * 1024,
-      placeholderText: 'Arrastra o sube un documento',
-      showPreview: true
-    });
-    document.getElementById('documentUploadContainer').addEventListener('documentUploadContainer-change', (e) => {
-      // Manejar el archivo subido: e.detail.file
-    });
-  }
-
-  // --- SUBIDA DE IMÁGENES DE ETIQUETAS ---
-  if (document.getElementById('labelImageUploadContainer')) {
-    const labelUploader = new FileUploader({
-      containerId: 'labelImageUploadContainer',
-      acceptedTypes: 'image/*',
-      maxSize: 2 * 1024 * 1024,
-      placeholderText: 'Arrastra o sube la imagen de la etiqueta',
-      showPreview: true
-    });
-    document.getElementById('labelImageUploadContainer').addEventListener('labelImageUploadContainer-change', (e) => {
-      // Manejar el archivo subido: e.detail.file
-    });
-  }
-
-  // --- SUBIDA DE DOCUMENTOS ESPECIALES ---
-  if (document.getElementById('specialDocumentUploadContainer')) {
-    const specialDocUploader = new FileUploader({
-      containerId: 'specialDocumentUploadContainer',
-      acceptedTypes: 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/*',
-      maxSize: 15 * 1024 * 1024,
-      placeholderText: 'Arrastra o sube un documento especial',
-      showPreview: true
-    });
-    document.getElementById('specialDocumentUploadContainer').addEventListener('specialDocumentUploadContainer-change', (e) => {
-      // Manejar el archivo subido: e.detail.file
-    });
-  }
-
-  // --- SUBIDA MÚLTIPLE PARA TODOS LOS TABS (UNIFICADO) ---
-
-
-  // Funciones para Antidumping
-  function resetAntidumpingImageSlots() {
-    const slotsContainer = document.getElementById('imageUploadSlots');
-    if (slotsContainer) {
-      slotsContainer.innerHTML = '';
-      antidumpingUploaders = [];
-      createImageSlotAntidumping();
-      updateAddImageBtnAntidumping();
+    </div>
+  `;
+  
+  // Remover modal anterior si existe
+  $('#antidumping-details-modal').remove();
+  
+  // Agregar el modal al body
+  $('body').append(modalHtml);
+  
+  // Event listeners para cerrar el modal
+  $('#close-details-modal, #close-details-modal-btn').on('click', function() {
+    $('#antidumping-details-modal').remove();
+  });
+  
+  // Cerrar modal al hacer clic fuera de él
+  $('#antidumping-details-modal').on('click', function(e) {
+    if (e.target === this) {
+      $(this).remove();
     }
-  }
+  });
+}
 
-  function createImageSlotAntidumping() {
-    if (antidumpingUploaders.length >= MAX_IMAGES_ANTIDUMPING) return;
-    const slotId = `antidumping-image-slot-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-    const slotDiv = document.createElement('div');
-    slotDiv.className = 'image-upload-slot mb-2';
-    slotDiv.id = slotId;
-    document.getElementById('imageUploadSlots').appendChild(slotDiv);
-    const uploader = new FileUploader({
-      containerId: slotId,
-      acceptedTypes: 'image/*',
-      maxSize: 5 * 1024 * 1024,
-      placeholderText: 'Arrastra o sube una imagen',
-      showPreview: true
-    });
-    slotDiv.addEventListener(`${slotId}-change`, (e) => {
-      if (!e.detail.file) {
-        slotDiv.remove();
-        antidumpingUploaders = antidumpingUploaders.filter(u => u.slotId !== slotId);
-        if (antidumpingUploaders.length === 0) {
-          createImageSlotAntidumping();
-        }
-        updateAddImageBtnAntidumping();
+// ========================================
+// FUNCIÓN PARA MOSTRAR DETALLES DE PERMISO
+// ========================================
+
+function showPermisoDetails(id, observaciones, documentos) {
+  // Crear el modal de detalles
+  const modalHtml = `
+    <div id="permiso-details-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center p-6 border-b">
+          <h3 class="text-xl font-bold text-gray-800">Detalles de Regulación de Permiso</h3>
+          <button id="close-permiso-details-modal" class="text-gray-500 hover:text-gray-700 text-2xl">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="p-6">
+          <!-- Sección de Observaciones -->
+          <div class="mb-8">
+            <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+              <i class="fas fa-comment-alt mr-2 text-blue-600"></i>
+              Observaciones
+            </h4>
+            <div class="bg-gray-50 rounded-lg p-4 border">
+              <p class="text-gray-800 whitespace-pre-wrap">${observaciones || 'No hay observaciones registradas'}</p>
+            </div>
+          </div>
+          
+          <!-- Sección de Documentos -->
+          <div>
+            <h4 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+              <i class="fas fa-file-alt mr-2 text-green-600"></i>
+              Documentos Adjuntos
+            </h4>
+            <div id="documentos-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              ${renderDocuments(documentos)}
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-end p-6 border-t">
+          <button id="close-permiso-details-modal-btn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Remover modal anterior si existe
+  $('#permiso-details-modal').remove();
+  
+  // Agregar el modal al body
+  $('body').append(modalHtml);
+  
+  // Event listeners para cerrar el modal
+  $('#close-permiso-details-modal, #close-permiso-details-modal-btn').on('click', function() {
+    $('#permiso-details-modal').remove();
+  });
+  
+  // Cerrar modal al hacer clic fuera de él
+  $('#permiso-details-modal').on('click', function(e) {
+    if (e.target === this) {
+      $(this).remove();
+    }
+  });
+}
+
+function renderImages(imagenes) {
+  if (!imagenes || imagenes.length === 0) {
+    return `
+      <div class="col-span-full text-center py-8">
+        <i class="fas fa-image text-4xl text-gray-300 mb-2"></i>
+        <p class="text-gray-500">No hay imágenes adjuntas</p>
+      </div>
+    `;
+  }
+  
+  let imagesHtml = '';
+  imagenes.forEach((imagen, index) => {
+    const imageUrl = imagen.ruta;
+    const fileName = imagen.nombre_original || 'Imagen ' + (index + 1);
+    const fileSize = (imagen.peso / 1024 / 1024).toFixed(2) + ' MB';
+    
+    imagesHtml += `
+      <div class="bg-white rounded-lg border shadow-sm overflow-hidden group">
+        <div class="aspect-square relative">
+          <img src="${imageUrl}" alt="${fileName}" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+            <button class="view-image-btn opacity-0 group-hover:opacity-100 bg-white text-gray-800 px-3 py-1 rounded-lg shadow-lg transition-all transform scale-90 group-hover:scale-100" data-image-url="${imageUrl}" data-image-name="${fileName}">
+              <i class="fas fa-expand-alt mr-1"></i>Ver
+            </button>
+          </div>
+        </div>
+        <div class="p-3">
+          <p class="text-sm font-medium text-gray-800 truncate" title="${fileName}">${fileName}</p>
+          <p class="text-xs text-gray-500">${fileSize}</p>
+        </div>
+      </div>
+    `;
+  });
+  
+  return imagesHtml;
+}
+
+function renderDocuments(documentos) {
+  if (!documentos || documentos.length === 0) {
+    return `
+      <div class="col-span-full text-center py-8">
+        <i class="fas fa-file-alt text-4xl text-gray-300 mb-2"></i>
+        <p class="text-gray-500">No hay documentos adjuntos</p>
+      </div>
+    `;
+  }
+  
+  let documentsHtml = '';
+  documentos.forEach((documento, index) => {
+    const documentUrl = documento.ruta;
+    const fileName = documento.nombre_original || 'Documento ' + (index + 1);
+    const fileSize = (documento.peso / 1024 / 1024).toFixed(2) + ' MB';
+    const fileExtension = fileName.split('.').pop().toLowerCase();
+    
+    // Icono según el tipo de archivo
+    let fileIcon = 'fas fa-file';
+    if (fileExtension === 'pdf') fileIcon = 'fas fa-file-pdf';
+    else if (['doc', 'docx'].includes(fileExtension)) fileIcon = 'fas fa-file-word';
+    else if (['xls', 'xlsx'].includes(fileExtension)) fileIcon = 'fas fa-file-excel';
+    else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) fileIcon = 'fas fa-file-image';
+    
+    documentsHtml += `
+      <div class="bg-white rounded-lg border shadow-sm overflow-hidden group">
+        <div class="aspect-square relative bg-gray-50 flex items-center justify-center">
+          <div class="text-center">
+            <i class="${fileIcon} text-4xl text-gray-400 mb-2"></i>
+            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+              <a href="${documentUrl}" download="${fileName}" class="view-document-btn opacity-0 group-hover:opacity-100 bg-white text-gray-800 px-3 py-1 rounded-lg shadow-lg transition-all transform scale-90 group-hover:scale-100">
+                <i class="fas fa-download mr-1"></i>Descargar
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="p-3">
+          <p class="text-sm font-medium text-gray-800 truncate" title="${fileName}">${fileName}</p>
+          <p class="text-xs text-gray-500">${fileSize}</p>
+        </div>
+      </div>
+    `;
+  });
+  
+  return documentsHtml;
+}
+
+// ========================================
+// FUNCIÓN PARA MOSTRAR MODAL DE IMAGEN
+// ========================================
+
+function showImageModal(imageUrl, imageName) {
+  const modalHtml = `
+    <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+      <div class="relative max-w-4xl max-h-[90vh] mx-4">
+        <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+          <div class="flex justify-between items-center p-4 border-b">
+            <h4 class="text-lg font-semibold text-gray-800 truncate">${imageName}</h4>
+            <button id="close-image-modal" class="text-gray-500 hover:text-gray-700 text-2xl">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="p-4">
+            <img src="${imageUrl}" alt="${imageName}" class="max-w-full max-h-[70vh] object-contain mx-auto">
+          </div>
+          <div class="flex justify-between items-center p-4 border-t">
+            <a href="${imageUrl}" download="${imageName}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+              <i class="fas fa-download mr-2"></i>Descargar
+            </a>
+            <button id="close-image-modal-btn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Remover modal anterior si existe
+  $('#image-modal').remove();
+  
+  // Agregar el modal al body
+  $('body').append(modalHtml);
+  
+  // Event listeners para cerrar el modal
+  $('#close-image-modal, #close-image-modal-btn').on('click', function() {
+    $('#image-modal').remove();
+  });
+  
+  // Cerrar modal al hacer clic fuera de él
+  $('#image-modal').on('click', function(e) {
+    if (e.target === this) {
+      $(this).remove();
+    }
+  });
+  
+  // Cerrar modal con tecla ESC
+  $(document).on('keydown.imageModal', function(e) {
+    if (e.key === 'Escape') {
+      $('#image-modal').remove();
+      $(document).off('keydown.imageModal');
+    }
+  });
+}
+
+// ========================================
+// FUNCIÓN PARA CREAR ENTIDAD REGULADORA
+// ========================================
+
+function showCreateEntidadModal() {
+  const modalHtml = `
+    <div id="create-entidad-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div class="flex justify-between items-center p-6 border-b">
+          <h3 class="text-xl font-bold text-gray-800">Crear Nueva Entidad Reguladora</h3>
+          <button id="close-create-entidad-modal" class="text-gray-500 hover:text-gray-700 text-2xl">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <form id="create-entidad-form" class="p-6">
+          <div class="mb-4">
+            <label for="entidad-nombre" class="block text-sm font-medium text-gray-700 mb-2">
+              Nombre de la Entidad *
+            </label>
+            <input 
+              type="text" 
+              id="entidad-nombre" 
+              name="nombre" 
+              required 
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Ej: SUNAT, DIGESA, etc."
+            >
+          </div>
+          
+          <div class="mb-6">
+            <label for="entidad-descripcion" class="block text-sm font-medium text-gray-700 mb-2">
+              Descripción (opcional)
+            </label>
+            <textarea 
+              id="entidad-descripcion" 
+              name="descripcion" 
+              rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Descripción de la entidad reguladora..."
+            ></textarea>
+          </div>
+          
+          <div class="flex justify-end space-x-3">
+            <button 
+              type="button" 
+              id="cancel-create-entidad" 
+              class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+            >
+              <i class="fas fa-save mr-2"></i>
+              Crear Entidad
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+  
+  // Remover modal anterior si existe
+  $('#create-entidad-modal').remove();
+  
+  // Agregar el modal al body
+  $('body').append(modalHtml);
+  
+  // Event listeners para cerrar el modal
+  $('#close-create-entidad-modal, #cancel-create-entidad').on('click', function() {
+    $('#create-entidad-modal').remove();
+  });
+  
+  // Cerrar modal al hacer clic fuera de él
+  $('#create-entidad-modal').on('click', function(e) {
+    if (e.target === this) {
+      $(this).remove();
+    }
+  });
+  
+  // Manejar el envío del formulario
+  $('#create-entidad-form').on('submit', async function(e) {
+    e.preventDefault();
+    
+    const nombre = $('#entidad-nombre').val().trim();
+    const descripcion = $('#entidad-descripcion').val().trim();
+    
+    if (!nombre) {
+      showToast('El nombre de la entidad es obligatorio', 'error');
+      return;
+    }
+    
+    try {
+      const formData = new FormData();
+      formData.append('nombre', nombre);
+      formData.append('descripcion', descripcion);
+      
+      const response = await fetch(base_url + 'BaseDatos/RegulacionesController/createEntidadReguladora', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        showToast('Entidad creada exitosamente', 'success');
+        
+        // Cerrar el modal
+        $('#create-entidad-modal').remove();
+        
+        // Recargar las entidades en el select
+        await loadEntidadesReguladoras();
+        
+        // Seleccionar la nueva entidad creada
+        const entidadSelect = $('#entidadSelector');
+        entidadSelect.val(result.data.id);
+        
+      } else {
+        showToast('Error al crear entidad: ' + result.message, 'error');
       }
-    });
-    antidumpingUploaders.push({ uploader, slotId });
+    } catch (error) {
+      console.error('Error al crear entidad:', error);
+      showToast('Error de conexión al crear entidad', 'error');
+    }
+  });
+}
+
+// ========================================
+// GESTIÓN DE ARCHIVOS
+// ========================================
+
+// Funciones para Antidumping
+function resetAntidumpingImageSlots() {
+  const slotsContainer = document.getElementById('imageUploadSlots');
+  if (slotsContainer) {
+    slotsContainer.innerHTML = '';
+    antidumpingUploaders = [];
+    createImageSlotAntidumping();
     updateAddImageBtnAntidumping();
   }
+}
 
-  function updateAddImageBtnAntidumping() {
-    const btn = document.getElementById('addImageSlotBtn');
-    if (!btn) return;
-    if (antidumpingUploaders.length >= MAX_IMAGES_ANTIDUMPING) {
-      btn.disabled = true;
-      btn.classList.add('opacity-50', 'cursor-not-allowed');
-    } else {
-      btn.disabled = false;
-      btn.classList.remove('opacity-50', 'cursor-not-allowed');
-    }
-  }
-
-  // Funciones para Permiso
-  function resetPermisoDocSlots() {
-    const slotsContainer = document.getElementById('documentUploadSlots');
-    if (slotsContainer) {
-      slotsContainer.innerHTML = '';
-      permisoUploaders = [];
-      createDocSlotPermiso();
-      updateAddDocBtnPermiso();
-    }
-  }
-
-  function createDocSlotPermiso() {
-    if (permisoUploaders.length >= MAX_DOCS_PERMISO) return;
-    const slotId = `permiso-doc-slot-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-    const slotDiv = document.createElement('div');
-    slotDiv.className = 'doc-upload-slot mb-2';
-    slotDiv.id = slotId;
-    document.getElementById('documentUploadSlots').appendChild(slotDiv);
-    const uploader = new FileUploader({
-      containerId: slotId,
-      acceptedTypes: 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      maxSize: 10 * 1024 * 1024,
-      placeholderText: 'Arrastra o sube un documento',
-      showPreview: true
-    });
-    slotDiv.addEventListener(`${slotId}-change`, (e) => {
-      if (!e.detail.file) {
-        slotDiv.remove();
-        permisoUploaders = permisoUploaders.filter(u => u.slotId !== slotId);
-        if (permisoUploaders.length === 0) {
-          createDocSlotPermiso();
-        }
-        updateAddDocBtnPermiso();
+function createImageSlotAntidumping() {
+  if (antidumpingUploaders.length >= MAX_IMAGES_ANTIDUMPING) return;
+  const slotId = `antidumping-image-slot-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+  const slotDiv = document.createElement('div');
+  slotDiv.className = 'image-upload-slot mb-2';
+  slotDiv.id = slotId;
+  document.getElementById('imageUploadSlots').appendChild(slotDiv);
+  const uploader = new FileUploader({
+    containerId: slotId,
+    acceptedTypes: 'image/*',
+    maxSize: 5 * 1024 * 1024,
+    placeholderText: 'Arrastra o sube una imagen',
+    showPreview: true
+  });
+  slotDiv.addEventListener(`${slotId}-change`, (e) => {
+    if (!e.detail.file) {
+      slotDiv.remove();
+      antidumpingUploaders = antidumpingUploaders.filter(u => u.slotId !== slotId);
+      if (antidumpingUploaders.length === 0) {
+        createImageSlotAntidumping();
       }
-    });
-    permisoUploaders.push({ uploader, slotId });
+      updateAddImageBtnAntidumping();
+    }
+  });
+  antidumpingUploaders.push({ uploader, slotId });
+  updateAddImageBtnAntidumping();
+}
+
+function updateAddImageBtnAntidumping() {
+  const btn = document.getElementById('addImageSlotBtn');
+  if (!btn) return;
+  if (antidumpingUploaders.length >= MAX_IMAGES_ANTIDUMPING) {
+    btn.disabled = true;
+    btn.classList.add('opacity-50', 'cursor-not-allowed');
+  } else {
+    btn.disabled = false;
+    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+  }
+}
+
+// Funciones para Permiso
+function resetPermisoDocSlots() {
+  const slotsContainer = document.getElementById('documentUploadSlots');
+  if (slotsContainer) {
+    slotsContainer.innerHTML = '';
+    permisoUploaders = [];
+    createDocSlotPermiso();
     updateAddDocBtnPermiso();
   }
+}
 
-  function updateAddDocBtnPermiso() {
-    const btn = document.querySelector('.add-document-btn');
-    if (!btn) return;
-    if (permisoUploaders.length >= MAX_DOCS_PERMISO) {
-      btn.disabled = true;
-      btn.classList.add('opacity-50', 'cursor-not-allowed');
-    } else {
-      btn.disabled = false;
-      btn.classList.remove('opacity-50', 'cursor-not-allowed');
-    }
-  }
-
-  // Funciones para Etiquetado
-  function resetEtiquetadoImageSlots() {
-    const slotsContainer = document.getElementById('labelImageUploadSlots');
-    if (slotsContainer) {
-      slotsContainer.innerHTML = '';
-      etiquetadoUploaders = [];
-      createImageSlotEtiquetado();
-      updateAddImageBtnEtiquetado();
-    }
-  }
-
-  function createImageSlotEtiquetado() {
-    if (etiquetadoUploaders.length >= MAX_IMAGES_ETIQUETADO) return;
-    const slotId = `etiquetado-image-slot-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-    const slotDiv = document.createElement('div');
-    slotDiv.className = 'image-upload-slot mb-2';
-    slotDiv.id = slotId;
-    document.getElementById('labelImageUploadSlots').appendChild(slotDiv);
-    const uploader = new FileUploader({
-      containerId: slotId,
-      acceptedTypes: 'image/*',
-      maxSize: 2 * 1024 * 1024,
-      placeholderText: 'Arrastra o sube una imagen',
-      showPreview: true
-    });
-    slotDiv.addEventListener(`${slotId}-change`, (e) => {
-      if (!e.detail.file) {
-        slotDiv.remove();
-        etiquetadoUploaders = etiquetadoUploaders.filter(u => u.slotId !== slotId);
-        if (etiquetadoUploaders.length === 0) {
-          createImageSlotEtiquetado();
-        }
-        updateAddImageBtnEtiquetado();
+function createDocSlotPermiso() {
+  if (permisoUploaders.length >= MAX_DOCS_PERMISO) return;
+  const slotId = `permiso-doc-slot-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+  const slotDiv = document.createElement('div');
+  slotDiv.className = 'doc-upload-slot mb-2';
+  slotDiv.id = slotId;
+  document.getElementById('documentUploadSlots').appendChild(slotDiv);
+  const uploader = new FileUploader({
+    containerId: slotId,
+    acceptedTypes: 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    maxSize: 10 * 1024 * 1024,
+    placeholderText: 'Arrastra o sube un documento',
+    showPreview: true
+  });
+  slotDiv.addEventListener(`${slotId}-change`, (e) => {
+    if (!e.detail.file) {
+      slotDiv.remove();
+      permisoUploaders = permisoUploaders.filter(u => u.slotId !== slotId);
+      if (permisoUploaders.length === 0) {
+        createDocSlotPermiso();
       }
-    });
-    etiquetadoUploaders.push({ uploader, slotId });
+      updateAddDocBtnPermiso();
+    }
+  });
+  permisoUploaders.push({ uploader, slotId });
+  updateAddDocBtnPermiso();
+}
+
+function updateAddDocBtnPermiso() {
+  const btn = document.querySelector('.add-document-btn');
+  if (!btn) return;
+  if (permisoUploaders.length >= MAX_DOCS_PERMISO) {
+    btn.disabled = true;
+    btn.classList.add('opacity-50', 'cursor-not-allowed');
+  } else {
+    btn.disabled = false;
+    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+  }
+}
+
+// Funciones para Etiquetado
+function resetEtiquetadoImageSlots() {
+  const slotsContainer = document.getElementById('labelImageUploadSlots');
+  if (slotsContainer) {
+    slotsContainer.innerHTML = '';
+    etiquetadoUploaders = [];
+    createImageSlotEtiquetado();
     updateAddImageBtnEtiquetado();
   }
+}
 
-  function updateAddImageBtnEtiquetado() {
-    const btn = document.querySelector('.add-label-image-btn');
-    if (!btn) return;
-    if (etiquetadoUploaders.length >= MAX_IMAGES_ETIQUETADO) {
-      btn.disabled = true;
-      btn.classList.add('opacity-50', 'cursor-not-allowed');
-    } else {
-      btn.disabled = false;
-      btn.classList.remove('opacity-50', 'cursor-not-allowed');
-    }
-  }
-
-  // Funciones para Documentos Especiales
-  function resetDocumentosEspecialesSlots() {
-    const slotsContainer = document.getElementById('specialDocumentUploadSlots');
-    if (slotsContainer) {
-      slotsContainer.innerHTML = '';
-      documentosUploaders = [];
-      createDocSlotEspeciales();
-      updateAddDocBtnEspeciales();
-    }
-  }
-
-  function createDocSlotEspeciales() {
-    if (documentosUploaders.length >= MAX_DOCS_ESPECIALES) return;
-    const slotId = `documentos-special-slot-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-    const slotDiv = document.createElement('div');
-    slotDiv.className = 'doc-upload-slot mb-2';
-    slotDiv.id = slotId;
-    document.getElementById('specialDocumentUploadSlots').appendChild(slotDiv);
-    const uploader = new FileUploader({
-      containerId: slotId,
-      acceptedTypes: 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/*',
-      maxSize: 15 * 1024 * 1024,
-      placeholderText: 'Arrastra o sube un documento especial',
-      showPreview: true
-    });
-    slotDiv.addEventListener(`${slotId}-change`, (e) => {
-      if (!e.detail.file) {
-        slotDiv.remove();
-        documentosUploaders = documentosUploaders.filter(u => u.slotId !== slotId);
-        if (documentosUploaders.length === 0) {
-          createDocSlotEspeciales();
-        }
-        updateAddDocBtnEspeciales();
+function createImageSlotEtiquetado() {
+  if (etiquetadoUploaders.length >= MAX_IMAGES_ETIQUETADO) return;
+  const slotId = `etiquetado-image-slot-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+  const slotDiv = document.createElement('div');
+  slotDiv.className = 'image-upload-slot mb-2';
+  slotDiv.id = slotId;
+  document.getElementById('labelImageUploadSlots').appendChild(slotDiv);
+  const uploader = new FileUploader({
+    containerId: slotId,
+    acceptedTypes: 'image/*',
+    maxSize: 2 * 1024 * 1024,
+    placeholderText: 'Arrastra o sube una imagen',
+    showPreview: true
+  });
+  slotDiv.addEventListener(`${slotId}-change`, (e) => {
+    if (!e.detail.file) {
+      slotDiv.remove();
+      etiquetadoUploaders = etiquetadoUploaders.filter(u => u.slotId !== slotId);
+      if (etiquetadoUploaders.length === 0) {
+        createImageSlotEtiquetado();
       }
-    });
-    documentosUploaders.push({ uploader, slotId });
+      updateAddImageBtnEtiquetado();
+    }
+  });
+  etiquetadoUploaders.push({ uploader, slotId });
+  updateAddImageBtnEtiquetado();
+}
+
+function updateAddImageBtnEtiquetado() {
+  const btn = document.querySelector('.add-label-image-btn');
+  if (!btn) return;
+  if (etiquetadoUploaders.length >= MAX_IMAGES_ETIQUETADO) {
+    btn.disabled = true;
+    btn.classList.add('opacity-50', 'cursor-not-allowed');
+  } else {
+    btn.disabled = false;
+    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+  }
+}
+
+// Funciones para Documentos Especiales
+function resetDocumentosEspecialesSlots() {
+  const slotsContainer = document.getElementById('specialDocumentUploadSlots');
+  if (slotsContainer) {
+    slotsContainer.innerHTML = '';
+    documentosUploaders = [];
+    createDocSlotEspeciales();
     updateAddDocBtnEspeciales();
   }
+}
 
-  function updateAddDocBtnEspeciales() {
-    const btn = document.querySelector('.add-special-document-btn');
-    if (!btn) return;
-    if (documentosUploaders.length >= MAX_DOCS_ESPECIALES) {
-      btn.disabled = true;
-      btn.classList.add('opacity-50', 'cursor-not-allowed');
-    } else {
-      btn.disabled = false;
-      btn.classList.remove('opacity-50', 'cursor-not-allowed');
+function createDocSlotEspeciales() {
+  if (documentosUploaders.length >= MAX_DOCS_ESPECIALES) return;
+  const slotId = `documentos-special-slot-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+  const slotDiv = document.createElement('div');
+  slotDiv.className = 'doc-upload-slot mb-2';
+  slotDiv.id = slotId;
+  document.getElementById('specialDocumentUploadSlots').appendChild(slotDiv);
+  const uploader = new FileUploader({
+    containerId: slotId,
+    acceptedTypes: 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/*',
+    maxSize: 15 * 1024 * 1024,
+    placeholderText: 'Arrastra o sube un documento especial',
+    showPreview: true
+  });
+  slotDiv.addEventListener(`${slotId}-change`, (e) => {
+    if (!e.detail.file) {
+      slotDiv.remove();
+      documentosUploaders = documentosUploaders.filter(u => u.slotId !== slotId);
+      if (documentosUploaders.length === 0) {
+        createDocSlotEspeciales();
+      }
+      updateAddDocBtnEspeciales();
     }
+  });
+  documentosUploaders.push({ uploader, slotId });
+  updateAddDocBtnEspeciales();
+}
+
+function updateAddDocBtnEspeciales() {
+  const btn = document.querySelector('.add-special-document-btn');
+  if (!btn) return;
+  if (documentosUploaders.length >= MAX_DOCS_ESPECIALES) {
+    btn.disabled = true;
+    btn.classList.add('opacity-50', 'cursor-not-allowed');
+  } else {
+    btn.disabled = false;
+    btn.classList.remove('opacity-50', 'cursor-not-allowed');
   }
+}
+
+// ========================================
+// GESTIÓN DE DATOS
+// ========================================
+
+async function loadEntidadesReguladoras() {
+  try {
+    // Limpiar y deshabilitar el select mientras carga
+    const entidadSelect = $('#entidadSelector');
+    if (entidadSelect.length === 0) return; // Si no existe el select, salir
+    
+    entidadSelect.empty();
+    entidadSelect.append('<option value="">Cargando entidades...</option>');
+    entidadSelect.prop('disabled', true);
+    
+    const response = await fetch(base_url + 'BaseDatos/RegulacionesController/getEntidadesReguladoras', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      // Llenar el select de entidades
+      entidadSelect.empty();
+      entidadSelect.append('<option value="">Selecciona una entidad</option>');
+      
+      result.data.forEach(entidad => {
+        entidadSelect.append(`<option value="${entidad.id}">${entidad.nombre}</option>`);
+      });
+      
+      // Habilitar el select de entidades
+      entidadSelect.prop('disabled', false);
+      
+      showToast(`Entidades cargadas correctamente`, "success");
+    } else {
+      entidadSelect.empty();
+      entidadSelect.append('<option value="">Selecciona una entidad para continuar</option>');
+      entidadSelect.prop('disabled', true);
+    }
+  } catch (error) {
+    console.error('Error al cargar entidades:', error);
+    const entidadSelect = $('#entidadSelector');
+    if (entidadSelect.length > 0) {
+      entidadSelect.empty();
+      entidadSelect.append('<option value="">Error de conexión</option>');
+      entidadSelect.prop('disabled', true);
+    }
+    showToast("Error de conexión al cargar entidades", "error");
+  }
+}
+
+async function loadRubrosForProduct() {
+  try {
+    const rubroSelect = $('#rubroSelector');
+    rubroSelect.empty();
+    rubroSelect.append('<option value="">Cargando rubros...</option>');
+    rubroSelect.prop('disabled', true);
+    
+    const response = await fetch(base_url + 'BaseDatos/RegulacionesController/getRubrosByProduct', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      rubroSelect.empty();
+      rubroSelect.append('<option value="">Selecciona un rubro</option>');
+      
+      result.data.forEach(rubro => {
+        rubroSelect.append(`<option value="${rubro.id}">${rubro.nombre}</option>`);
+      });
+      
+      rubroSelect.prop('disabled', false);
+      showToast(`Rubros cargados correctamente`, "success");
+    } else {
+      rubroSelect.empty();
+      rubroSelect.append('<option value="">Error al cargar rubros</option>');
+      rubroSelect.prop('disabled', true);
+      showToast("Error al cargar rubros: " + result.message, "error");
+    }
+  } catch (error) {
+    console.error('Error al cargar rubros:', error);
+    const rubroSelect = $('#rubroSelector');
+    rubroSelect.empty();
+    rubroSelect.append('<option value="">Error de conexión</option>');
+    rubroSelect.prop('disabled', true);
+    showToast("Error de conexión al cargar rubros", "error");
+  }
+}
+
+async function saveRegulaciones() {
+  try {
+    const formData = new FormData()
+    formData.append('created_at', new Date().toISOString())
+    
+    Object.keys(tabData).forEach(tab => {
+      const tabFormData = tabData[tab]
+      if (tabFormData instanceof FormData) {
+        for (let [key, value] of tabFormData.entries()) {
+          formData.append(key, value)
+        }
+      }
+    })
+    
+    const response = await fetch(base_url + 'BaseDatos/RegulacionesController/saveRegulacion', {
+      method: 'POST',
+      body: formData
+    })
+    
+    const result = await response.json()
+    
+    if (result.success) {
+      showToast('Regulaciones guardadas correctamente', 'success')
+      
+      if (antidumpingTable) antidumpingTable.ajax.reload()
+      if (permisoTable) permisoTable.ajax.reload()
+      if (etiquetadoTable) etiquetadoTable.ajax.reload()
+      if (documentosTable) documentosTable.ajax.reload()
+      
+      tabStates = { antidumping: false, permiso: false, etiquetado: false, documentos: false }
+      tabData = {}
+      updateStepper()
+      
+      $('.formulario-container').addClass('hidden')
+      $('.container').removeClass('hidden')
+    } else {
+      showToast('Error al guardar: ' + result.message, 'error')
+    }
+  } catch (error) {
+    console.error('Error al guardar:', error)
+    showToast('Error de conexión al guardar', 'error')
+  }
+}
+
+// ========================================
+// INICIALIZACIÓN DE DATATABLES
+// ========================================
+
+function initializeDataTables() {
+  console.log('initializeDataTables');
+  
+  // DataTable para Antidumping
+  if ($.fn.DataTable.isDataTable('#antidumpingTable')) {
+    antidumpingTable.ajax.reload();
+  } else {
+    antidumpingTable = $('#antidumpingTable').DataTable({
+      ajax: {
+        url: base_url + 'BaseDatos/RegulacionesController/getAntidumpingData',
+        type: 'POST',
+        data: function (d) {
+          // Filtros adicionales si los necesitas
+        }
+      },
+      order: [[0, 'desc']],
+      paging: true,
+      lengthChange: true,
+      searching: true,
+      ordering: false,
+      info: true,
+      autoWidth: false,
+      responsive: false,
+      serverSide: false,
+      pagingType: "full_numbers",
+      oLanguage: {
+        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+        sLengthMenu: "_MENU_",
+        sSearch: "Buscar por: ",
+        sSearchPlaceholder: "",
+        sZeroRecords: "No se encontraron registros",
+        sInfoEmpty: "No hay registros",
+        sLoadingRecords: "Cargando...",
+        sProcessing: "Procesando...",
+        oPaginate: {
+          sFirst: "<<",
+          sLast: ">>",
+          sPrevious: "<",
+          sNext: ">",
+        },
+      }
+    });
+  }
+
+  // DataTable para Permisos
+  if ($.fn.DataTable.isDataTable('#permisoTable')) {
+    permisoTable.ajax.reload();
+  } else {
+    permisoTable = $('#permisoTable').DataTable({
+      ajax: {
+        url: base_url + 'BaseDatos/RegulacionesController/getPermisoData',
+        type: 'POST',
+        data: function (d) {
+          // Filtros adicionales si los necesitas
+        }
+      },
+      order: [[0, 'desc']],
+      paging: true,
+      lengthChange: true,
+      searching: true,
+      ordering: false,
+      info: true,
+      autoWidth: false,
+      responsive: false,
+      serverSide: false,
+      pagingType: "full_numbers",
+      oLanguage: {
+        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+        sLengthMenu: "_MENU_",
+        sSearch: "Buscar por: ",
+        sSearchPlaceholder: "",
+        sZeroRecords: "No se encontraron registros",
+        sInfoEmpty: "No hay registros",
+        sLoadingRecords: "Cargando...",
+        sProcessing: "Procesando...",
+        oPaginate: {
+          sFirst: "<<",
+          sLast: ">>",
+          sPrevious: "<",
+          sNext: ">",
+        },
+      }
+    });
+  }
+
+  // DataTable para Etiquetado
+  if ($.fn.DataTable.isDataTable('#etiquetadoTable')) {
+    etiquetadoTable.ajax.reload();
+  } else {
+    etiquetadoTable = $('#etiquetadoTable').DataTable({
+      ajax: {
+        url: base_url + 'BaseDatos/RegulacionesController/getEtiquetadoData',
+        type: 'POST',
+        data: function (d) {
+          // Filtros adicionales si los necesitas
+        }
+      },
+      order: [[0, 'desc']],
+      paging: true,
+      lengthChange: true,
+      searching: true,
+      ordering: false,
+      info: true,
+      autoWidth: false,
+      responsive: false,
+      serverSide: false,
+      pagingType: "full_numbers",
+      oLanguage: {
+        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+        sLengthMenu: "_MENU_",
+        sSearch: "Buscar por: ",
+        sSearchPlaceholder: "",
+        sZeroRecords: "No se encontraron registros",
+        sInfoEmpty: "No hay registros",
+        sLoadingRecords: "Cargando...",
+        sProcessing: "Procesando...",
+        oPaginate: {
+          sFirst: "<<",
+          sLast: ">>",
+          sPrevious: "<",
+          sNext: ">",
+        },
+      }
+    });
+  }
+
+  // DataTable para Documentos Especiales
+  if ($.fn.DataTable.isDataTable('#documentosTable')) {
+    documentosTable.ajax.reload();
+  } else {
+    documentosTable = $('#documentosTable').DataTable({
+      ajax: {
+        url: base_url + 'BaseDatos/RegulacionesController/getDocumentosData',
+        type: 'POST',
+        data: function (d) {
+          // Filtros adicionales si los necesitas
+        }
+      },
+      order: [[0, 'desc']],
+      paging: true,
+      lengthChange: true,
+      searching: true,
+      ordering: false,
+      info: true,
+      autoWidth: false,
+      responsive: false,
+      serverSide: false,
+      pagingType: "full_numbers",
+      oLanguage: {
+        sInfo: "Mostrando (_START_ - _END_) total de registros _TOTAL_",
+        sLengthMenu: "_MENU_",
+        sSearch: "Buscar por: ",
+        sSearchPlaceholder: "",
+        sZeroRecords: "No se encontraron registros",
+        sInfoEmpty: "No hay registros",
+        sLoadingRecords: "Cargando...",
+        sProcessing: "Procesando...",
+        oPaginate: {
+          sFirst: "<<",
+          sLast: ">>",
+          sPrevious: "<",
+          sNext: ">",
+        },
+      }
+    });
+  }
+}
+
+function initializeDataTableEventListeners() {
+  // Botón Nueva Regulación
+  $('#btn-nueva-regulacion').click(function () {
+    $('.container').addClass('hidden');
+    $('.formulario-container').removeClass('hidden');
+  });
+
+  // Botón Volver a Tablas
+  $('#btn-volver-tablas').click(function () {
+    $('.formulario-container').addClass('hidden');
+    $('.container').removeClass('hidden');
+  });
+
+  // Tabs de regulaciones
+  $('.regulacion-tab-btn').click(function () {
+    const tab = $(this).data('tab');
+
+    $('.regulacion-tab-btn').removeClass('active bg-blue-600 text-white').addClass('bg-gray-100 text-gray-700');
+    $(this).removeClass('bg-gray-100 text-gray-700').addClass('active bg-blue-600 text-white');
+
+    $('.regulacion-content').addClass('hidden');
+    $(`#${tab}-table`).removeClass('hidden');
+  });
+
+  // Botones de refresh
+  $('.btn-refresh-table').click(function () {
+    const table = $(this).data('table');
+    switch (table) {
+      case 'antidumping':
+        antidumpingTable.ajax.reload();
+        break;
+      case 'permiso':
+        permisoTable.ajax.reload();
+        break;
+      case 'etiquetado':
+        etiquetadoTable.ajax.reload();
+        break;
+      case 'documentos':
+        documentosTable.ajax.reload();
+        break;
+    }
+  });
+
+  // Botones de editar
+  $(document).on('click', '.btn-edit', function () {
+    const id = $(this).data('id');
+    console.log('Editar regulación ID:', id);
+  });
+
+  // Botones de eliminar
+  $(document).on('click', '.btn-delete', function () {
+    const id = $(this).data('id');
+    if (confirm('¿Está seguro de que desea eliminar esta regulación?')) {
+      console.log('Eliminar regulación ID:', id);
+    }
+  });
+
+  // Botón para mostrar subtabla
+  $('#antidumpingTable').on('click', '.btn-show-subtable', function() {
+    const rubroId = $(this).data('rubro-id');
+    showSubtable(rubroId);
+  });
+
+  // Botón para mostrar subtabla de permisos
+  $('#permisoTable').on('click', '.btn-show-subtable', function() {
+    const entidadId = $(this).data('entidad-id');
+    showPermisoSubtable(entidadId);
+  });
+}
+
+// ========================================
+// EVENT LISTENERS
+// ========================================
+
+$(document).ready(() => {
+  initializeDataTables();
+  initializeDataTableEventListeners();
+  loadRubrosForProduct();
+  loadEntidadesReguladoras();
+
+  // Detectar cambios en inputs para marcar el tab como "dirty"
+  $(document).on("input change", ".tab-content.active :input", markTabDirty);
+
+  // Guardar por tab
+  $(document).on("click", ".guardar-tab-btn", function () {
+    const tab = $(this).data("tab");
+    if (!isTabComplete(tab)) {
+      showToast("Completa todos los campos obligatorios antes de guardar.", "error");
+      return;
+    }
+    tabData[tab] = getTabData(tab);
+    tabStates[tab] = true;
+    markTabClean();
+    updateStepper();
+  });
+
+  // Cambio de tab con alerta si hay cambios sin guardar
+  $(document).on("click", ".tab-btn", function (e) {
+    const nextTab = $(this).data("tab");
+    if (nextTab === currentTab) return;
+    if (tabDirty) {
+      e.preventDefault();
+      showConfirmModal(
+        "Tienes cambios sin guardar",
+        "Si cambias de sección perderás el avance no guardado. ¿Deseas continuar?",
+        () => {
+          switchTab(nextTab);
+          markTabClean();
+        }
+      );
+      return;
+    }
+    switchTab(nextTab);
+  });
+
+  // Guardar global
+  $("#guardar-global-btn").click(async function () {
+    if (!Object.values(tabStates).some(Boolean)) {
+      showToast("No hay datos para guardar", "error");
+      return;
+    }
+
+    const formData = new FormData();
+
+    Object.entries(tabData).forEach(([tab, data]) => {
+      if (tabStates[tab]) {
+        Object.entries(data).forEach(([key, value]) => {
+          if (key === 'archivos' && Array.isArray(value)) {
+            value.forEach((file, index) => {
+              if (file) {
+                formData.append(`${tab}[archivos][${index}]`, file);
+              }
+            });
+          } else {
+            formData.append(`${tab}[${key}]`, value);
+          }
+        });
+      }
+    });
+
+    const selectedProduct = $("#productSelector").val();
+    formData.append('producto', selectedProduct);
+    formData.append('created_at', new Date().toISOString());
+
+    await saveRegulaciones();
+  });
+
+  // Rubro selector change
+  $("#rubroSelector").change(function () {
+    const selectedRubro = $(this).val()
+    if (selectedRubro) {
+      showToast(`Rubro seleccionado`, "info")
+    }
+  });
+
+  // Entidad selector change
+  $("#entidadSelector").change(function () {
+    const selectedEntidad = $(this).val()
+    if (selectedEntidad) {
+      showToast(`Entidad seleccionada`, "info")
+    }
+  });
+
+  // Botón para crear nueva entidad
+  $(document).on('click', '#btn-create-entidad', function() {
+    showCreateEntidadModal();
+  });
 
   // Inicializar slots para todos los tabs
   if (document.getElementById('imageUploadSlots')) {
@@ -1280,16 +1575,11 @@ $(document).ready(() => {
     });
   }
 
-  // Eliminar la lógica manual de drag and drop y FileReader para subida de archivos
-  // (El resto de la lógica de la app permanece igual, pero ahora la subida de archivos es gestionada por FileUploader)
-  // Unificar colores de los slots y botones en todos los tabs
+  // Efectos visuales para slots
   $(document).on('mouseenter', '.image-upload-slot, .doc-upload-slot', function () {
     $(this).addClass('ring-2 ring-blue-300');
   });
   $(document).on('mouseleave', '.image-upload-slot, .doc-upload-slot', function () {
     $(this).removeClass('ring-2 ring-blue-300');
   });
-
-
-
-})
+});
