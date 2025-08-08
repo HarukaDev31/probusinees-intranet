@@ -99,7 +99,11 @@ class ContenedorConsolidado extends CI_Controller
 		});
 		foreach ($arrData as $row) {
 			$subdata   = [];
-			$subdata[] = $row->tipo_carga == 'G. IMPORTACION' ? $row->tipo_carga : $row->tipo_carga . " #" . $row->carga;
+			if($this->user->No_Grupo == "Documentacion"){
+				$subdata[] = $row->tipo_carga == 'G. IMPORTACION' ? $row->tipo_carga : "CONSOLIDADO #" . $row->carga;
+			} else{
+				$subdata[] = $row->tipo_carga == 'G. IMPORTACION' ? $row->tipo_carga : $row->tipo_carga . " #" . $row->carga;
+			}
 			$subdata[] = $row->mes;
 			$subdata[] = $row->No_Pais;
 			$subdata[] = date("d/m/Y", strtotime($row->f_cierre));

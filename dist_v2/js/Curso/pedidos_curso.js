@@ -308,20 +308,12 @@ $(function () {
             'data': function (data) {
               data.sMethod = $('#hidden-sMethod').val();
               data.estado_pago = $('#cbo-filtro-estado_pago').val();
-              data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio').val() == "" ? ParseDateString(
-                new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric'
-                }))
-                : $('#txt-Fe_Inicio').val();
-              data.Filtro_Fe_Fin = $('#txt-Fe_Fin').val() == "" ? ParseDateString(
-                new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric'
-                }))
-                : $('#txt-Fe_Fin').val();
+              data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio').val() == "" 
+                ? new Date(new Date().setFullYear(new Date().getFullYear() - 5)).toISOString().slice(0, 10)
+                : $('#txt-Fe_Inicio').val().split('/').reverse().join('-');
+              data.Filtro_Fe_Fin = $('#txt-Fe_Fin').val() == "" 
+                ? new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().slice(0, 10)
+                : $('#txt-Fe_Fin').val().split('/').reverse().join('-');
               data.tipoTabla = "alumnos";
               data.campana = $('#txt-ID_Campana_Curso').val() ?? 0;
             },
@@ -446,20 +438,12 @@ $(function () {
             data: function (data) {
               data.sMethod = $('#hidden-sMethod').val();
               data.estado_pago = $('#cbo-filtro-estado_pago').val();
-              data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio').val() == "" ? ParseDateString(
-                new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric'
-                })
-              ) : $('#txt-Fe_Inicio').val();
-              data.Filtro_Fe_Fin = $('#txt-Fe_Fin').val() == "" ? ParseDateString(
-                new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric'
-                })
-              ) : $('#txt-Fe_Fin').val();
+              data.Filtro_Fe_Inicio = $('#txt-Fe_Inicio').val() == "" 
+                ? new Date(new Date().setFullYear(new Date().getFullYear() - 5)).toISOString().slice(0, 10)
+                : $('#txt-Fe_Inicio').val().split('/').reverse().join('-');
+              data.Filtro_Fe_Fin = $('#txt-Fe_Fin').val() == "" 
+                ? new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().slice(0, 10)
+                : $('#txt-Fe_Fin').val().split('/').reverse().join('-');
               data.tipoTabla = "pagos";
               data.campana = $('#txt-ID_Campana_Curso').val() ?? 0;
 
@@ -817,16 +801,8 @@ function aplicarFiltrosContenedor() {
 
 // Función para limpiar los filtros y recargar la tabla
 function limpiarFiltrosContenedor() {
-  $("#txt-Fe_Inicio").val(ParseDateString(new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  }), 'fecha', '/'));
-  $("#txt-Fe_Fin").val(ParseDateString(new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  }), 'fecha', '/'));
+  $("#txt-Fe_Inicio").val('');
+  $("#txt-Fe_Fin").val('');
   $("#txt-ID_Campana_Curso").val('0');
   $("#txt-ID_Estado").val('0');
   //emit event to set search input to empty
@@ -840,8 +816,7 @@ function limpiarFiltrosContenedor() {
     $("#cbo-filtro-estado_pago").val('0').trigger('change');
     tableCursoPagos.ajax.reload(null, false);
   }
-  //dropdown-menu  remove show class
-  $('.dropdown-menu').removeClass('show');
+
 
 }
 
@@ -1557,21 +1532,12 @@ $(document).on('change', 'select[name="ID_Campana"]', function () {
 
 async function getCursosHeader() {
   const formData = new FormData();
-  formData.append("Filtro_Fe_Inicio", $('#txt-Fe_Inicio').val() == "" || typeof $('#txt-Fe_Inicio').val() === 'undefined' ?
-    //fin inicio 2 meses antes
-    new Date(new Date().setMonth(new Date().getMonth() - 2)).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    })
-    : $('#txt-Fe_Inicio').val());
-  formData.append("Filtro_Fe_Fin", $('#txt-Fe_Fin').val() == "" || typeof $('#txt-Fe_Fin').val() === 'undefined' ?
-    new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    })
-    : $('#txt-Fe_Fin').val());
+  formData.append("Filtro_Fe_Inicio", $('#txt-Fe_Inicio').val() == "" || typeof $('#txt-Fe_Inicio').val() === 'undefined'
+  ? new Date(new Date().setFullYear(new Date().getFullYear() - 5)).toISOString().slice(0, 10)
+  : $('#txt-Fe_Inicio').val().split('/').reverse().join('-'));
+formData.append("Filtro_Fe_Fin", $('#txt-Fe_Fin').val() == "" || typeof $('#txt-Fe_Fin').val() === 'undefined'
+  ? new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().slice(0, 10)
+  : $('#txt-Fe_Fin').val().split('/').reverse().join('-'));
   const response = await fetch(base_url + "Curso/PedidosCurso/getCursosHeader", {
     method: "POST",
     body: formData
