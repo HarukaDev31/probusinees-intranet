@@ -293,7 +293,7 @@ Search for
                             <!--th mes,pais,empresa,T.ctn,canal,desaduanaje,ajuste,multa,fob,flete,c.destino,observaciones,ver-->
                             <th>Mes</th>
                             <th style="min-width: 12em;">Empresa</th>
-                            <th style="min-width: 12em;">Carga</th>
+                            <th style="min-width: 10em;">Carga</th>
                             <th style="min-width: 4em;">T. Ctn</th>
                             <th>Canal</th>
                             <th>F. Cierre</th>
@@ -302,11 +302,11 @@ Search for
                             <th>F. Levante</th>
                             <th>Días de levante</th>
                             <th style="min-width: 8em;">N. Dua</th>
-                            <th>Ajuste</th>
-                            <th>Multa</th>
-                            <th>FOB</th>
-                            <th>Flete</th>
-                            <th>C. Destino</th>
+                            <th style="min-width: 6em;">Ajuste</th>
+                            <th style="min-width: 6em;">Multa</th>
+                            <th style="min-width: 6em;">FOB</th>
+                            <th style="min-width: 6em;">Flete</th>
+                            <th style="min-width: 6em;">C. Destino</th>
                             <th>Acciones</th>
 
                         </tr>
@@ -3460,4 +3460,7 @@ label>i {
 #modalClientePagosCoordination >.modal-dialog>.modal-content {
  background-color: #F0F4F9;
 } 
+#table-contenedor-completados_wrapper > .row > .col-sm-12{
+    overflow-x: auto;
+}
 </style>
