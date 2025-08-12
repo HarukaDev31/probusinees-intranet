@@ -260,6 +260,9 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->where('id_pedido', $idContenedor);
             $this->db->order_by('id_order', 'asc');
             if ($this->user->No_Grupo == "Cotizador") {
+                $this->db->limit(1);
+            }
+            if ($this->user->ID_Usuario == 28791) {
                 //limit to 2 steps
                 $this->db->limit(2);
             }
@@ -282,6 +285,7 @@ class ContenedorConsolidadoModel extends CI_Model
         $this->db->select("
             CC.*,
             CC.id AS id_cotizacion,
+            TC.name AS name,
             U.No_Nombres_Apellidos,
             CONCAT(
                 C.carga,
@@ -4283,37 +4287,57 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     public function getCotizacionEmbarqueHeaders($idContenedor)
     {
         try {
-            // Consulta para cbm_total_china usando DISTINCT para evitar duplicación
+
+            $userId = $this->user->ID_Usuario;
+
+
+            // CBM Total China (todos los CONFIRMADO)
             $this->db->select('
-            COALESCE(SUM( IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china
-        ')
-                ->from($this->table_contenedor_cotizacion_proveedores . ' cccp')
-                ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id')
-                ->where('cccp.id_contenedor', $idContenedor);
+                COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china
+            ')
+            ->from($this->table_contenedor_cotizacion_proveedores . ' cccp')
+            ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id')
+            ->where('cccp.id_contenedor', $idContenedor);
 
-            // Subconsulta para cbm_total
+            // CBM Total Perú (todos los CONFIRMADO)
             $this->db->select('(
-            SELECT COALESCE(SUM(volumen), 0) 
-            FROM ' . $this->table_contenedor_cotizacion . ' 
-            WHERE id IN (
-                SELECT DISTINCT id_cotizacion 
-                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
-                WHERE id_contenedor = ' . $idContenedor . '
-            )
-            AND estado_cotizador = "CONFIRMADO"
-        ) as cbm_total', false);
+                SELECT COALESCE(SUM(volumen), 0)
+                FROM ' . $this->table_contenedor_cotizacion . '
+                WHERE id IN (
+                    SELECT DISTINCT id_cotizacion
+                    FROM ' . $this->table_contenedor_cotizacion_proveedores . '
+                    WHERE id_contenedor = ' . $idContenedor . '
+                )
+                AND estado_cotizador = "CONFIRMADO"
+            ) as cbm_total_peru', false);
 
-            // Subconsulta para cbm_total_pendiente
+            // CBM Vendido (CONFIRMADO, solo del usuario)
             $this->db->select('(
-            SELECT COALESCE(SUM(volumen), 0) 
-            FROM ' . $this->table_contenedor_cotizacion . ' 
-            WHERE id IN (
-                SELECT DISTINCT id_cotizacion 
-                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
+                SELECT COALESCE(SUM(volumen), 0)
+                FROM ' . $this->table_contenedor_cotizacion . '
                 WHERE id_contenedor = ' . $idContenedor . '
-            )
-            AND estado_cotizador != "CONFIRMADO"
-        ) as cbm_total_pendiente', false);
+                AND estado_cotizador = "CONFIRMADO"
+                AND id_usuario = ' . $userId . '
+            ) as cbm_vendido', false);
+
+            // CBM Pendiente (NO CONFIRMADO, solo del usuario)
+            $this->db->select('(
+                SELECT COALESCE(SUM(volumen), 0)
+                FROM ' . $this->table_contenedor_cotizacion . '
+                WHERE id_contenedor = ' . $idContenedor . '
+                AND estado_cotizador != "CONFIRMADO"
+                AND id_usuario = ' . $userId . '
+            ) as cbm_pendiente', false);
+
+            // CBM Embarcado (LOADED, solo del usuario)
+            $this->db->select('(
+                SELECT COALESCE(SUM(cccp.cbm_total_china), 0)
+                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' cccp
+                JOIN ' . $this->table_contenedor_cotizacion . ' cc ON cccp.id_cotizacion = cc.id
+                WHERE cccp.id_contenedor = ' . $idContenedor . '
+                AND cccp.estados_proveedor = "LOADED"
+                AND cc.id_usuario = ' . $userId . '
+            ) as cbm_embarcado', false);
 
             // Subconsulta para total_logistica
             $this->db->select('(
@@ -4358,11 +4382,72 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $query = $this->db->get();
             $result2 = $query->row();
 
+            // Si es el usuario 28791, obtener los CBM por usuario (vendido, pendiente, embarcado)
+        // Si es el usuario 28791, obtener los CBM por usuario (vendido, pendiente, embarcado)
+        if ($userId == 28791) {
+            // CBM Vendido por usuario
+            $cbmVendido = [];
+            $cbmPendiente = [];
+            $cbmEmbarcado = [];
+
+            // Vendido
+            $vendidoQuery = $this->db->query('
+                SELECT u.No_Nombres_Apellidos, COALESCE(SUM(volumen), 0) as cbm_vendido
+                FROM ' . $this->table_contenedor_cotizacion . ' c
+                LEFT JOIN usuario u ON u.ID_Usuario = c.id_usuario
+                WHERE id_contenedor = ? AND estado_cotizador = "CONFIRMADO"
+                GROUP BY u.No_Nombres_Apellidos
+            ', [$idContenedor]);
+            foreach ($vendidoQuery->result() as $row) {
+                $cbmVendido[$row->No_Nombres_Apellidos] = $row->cbm_vendido;
+            }
+
+            // Pendiente
+            $pendienteQuery = $this->db->query('
+                SELECT u.No_Nombres_Apellidos, COALESCE(SUM(volumen), 0) as cbm_pendiente
+                FROM ' . $this->table_contenedor_cotizacion . ' c
+                LEFT JOIN usuario u ON u.ID_Usuario = c.id_usuario
+                WHERE id_contenedor = ? AND estado_cotizador != "CONFIRMADO"
+                GROUP BY u.No_Nombres_Apellidos
+            ', [$idContenedor]);
+            foreach ($pendienteQuery->result() as $row) {
+                $cbmPendiente[$row->No_Nombres_Apellidos] = $row->cbm_pendiente;
+            }
+
+            // Embarcado
+            $embarcadoQuery = $this->db->query('
+                SELECT u.No_Nombres_Apellidos, COALESCE(SUM(cccp.cbm_total_china), 0) as cbm_embarcado
+                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' cccp
+                JOIN ' . $this->table_contenedor_cotizacion . ' cc ON cccp.id_cotizacion = cc.id
+                LEFT JOIN usuario u ON u.ID_Usuario = cc.id_usuario
+                WHERE cccp.id_contenedor = ? AND cccp.estados_proveedor = "LOADED"
+                GROUP BY u.No_Nombres_Apellidos
+            ', [$idContenedor]);
+            foreach ($embarcadoQuery->result() as $row) {
+                $cbmEmbarcado[$row->No_Nombres_Apellidos] = $row->cbm_embarcado;
+            }
+
+            return [
+                'cbm_total_china'   => $result->cbm_total_china,
+                'cbm_total_peru'    => $result->cbm_total_peru,
+                'cbm_vendido'       => $cbmVendido,
+                'cbm_pendiente'     => $cbmPendiente,
+                'cbm_embarcado'     => $cbmEmbarcado,
+                'total_logistica'   => $result->total_logistica,
+                'total_logistica_pagado' => $result->total_logistica_pagado,
+                'qty_items'         => $result->total_qty_items,
+                'bl_file_url'       => $result2->bl_file_url,
+                'lista_embarque_url'=> $result2->lista_embarque_url
+            ];
+        }
+
             if ($result) {
                 return [
                     'cbm_total_china' => $result->cbm_total_china,
-                    'cbm_total' => $result->cbm_total,
-                    'cbm_total_pendiente' => $result->cbm_total_pendiente,
+                    'cbm_total_peru' => $result->cbm_total_peru,
+                    'cbm_vendido'       => $result->cbm_vendido,
+                    'cbm_pendiente'     => $result->cbm_pendiente,
+                    'cbm_embarcado'     => $result->cbm_embarcado,
                     'total_logistica' => $result->total_logistica,
                     'total_logistica_pagado' => round($result->total_logistica_pagado, 2),
                     'qty_items' => $result->total_qty_items,
@@ -4375,11 +4460,13 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     'error' => false,
                     "data" => [
                         'cbm_total_china' => 0,
-                        'cbm_total_pendiente' => 0,
+                        'cbm_pendiente' => 0,
+                        'cbm_embarcado' => 0,
+                        'cbm_vendido' => 0,
                         'total_logistica' => 0,
                         'total_logistica_pagado' => 0,
                         'qty_items' => 0,
-                        'cbm_total' => 0,
+                        'cbm_total_peru' => 0,
                         'bl_file_url' => '',
                         'lista_embarque_url' => ''
                     ]
