@@ -403,7 +403,8 @@ class ContenedorConsolidado extends CI_Controller
 		echo json_encode([
 			'data' => $arrResponse,
 			'status' => "success",
-			"currentPrivilege" => $this->user->No_Grupo
+			"currentPrivilege" => $this->user->No_Grupo,
+			"idusuario" => $this->user->ID_Usuario
 		]);
 	}
 	public function updateProveedorData()
@@ -502,9 +503,7 @@ class ContenedorConsolidado extends CI_Controller
 						" id="estado-cotizador-' . $row->id_cotizacion . '" name="estado" onchange="updateEstadoCotizador(' . $row->id_cotizacion . ')">
 							<option
 							value="PENDIENTE" ' . ($row->estado_cotizador == "PENDIENTE" ? "selected" : "") . '>PENDIENTE</option>
-							<option value="CONTACTADO" ' . ($row->estado_cotizador == "CONTACTADO" ? "selected" : "") . '>CONTACTADO</option>
-							<option value="INTERESADO" ' . ($row->estado_cotizador == "INTERESADO" ? "selected" : "") . '>INTERESADO</option>
-
+							<option value="COTIZADO" ' . ($row->estado_cotizador == "COTIZADO" ? "selected" : "") . '>COTIZADO</option>
 							<option value="CONFIRMADO" ' . ($row->estado_cotizador == "CONFIRMADO" ? "selected" : "") . '>CONFIRMADO</option>
 						</select>';
 						$subdata[] = $divEstadoCotizador;

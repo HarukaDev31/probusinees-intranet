@@ -12,6 +12,7 @@ var currentProveedor = 0;
 var currentCotizacion;
 var currentTableCotizacion = "prospectos";
 var currentPrivilege = localStorage.getItem("currentPrivilege") == null ? "" : localStorage.getItem("currentPrivilege");
+var idusuario = localStorage.getItem("idusuario") == null ? "" : localStorage.getItem("idusuario");
 var rolesChina = ["CatalogoChina", "ContenedorAlmacen"];
 var fileManager = null;
 var fileManagerInspection = null;
@@ -1843,12 +1844,19 @@ async function viewSteps(id, carga, disabled = false) {
       spinner.hide();
       const data = result.data;
       currentPrivilege = result.currentPrivilege;
+      idusuario = result.idusuario;
       //here
       if (rolesChina.includes(currentPrivilege)) {
         openStepFunction(1, id);
         mainContainer.hide();
         contentHeader.hide();
         return;
+      }
+    if(currentPrivilege == "Cotizador" && Number(idusuario) !== 28791){
+          openStepFunction(1, id);
+          mainContainer.hide();
+          contentHeader.hide();
+          return;
       }
       mainContainer.hide();
       contentHeader.hide();
@@ -4243,6 +4251,13 @@ const openStepFunction = async (step, id) => {
       clientesDocumentacionContainer.hide();
       table_Entidad.ajax.reload();
       stepsContainer.hide();
+    } else if (currentPrivilege == "Cotizador" && Number(idusuario) !== 28791) {
+      mainContainer.show();
+      contentHeader.show();
+      cotizacionContainer.hide();
+      clientesDocumentacionContainer.hide();
+      table_Entidad.ajax.reload();
+      stepsContainer.hide();
     } else {
       returnToSteps();
     }
@@ -4817,10 +4832,24 @@ async function getTableCotizacionEmbarqueHeaders() {
 
   const response = await fetch(url);
   const result = await response.json();
+  function formatCBMDetalle(val) {
+    if (typeof val === "object" && val !== null) {
+      let html = "<div style='font-size:11px;color:#888'>";
+      for (const usuario in val) {
+        html += `${usuario}: <b>${val[usuario]}</b><br>`;
+      }
+      html += "</div>";
+      return html;
+    }
+    return val ?? 0;
+  }
+
   $("#cotizacion_name").val('#' + currentCargaNumber);
-  $("#txt-CBM_Total_Peru").html(result.cbm_total);
+  $("#txt-CBM_Total_Peru").html(result.cbm_total_peru);
   $("#txt-CBM_Total_China").html(result.cbm_total_china);
-  $("#txt-CBM_Total_Pendiente").html(result.cbm_total_pendiente);
+  $("#txt-CBM_Total_Vendido").html(formatCBMDetalle(result.cbm_vendido));
+  $("#txt-CBM_Total_Pendiente").html(formatCBMDetalle(result.cbm_pendiente));
+  $("#txt-CBM_Total_Embarcado").html(formatCBMDetalle(result.cbm_embarcado));
   $("#txt-CBM_Total_Logistica").html(result.total_logistica);
   $("#txt-CBM_Total_Pagado").html(result.total_logistica_pagado);
   $("#txt-CBM_Total_Qty_Items").html(result.qty_items);

@@ -1094,43 +1094,66 @@ Search for
                         </div>
                     </div>
                     <?php } ?>
-
+                    <?php if ($this->user->ID_Usuario == 28791) { ?>
+                    <div class="col-5 col-sm-12 col-md-4 col-xl-2 d-flex align-items-center justify-content-between gap-3">
+                        <div
+                            class="flex align-items-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
+                                class="country-icons" alt="Perú">
+                            <span class="text-xs">CBM Total:</span>
+                            <div class="pl-1">
+                                <strong><span type="number" id="txt-CBM_Total_Peru" class="cbm_score"
+                                        disabled></span></strong>
+                            </div>
+                        </div>
+                        <div
+                            class="flex align-items-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg"
+                                alt="China" class="country-icons">
+                            <span class="text-xs">CBM Total:</span>
+                            <div class="pl-1">
+                                <strong><span type="number" id="txt-CBM_Total_China" class="cbm_score"
+                                        disabled></span></strong>
+                            </div>
+                        </div>
+                    </div>
+                    <?php } ?>
+                    <?php if ($this->user->No_Grupo == 'Cotizador') { ?>
                     <div
-                        class="col-5 col-sm-12 col-md-4 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+                        class="col-5 col-sm-4 col-md-6 col-xl-2 d-flex align-items-center justify-content-center gap-2">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
                             class="country-icons" alt="Perú">
-                        <span>CBM Total:</span>
+                        <span class="text-xs">CBM Vendido:</span>
                         <div class="">
-                            <strong><span type="number" id="txt-CBM_Total_Peru" class="cbm_score"
+                            <strong><span type="number" id="txt-CBM_Total_Vendido" class="cbm_score"
                                     disabled></span></strong>
                         </div>
                     </div>
-                    <?php if ($this->user->No_Grupo == 'Cotizador') { ?>
                     <div
-                        class="col-5 col-sm-4  col-md-6  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+                        class="col-5 col-sm-4 col-md-6 col-xl-2 d-flex align-items-center justify-content-center gap-2">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
                             class="country-icons" alt="Perú">
-                        <span>CBM Pendiente:</span>
+                        <span class="text-xs">CBM Pendiente:</span>
                         <div class="">
                             <strong><span type="number" id="txt-CBM_Total_Pendiente" class="cbm_score"
                                     disabled></span></strong>
                         </div>
                     </div>
-                    <?php } ?>
                     <div
-                        class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+                        class="col-5 col-sm-4 col-md-6 col-xl-2 d-flex align-items-center justify-content-center gap-2">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg"
                             alt="China" class="country-icons">
-                        <span>CBM Total:</span>
+                        <span class="text-xs">CBM Embarcado:</span>
                         <div class="">
-                            <strong><span type="number" id="txt-CBM_Total_China" class="cbm_score"
+                            <strong><span type="number" id="txt-CBM_Total_Embarcado" class="cbm_score"
                                     disabled></span></strong>
                         </div>
                     </div>
+                    <?php } ?>
                     <?php if ($this->user->No_Grupo=="Coordinación" ) { ?>
 
                     <div
-                        class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
+                        class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1">
                         <!-- icon with dollar icon-->
                         <i class="fas fa-dollar-sign"></i>
                         <span>Total Logistica:</span>
@@ -1143,7 +1166,7 @@ Search for
                     <?php } ?>
                     <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
                     <div
-                        class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
+                        class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1">
                         <!-- icon with dollar icon-->
                         <i class="fas fa-dollar-sign"></i>
                         <span>Total Pagado:</span>
@@ -1155,7 +1178,7 @@ Search for
                     <?php } ?>
                     <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
                     <div
-                        class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
+                        class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1">
                         <!-- icon with boxes icon-->
                         <i class="nav-icon fas fa-boxes"></i>
                         <span>Total Qty Items:</span>
