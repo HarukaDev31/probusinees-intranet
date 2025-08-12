@@ -163,6 +163,32 @@ class ContenedorConsolidadoModel extends CI_Model
             return false;
         }
     }
+    public function deleteListaEmbarque($idContenedor)
+    {
+        try {
+            $this->db->select('lista_embarque_url')
+                ->from('carga_consolidada_contenedor')
+                ->where('id', $idContenedor);
+            $query = $this->db->get();
+            $listaEmbarqueUrl = $query->row();
+           
+            if ($listaEmbarqueUrl) {
+                //unlink file
+                unlink($listaEmbarqueUrl->lista_embarque_url);
+            }
+            //set lista_embarque_url to null
+            $this->db->where('id', $idContenedor);
+            $this->db->update('carga_consolidada_contenedor', ['lista_embarque_url' => null]);
+            if ($this->db->error()['code'] == 0) {
+                return "success";
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+            return false;
+        }
+    }
     public function getNotes($idProveedor)
     {
         $this->db->select('nota')
@@ -299,7 +325,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = CC.id_usuario', 'left')
             ->where('id_contenedor', $idContenedor)
             ->order_by('id_cotizacion', 'asc');
-       // Si el usuario es "Cotizador", filtrar por el id del usuario actual
+        // Si el usuario es "Cotizador", filtrar por el id del usuario actual
         if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
             $this->db->where('CC.id_usuario', $this->user->ID_Usuario);
         }
@@ -478,7 +504,7 @@ class ContenedorConsolidadoModel extends CI_Model
                     'CatalogoChina' => 'estado_china',
                     'Documentacion' => 'estado',
                 ];
-                $this->db->where("main" . $fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
+                $this->db->where("main." . $fieldToFilter[$this->user->No_Grupo], $this->input->post('Filtro_Estado'));
             }
             if ($filtroState != "0") {
                 $state = $this->db->escape_str($filtroState);
@@ -673,13 +699,13 @@ class ContenedorConsolidadoModel extends CI_Model
                 UPPER(LEFT(TRIM(CC.nombre), 3))
             ) AS COD
         ")
-        ->from($this->table_contenedor_cotizacion . " AS CC")
-        ->join($this->table . ' AS C', 'C.id = CC.id_contenedor')
-        ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'join')
-        ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = CC.id_usuario', 'left')
-        ->where('CC.id_contenedor', $idContenedor)
-        ->where('CC.estado_cliente IS NOT NULL')
-        ->where('CC.estado_cotizador', 'CONFIRMADO');
+            ->from($this->table_contenedor_cotizacion . " AS CC")
+            ->join($this->table . ' AS C', 'C.id = CC.id_contenedor')
+            ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'join')
+            ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = CC.id_usuario', 'left')
+            ->where('CC.id_contenedor', $idContenedor)
+            ->where('CC.estado_cliente IS NOT NULL')
+            ->where('CC.estado_cotizador', 'CONFIRMADO');
         $estado = $this->input->post('estado') ?? "0";
         if ($estado != "0") {
             $this->db->where('CC.estado_cliente', $estado);
@@ -4295,9 +4321,9 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $this->db->select('
                 COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china
             ')
-            ->from($this->table_contenedor_cotizacion_proveedores . ' cccp')
-            ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id')
-            ->where('cccp.id_contenedor', $idContenedor);
+                ->from($this->table_contenedor_cotizacion_proveedores . ' cccp')
+                ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id')
+                ->where('cccp.id_contenedor', $idContenedor);
 
             // CBM Total Perú (todos los CONFIRMADO)
             $this->db->select('(
@@ -4381,7 +4407,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 ->where('id', $idContenedor);
             $query = $this->db->get();
             $result2 = $query->row();
-
 
 
             if ($result) {
