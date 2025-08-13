@@ -1218,7 +1218,7 @@ Search for
                                 <th>COD</th>
                                 <th>Fecha</th>
                                 <th>Fecha de modificación</th>
-                                <th>Nombre</th>
+                                <th style="min-width: 12em;">Nombre</th>
                                 <th>DNI/RUC</th>
                                 <th>Correo</th>
                                 <th>Whatsapp</th>
@@ -1254,7 +1254,7 @@ Search for
                                 <?php } ?>
                                 <th style="min-width: 8em;" class="no-sort">Status</th>
                                 <th class="orderable">N.</th>
-                                <th class="buyer" style="min-width: 10em;">Buyer</th>
+                                <th class="buyer" style="min-width: 15em;">Buyer</th>
                                 <?php if (!in_array($this->user->No_Grupo, $rolesChina) && $this->user->No_Grupo != "Documentacion") {  ?>
                                 <th style="min-width: 8em;">Whatsapp</th>
                                 <th style="min-width: 9em;">Estado</th>
@@ -1291,7 +1291,7 @@ Search for
                         <thead class="thead-default">
                             <tr>
                                 <th>N.</th>
-                                <th>Nombre</th>
+                                <th style="min-width: 15em;">Nombre</th>
                                 <th>DNI/RUC</th>
                                 <th>Whatsapp</th>
                                 <th>T. Cliente</th>
@@ -1453,7 +1453,7 @@ Search for
                         <th>Codigo</th>
                         <th>Fecha</th>
                         <th>Fecha Modificación</th>
-                        <th style="min-width: 10em;">Nombre</th>
+                        <th style="min-width: 15em;">Nombre</th>
                         <th>DNI/RUC</th>
                         <th>Correo</th>
                         <th>Whatsapp</th>
@@ -1477,7 +1477,7 @@ Search for
                     <tr>
                         <th>N°</th>
                         <th>Asesor</th>
-                        <th>Nombre</th>
+                        <th style="min-width: 15em;">Nombre</th>
                         <th>DNI/RUC</th>
                         <th>T. Cliente</th>
                         <th>Tarifa</th>
@@ -1494,7 +1494,7 @@ Search for
                 <thead class="thead-default">
                     <tr>
                         <th>N.</th>
-                        <th>Nombre</th>
+                        <th style="min-width: 15em;">Nombre</th>
                         <th>DNI/RUC</th>
                         <th>Whatsapp</th>
                         <th>T. Cliente</th>
@@ -1987,7 +1987,7 @@ Search for
                     <thead class="thead-default">
                         <tr>
                             <th>N°</th>
-                            <th>Nombre</th>
+                            <th style="min-width: 15em;">Nombre</th>
                             <th>DNI/RUC</th>
                             <th>Correo</th>
                             <th>Whatsapp</th>
@@ -2006,7 +2006,7 @@ Search for
                     <thead class="thead-default">
                         <tr>
                             <th>N.</th>
-                            <th>Nombre</th>
+                            <th style="min-width: 15em;">Nombre</th>
                             <th>DNI/RUC</th>
                             <th>Whatsapp</th>
                             <th>T. Cliente</th>
@@ -2039,7 +2039,7 @@ Search for
                     <thead class="thead-default">
                         <tr>
                             <th>N°</th>
-                            <th>Nombre</th>
+                            <th style="min-width: 15em;">Nombre</th>
                             <th>DNI/RUC</th>
                             <th>Correo</th>
                             <th>Whatsapp</th>
