@@ -3870,6 +3870,7 @@ const openStepFunction = async (step, id) => {
                               selectValues.push(selectedText);
                             }
                           });
+                          return selectValues.join('\n');
                         }
 
                         // Handle single input
