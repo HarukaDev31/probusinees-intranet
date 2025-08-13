@@ -3095,6 +3095,7 @@ const openStepFunction = async (step, id) => {
                               selectValues.push(selectedText);
                             }
                           });
+                          return selectValues.join('\n');
                         }
 
                         // Handle single input
@@ -3102,9 +3103,6 @@ const openStepFunction = async (step, id) => {
                           const inputValue = $(node).find('input').val();
                           return inputValue || '';
                         }
-
-                        // Handle multiple selects (if needed)
-
 
                         // Handle mixed inputs and selects
                         if ($(node).find('input, select').length > 0) {
