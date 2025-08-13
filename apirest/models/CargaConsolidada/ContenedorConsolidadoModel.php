@@ -4408,64 +4408,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $query = $this->db->get();
             $result2 = $query->row();
 
-            // Si es el usuario 28791, obtener los CBM por usuario (vendido, pendiente, embarcado)
-            // Si es el usuario 28791, obtener los CBM por usuario (vendido, pendiente, embarcado)
-            if ($userId == 28791) {
-                // CBM Vendido por usuario
-                $cbmVendido = [];
-                $cbmPendiente = [];
-                $cbmEmbarcado = [];
-
-                // Vendido
-                $vendidoQuery = $this->db->query('
-                SELECT u.No_Nombres_Apellidos, COALESCE(SUM(volumen), 0) as cbm_vendido
-                FROM ' . $this->table_contenedor_cotizacion . ' c
-                LEFT JOIN usuario u ON u.ID_Usuario = c.id_usuario
-                WHERE id_contenedor = ? AND estado_cotizador = "CONFIRMADO"
-                GROUP BY u.No_Nombres_Apellidos
-            ', [$idContenedor]);
-                foreach ($vendidoQuery->result() as $row) {
-                    $cbmVendido[$row->No_Nombres_Apellidos] = $row->cbm_vendido;
-                }
-
-                // Pendiente
-                $pendienteQuery = $this->db->query('
-                SELECT u.No_Nombres_Apellidos, COALESCE(SUM(volumen), 0) as cbm_pendiente
-                FROM ' . $this->table_contenedor_cotizacion . ' c
-                LEFT JOIN usuario u ON u.ID_Usuario = c.id_usuario
-                WHERE id_contenedor = ? AND estado_cotizador != "CONFIRMADO"
-                GROUP BY u.No_Nombres_Apellidos
-            ', [$idContenedor]);
-                foreach ($pendienteQuery->result() as $row) {
-                    $cbmPendiente[$row->No_Nombres_Apellidos] = $row->cbm_pendiente;
-                }
-
-                // Embarcado
-                $embarcadoQuery = $this->db->query('
-                SELECT u.No_Nombres_Apellidos, COALESCE(SUM(cccp.cbm_total_china), 0) as cbm_embarcado
-                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' cccp
-                JOIN ' . $this->table_contenedor_cotizacion . ' cc ON cccp.id_cotizacion = cc.id
-                LEFT JOIN usuario u ON u.ID_Usuario = cc.id_usuario
-                WHERE cccp.id_contenedor = ? AND cccp.estados_proveedor = "LOADED"
-                GROUP BY u.No_Nombres_Apellidos
-            ', [$idContenedor]);
-                foreach ($embarcadoQuery->result() as $row) {
-                    $cbmEmbarcado[$row->No_Nombres_Apellidos] = $row->cbm_embarcado;
-                }
-
-                return [
-                    'cbm_total_china'   => $result->cbm_total_china,
-                    'cbm_total_peru'    => $result->cbm_total_peru,
-                    'cbm_vendido'       => $cbmVendido,
-                    'cbm_pendiente'     => $cbmPendiente,
-                    'cbm_embarcado'     => $cbmEmbarcado,
-                    'total_logistica'   => $result->total_logistica,
-                    'total_logistica_pagado' => $result->total_logistica_pagado,
-                    'qty_items'         => $result->total_qty_items,
-                    'bl_file_url'       => $result2->bl_file_url,
-                    'lista_embarque_url' => $result2->lista_embarque_url
-                ];
-            }
 
             if ($result) {
                 return [

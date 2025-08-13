@@ -1083,10 +1083,10 @@ Search for
                 <?php } ?>
 
 
-                <div class="col-xl-12 list-cmb row mb-2 gap-xs-3 gap-md-0 mx-100 py-3"
+                <div class="col-xl-12 list-cmb row mb-2 gap-xs-3 gap-md-0 mx-100 sm:flex-col flex-row"
                     style="border-bottom: #DFDFDF solid 2px">
                     <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
-                    <div class="d-flex align-items-center col-sm-2"
+                    <div class="d-flex align-items-center col-sm-12 col-xl-2"
                         style="border-right: #DFDFDF solid 2px; width:10%; padding:15px 10px">
                         <span>Consolidado </span>
                         <div class="col-4 col-md-4 px-0">
@@ -1094,59 +1094,59 @@ Search for
                         </div>
                     </div>
                     <?php } ?>
-                    <?php if ($this->user->ID_Usuario == 28791) { ?>
-                    <div class="col-5 col-sm-12 col-md-4 col-xl-2 d-flex align-items-center justify-content-between gap-3">
-                        <div
-                            class="flex align-items-center">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
-                                class="country-icons" alt="Perú">
-                            <span class="text-xs">CBM Total:</span>
-                            <div class="pl-1">
-                                <strong><span type="number" id="txt-CBM_Total_Peru" class="cbm_score"
-                                        disabled></span></strong>
-                            </div>
+                    <?php if ($this->user->ID_Usuario == 28791 || $this->user->No_Grupo == "Coordinación") { ?>
+                    <div
+                        class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
+                            class="country-icons" alt="Perú">
+                        <span>CBM Total:</span>
+                        <div class="">
+                            <strong><span type="number" id="txt-CBM_Total_Peru" class="cbm_score"
+                                    disabled></span></strong>
                         </div>
-                        <div
-                            class="flex align-items-center">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg"
-                                alt="China" class="country-icons">
-                            <span class="text-xs">CBM Total:</span>
-                            <div class="pl-1">
-                                <strong><span type="number" id="txt-CBM_Total_China" class="cbm_score"
-                                        disabled></span></strong>
-                            </div>
+                    </div>
+                    <div
+                        class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg"
+                            alt="China" class="country-icons">
+                        <span>CBM Total:</span>
+                        <div class="">
+                            <strong><span type="number" id="txt-CBM_Total_China" class="cbm_score"
+                                    disabled></span></strong>
                         </div>
                     </div>
                     <?php } ?>
                     <?php if ($this->user->No_Grupo == 'Cotizador') { ?>
-                    <div
-                        class="col-5 col-sm-4 col-md-6 col-xl-2 d-flex align-items-center justify-content-center gap-2">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
-                            class="country-icons" alt="Perú">
-                        <span class="text-xs">CBM Vendido:</span>
-                        <div class="">
-                            <strong><span type="number" id="txt-CBM_Total_Vendido" class="cbm_score"
-                                    disabled></span></strong>
+                    <div class="flex col-xl-4 col-md-12">
+                        <div
+                            class="col-5 col-sm-4 col-md-3 col-xl-4 d-flex align-items-center justify-content-center gap-1">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
+                                class="country-icons" alt="Perú">
+                            <span class="text-xs">CBM Vendido:</span>
+                            <div class="">
+                                <strong><span type="number" id="txt-CBM_Total_Vendido" class="cbm_score"
+                                        disabled></span></strong>
+                            </div>
                         </div>
-                    </div>
-                    <div
-                        class="col-5 col-sm-4 col-md-6 col-xl-2 d-flex align-items-center justify-content-center gap-2">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
-                            class="country-icons" alt="Perú">
-                        <span class="text-xs">CBM Pendiente:</span>
-                        <div class="">
-                            <strong><span type="number" id="txt-CBM_Total_Pendiente" class="cbm_score"
-                                    disabled></span></strong>
+                        <div
+                            class="col-5 col-sm-4 col-md-3 col-xl-4 d-flex align-items-center justify-content-center gap-1">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
+                                class="country-icons" alt="Perú">
+                            <span class="text-xs">CBM Pendiente:</span>
+                            <div class="">
+                                <strong><span type="number" id="txt-CBM_Total_Pendiente" class="cbm_score"
+                                        disabled></span></strong>
+                            </div>
                         </div>
-                    </div>
-                    <div
-                        class="col-5 col-sm-4 col-md-6 col-xl-2 d-flex align-items-center justify-content-center gap-2">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg"
-                            alt="China" class="country-icons">
-                        <span class="text-xs">CBM Embarcado:</span>
-                        <div class="">
-                            <strong><span type="number" id="txt-CBM_Total_Embarcado" class="cbm_score"
-                                    disabled></span></strong>
+                        <div
+                            class="col-5 col-sm-4 col-md-3 col-xl-4 d-flex align-items-center justify-content-center gap-1">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg"
+                                alt="China" class="country-icons">
+                            <span class="text-xs">CBM Embarcado:</span>
+                            <div class="">
+                                <strong><span type="number" id="txt-CBM_Total_Embarcado" class="cbm_score"
+                                        disabled></span></strong>
+                            </div>
                         </div>
                     </div>
                     <?php } ?>
