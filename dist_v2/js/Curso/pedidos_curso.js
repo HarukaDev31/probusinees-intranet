@@ -579,6 +579,11 @@ async function enviarEmailUsuarioMoodle(id, ID_Pedido_Curso) {
 
 }
 
+function descargarConstancia(url) {
+  const urlFinal = base_url + url;
+  window.open(urlFinal, '_blank');
+}
+
 async function viewCliente(id) {
   var url = base_url + 'Curso/PedidosCurso/ViewCliente/' + id;
   const response = await fetch(url);
@@ -621,7 +626,7 @@ async function viewCliente(id) {
         if(response.data.url_constancia){
           console.log(response.data.url_constancia, "console log");
           $('#btn-descargar-constancia').html(
-            `<button type="button" class="btn btn-primary px-5 py-3" onclick="window.open('${response.data.url_constancia}', '_blank')">
+            `<button type="button" class="btn btn-primary px-5 py-3" onclick="descargarConstancia('${response.data.url_constancia}')">
                 <i class="fa fa-download"></i> Descargar Constancia
             </button>`
           );
