@@ -533,6 +533,7 @@ async function crearUsuarioCursosMoodle(id, ID_Pedido_Curso) {
             Password: ${response.debug_data.No_Password || 'No disponible'}.
             `);
           setTimeout(function () { $('#modal-message').modal('hide'); }, 4100);
+          await enviarEmailUsuarioMoodle(id, ID_Pedido_Curso);
           return;
         }
         $('#moda-message-content').addClass('bg-danger');
@@ -578,6 +579,11 @@ async function enviarEmailUsuarioMoodle(id, ID_Pedido_Curso) {
 
 }
 
+function descargarConstancia(url) {
+  const urlFinal = base_url + url;
+  window.open(urlFinal, '_blank');
+}
+
 async function viewCliente(id) {
   var url = base_url + 'Curso/PedidosCurso/ViewCliente/' + id;
   const response = await fetch(url);
@@ -616,6 +622,17 @@ async function viewCliente(id) {
           );
         } else {
           $('#contenedor-boton-usuario').empty();
+        }
+        if(response.data.url_constancia){
+          console.log(response.data.url_constancia, "console log");
+          $('#btn-descargar-constancia').html(
+            `<button type="button" class="btn btn-primary px-5 py-3" onclick="descargarConstancia('${response.data.url_constancia}')">
+                <i class="fa fa-download"></i> Descargar Constancia
+            </button>`
+          );
+        }else {
+          $('#btn-descargar-constancia').empty();
+          console.log("No hay constancia disponible");
         }
 
         // Siempre deja los campos en readonly y muestra solo el botón editar
@@ -780,6 +797,7 @@ function ocultarSectionDatosCliente() {
   $('.dropdown-menu').on('click', function (event) {
     event.stopPropagation(); // Evita que el evento se propague
   });
+  getCampanasActivas();
 
 }
 // Función para aplicar los filtros y recargar la tabla
