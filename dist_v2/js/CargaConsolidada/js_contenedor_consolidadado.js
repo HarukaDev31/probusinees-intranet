@@ -4824,6 +4824,24 @@ async function reloadTableCotizacionFinal() {
   tableCotizacionFinal.ajax.reload();
   enableHorizontalAutoScrollForAllTables();
 }
+// Modal simple usando Swal para mostrar los detalles
+function showCBMDetalleModal(uniqueId) {
+  const val = window[uniqueId];
+  let html = "<div class='flex flex-column text-sm text-center' style='color:#888'>";
+  for (const usuario in val) {
+    html += `<div class="flex ">${usuario}: <b>${val[usuario]}</b><br></div>`;
+  }
+  html += "</div>";
+  Swal.fire({
+    title: "Detalle por usuario",
+    html: html,
+    confirmButtonText: "Cerrar",
+    width: 350,
+    customClass: {
+      title: 'min-h-[60px]'
+    }
+  });
+}
 async function getTableCotizacionEmbarqueHeaders() {
   url =
     base_url +
@@ -4833,16 +4851,26 @@ async function getTableCotizacionEmbarqueHeaders() {
   const response = await fetch(url);
   const result = await response.json();
   function formatCBMDetalle(val) {
-    if (typeof val === "object" && val !== null) {
-      let html = "<div style='font-size:11px;color:#888'>";
-      for (const usuario in val) {
-        html += `${usuario}: <b>${val[usuario]}</b><br>`;
-      }
-      html += "</div>";
-      return html;
+  if (typeof val === "object" && val !== null) {
+    // Sumar todos los valores numéricos
+    let total = 0;
+    for (const usuario in val) {
+      const num = parseFloat(val[usuario]);
+      if (!isNaN(num)) total += num;
     }
-    return val ?? 0;
+    // Crear un id único para el elemento
+    const uniqueId = "cbm-detalle-" + Math.random().toString(36).substr(2, 9);
+
+    // Guardar los detalles en el window para acceso desde el evento
+    window[uniqueId] = val;
+
+    // Retornar el HTML con evento onclick
+    return `<span style="cursor:pointer;font-weight:bold;color:#e67e22;" onclick="showCBMDetalleModal('${uniqueId}')">${total.toFixed(2)}</span>`;
   }
+  return val ?? 0;
+}
+
+
 
   $("#cotizacion_name").val('#' + currentCargaNumber);
   $("#txt-CBM_Total_Peru").html(result.cbm_total_peru);

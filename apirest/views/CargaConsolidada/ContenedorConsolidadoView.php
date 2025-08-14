@@ -296,12 +296,9 @@ Search for
                             <th style="min-width: 10em;">Carga</th>
                             <th style="min-width: 4em;">T. Ctn</th>
                             <th>Canal</th>
-                            <th>F. Cierre</th>
-                            <th>F. Arribo</th>
-                            <th>F. Declaración</th>
-                            <th>F. Levante</th>
+                            <th>Naviera</th>
+                            <th>T. Transito</th>
                             <th>Días de levante</th>
-                            <th style="min-width: 8em;">N. Dua</th>
                             <th style="min-width: 6em;">Ajuste</th>
                             <th style="min-width: 6em;">Multa</th>
                             <th style="min-width: 6em;">FOB</th>
@@ -1094,7 +1091,6 @@ Search for
                         </div>
                     </div>
                     <?php } ?>
-                    <?php if ($this->user->ID_Usuario == 28791 || $this->user->No_Grupo == "Coordinación") { ?>
                     <div
                         class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
@@ -1115,7 +1111,6 @@ Search for
                                     disabled></span></strong>
                         </div>
                     </div>
-                    <?php } ?>
                     <?php if ($this->user->No_Grupo == 'Cotizador') { ?>
                     <div class="flex col-xl-4 col-md-12">
                         <div
@@ -1218,10 +1213,10 @@ Search for
                                 <th>COD</th>
                                 <th>Fecha</th>
                                 <th>Fecha de modificación</th>
-                                <th style="min-width: 12em;">Nombre</th>
+                                <th style="min-width: 15em;">Nombre</th>
                                 <th>DNI/RUC</th>
                                 <th>Correo</th>
-                                <th>Whatsapp</th>
+                                <th style="min-width: 7em;">Whatsapp</th>
                                 <th>T. Cliente</th>
                                 <th>Volumen</th>
                                 <th>Volumen China</th>
@@ -1456,7 +1451,7 @@ Search for
                         <th style="min-width: 15em;">Nombre</th>
                         <th>DNI/RUC</th>
                         <th>Correo</th>
-                        <th>Whatsapp</th>
+                        <th style="min-width: 7em;">Whatsapp</th>
                         <th>T. Cliente</th>
                         <th>Volumen</th>
                         <th>Volumen China</th>
