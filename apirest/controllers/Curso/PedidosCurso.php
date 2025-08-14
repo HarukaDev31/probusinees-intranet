@@ -319,6 +319,7 @@ class PedidosCurso extends CI_Controller
                 'nu_estado_usuario_externo'   => $data['Nu_Estado_Usuario_Externo'] ?? null,
                 'id_usuario'                  => $data['id_usuario'] ?? null, // o el campo correcto de tu modelo
                 'id_pedido_curso'             => $id_pedido,
+                'url_constancia'             => $data['url_constancia'] ?? null,
             ];
 
             echo json_encode(['status' => 'success', 'data' => $response]);

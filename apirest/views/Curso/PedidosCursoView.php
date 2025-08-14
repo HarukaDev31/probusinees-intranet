@@ -302,8 +302,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card px-4 py-4 row-span-1
-                        " id="acceso-aula-virtual">
+                        <div class="card px-4 py-4 row-span-1" id="acceso-aula-virtual">
                             <div class="row mt-4">
                                 <div class="col-md-12">
                                     <h6 class="mb-3"><i class="fa fa-graduation-cap"></i> ACCESO AULA VIRTUAL</h6>
@@ -319,9 +318,12 @@
                                             readonly>
                                     </div>
                                 </div>
+                                <!-- Botón Generar Usuario -->
                                 <div id="contenedor-boton-usuario"></div>
                             </div>
                         </div>
+                        <!-- Botón Descargar Constancia -->
+                        <div id="btn-descargar-constancia" class="form-group flex align-items-center justify-center pt-3"></div>
                     </div>
                 </form>
             </div>
