@@ -213,18 +213,19 @@ class ContenedorConsolidado extends CI_Controller
 						break;
 				}
 				$subdata[] = '<span class="ml-2 d-flex rounded-circle ' . $color . '" style="width:18px;height:18px;border:1px solid #ccc;"></span>';
-				$subdata[] = date("d/m/Y", strtotime($row->f_cierre));
-				$subdata[] = date("d/m/Y", strtotime($row->fecha_arribo));
-				$subdata[] = date("d/m/Y", strtotime($row->fecha_declaracion));
+				//naviera
+				$subdata[] = $row->naviera;
+				//Tiempo de transito (fecha_zarpe-fecha arribo)
 				if (
-					empty($row->fecha_levante) ||
-					$row->fecha_levante == "0000-00-00" ||
-					$row->fecha_levante == null
+					!empty($row->fecha_zarpe) && $row->fecha_zarpe != "0000-00-00" && $row->fecha_zarpe != null &&
+					!empty($row->fecha_arribo) && $row->fecha_arribo != "0000-00-00" && $row->fecha_arribo != null
 				) {
-					$subdata[] = "00/00/0000";
+					$tiempo_transito = (strtotime($row->fecha_arribo) - strtotime($row->fecha_zarpe)) / (60 * 60 * 24);
+					$subdata[] = $tiempo_transito;
 				} else {
-					$subdata[] = date("d/m/Y", strtotime($row->fecha_levante));
+					$subdata[] = "0";
 				}
+				//Dias-levante
 				if (	
 					!empty($row->fecha_levante) && $row->fecha_levante != "0000-00-00" && $row->fecha_levante != null &&
 					!empty($row->fecha_arribo) && $row->fecha_arribo != "0000-00-00" && $row->fecha_arribo != null
@@ -234,7 +235,6 @@ class ContenedorConsolidado extends CI_Controller
 				} else {
 					$subdata[] = "0";
 				}
-				$subdata[] = $row->numero_dua;
 				$subdata[] = "$" . $row->ajuste_valor;
 				$subdata[] = "$" . $row->multa;
 				$subdata[] = "$" . $row->valor_fob;
