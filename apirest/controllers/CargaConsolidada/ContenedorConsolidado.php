@@ -423,7 +423,6 @@ class ContenedorConsolidado extends CI_Controller
 		$idContenedor = $this->input->post('idContenedor');
 		$cargaConsolidado = $this->ContenedorConsolidadoModel->show($idContenedor);
 		$proveedoresData = $this->ContenedorConsolidadoModel->getContenedorCotizacionProveedores($idContenedor);
-		$cbm_total_china_sum = 0;
 		$tipoTabla = $this->input->post('tipoTabla');
 		if ($stepIndex == 1 && $this->user->No_Grupo != "Documentacion") {
 			$arrResponse = [];
@@ -440,6 +439,7 @@ class ContenedorConsolidado extends CI_Controller
 			$index = 1;		
 			foreach ($arrResponse as $row) {
 				if ($tipoTabla == "prospectos") {
+					$cbm_total_china_sum = 0;
 					// Obtener todos los proveedores de la cotización actual
 					foreach ($proveedoresData as $cotizacion) {
 						if ($cotizacion->id == $row->id_cotizacion && !empty($cotizacion->proveedores)) {
