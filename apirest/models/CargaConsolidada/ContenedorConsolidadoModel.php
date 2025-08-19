@@ -740,7 +740,6 @@ class ContenedorConsolidadoModel extends CI_Model
 
             //get tipo cliente for e11
             $tipoCliente = $sheet->getCell('F11')->getValue();
-            //find if exists in table contenedor_consolidado_tipo_cliente with name = $tipoCliente else create new and get id
             $idTipoCliente = $this->db->select('id')
                 ->from($this->table_contenedor_tipo_cliente)
                 ->where('name', $tipoCliente)
@@ -4848,6 +4847,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         $adValorem = $sheet->getCell('R' . $i)->getValue();
                         $antiDumping = $sheet->getCell('S' . $i)->getValue();
                         $volSistema = $sheet->getCell('T' . $i)->getValue();
+                        log_message('error',$volSistema)
                         //insert before $newRow-1
                         $newSheet->insertNewRowBefore($newRow, 1);
                         $newSheet->mergeCells('F' . $newRow . ':M' . $newRow);
@@ -5163,7 +5163,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             $CobroCell = $InitialColumn . '40';
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', $data['cliente']['productos'][0]['cbm']);
             $cbmTotalProductos = $data['cliente']['productos'][0]['cbm'];
-
+            
             $tarifaValue = $tarifa;
             $cbmTotalProductos = round($cbmTotalProductos, 2);
             if (trim(strtoupper($tipoCliente)) == "NUEVO") {
