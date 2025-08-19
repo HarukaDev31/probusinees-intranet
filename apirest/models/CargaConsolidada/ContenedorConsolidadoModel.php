@@ -2532,6 +2532,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
 
                         // Buscar información aduanera
                         $mergedCells = $sheetListaPartidas->getMergeCells();
+                        log_message('error', 'Merged Cells: ' . json_encode($mergedCells));
                         foreach ($mergedCells as $range) {
                             [$startCell, $endCell] = explode(':', $range);
                             if (preg_match('/^B\d+$/', $startCell)) {
@@ -4847,7 +4848,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         $adValorem = $sheet->getCell('R' . $i)->getValue();
                         $antiDumping = $sheet->getCell('S' . $i)->getValue();
                         $volSistema = $sheet->getCell('T' . $i)->getValue();
-                        log_message('error',$volSistema);
                         //insert before $newRow-1
                         $newSheet->insertNewRowBefore($newRow, 1);
                         $newSheet->mergeCells('F' . $newRow . ':M' . $newRow);
@@ -4931,7 +4931,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         $this->load->library('zip');
         $templatePath = 'assets/downloads/Boleta_Template.xlsx';
         $data = $this->getMassiveExcelData($objPHPExcel);
-        $result = $this->db->select('cc.id,cc.tarifa,cc.nombre,tc.id as id_tipo_cliente, tc.name as tipoCliente,cc.correo')
+        $result = $this->db->select('cc.id,cc.tarifa,cc.nombre,tc.id as id_tipo_cliente, tc.name as tipoCliente,
+        cc.correo,cc.vol_selected,cc.volumen,cc.volumen_china,cc.volumen_doc')
             ->from($this->table_contenedor_cotizacion . ' as cc')
             ->join($this->table_contenedor_tipo_cliente . ' as tc', 'cc.id_tipo_cliente = tc.id')
             ->where('id_contenedor', $idContainer)
@@ -4951,6 +4952,15 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         $cliente['cliente']['tipo_cliente'] = $item->tipoCliente;
                         $cliente['cliente']['id_tipo_cliente'] = $item->id_tipo_cliente;
                         $cliente['id'] = $item->id;
+                        if($item->vol_selected == 'volumen'){
+                            $cliente['cliente']['volumen'] = $item->volumen;
+                        }else if($item->vol_selected == 'volumen_china'){
+                            $cliente['cliente']['volumen'] = $item->volumen_china;
+                        }else if($item->vol_selected == 'volumen_doc'){
+                            $cliente['cliente']['volumen'] = $item->volumen_doc;
+                        }else{
+                            $cliente['cliente']['volumen'] =0
+                        }
                         break;
                     }
                 }
@@ -5098,6 +5108,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             //         $cliente['cliente']['tipo_cliente'] = $item->tipoCliente;  $cliente['cliente']['id_tipo_cliente'] = $item->id_tipo_cliente;
 
             $tipoCliente = trim($data['cliente']["tipo_cliente"]);
+            $volumen = $data['cliente']['volumen'];
             log_message('error', 'Tipo Cliente: ' . $tipoCliente);
             $tipoClienteCell = $this->incrementColumn($InitialColumn, 3) . '6';
             $tipoClienteCellValue = $this->incrementColumn($InitialColumn, 3) . '7';
@@ -5160,8 +5171,9 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             //log CBMTotal cell value
             $FleteCell = $InitialColumn . '14';
             $CobroCell = $InitialColumn . '40';
+            
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', $data['cliente']['productos'][0]['cbm']);
-            $cbmTotalProductos = $data['cliente']['productos'][0]['cbm'];
+            $cbmTotalProductos = $volumen;
             
             $tarifaValue = $tarifa;
             $cbmTotalProductos = round($cbmTotalProductos, 2);
@@ -5714,7 +5726,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 'documento' => $data['cliente']['dni'],
                 'correo' => $data['cliente']['correo'],
                 'whatsapp' => $data['cliente']['telefono'],
-                'volumen_final' => $data['cliente']['productos'][0]['cbm'],
+                'volumen_final' => $volumen,
                 'monto_final' => $montoFinal,
                 'tarifa_final' => $tarifaValue,
                 'impuestos_final' => $impuestos,
