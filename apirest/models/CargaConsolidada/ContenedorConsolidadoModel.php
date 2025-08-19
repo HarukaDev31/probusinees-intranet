@@ -2532,6 +2532,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
 
                         // Buscar información aduanera
                         $mergedCells = $sheetListaPartidas->getMergeCells();
+                        log_message('error', 'Merged Cells: ' . json_encode($mergedCells));
                         foreach ($mergedCells as $range) {
                             [$startCell, $endCell] = explode(':', $range);
                             if (preg_match('/^B\d+$/', $startCell)) {
@@ -4958,7 +4959,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         }else if($item->vol_selected == 'volumen_doc'){
                             $cliente['cliente']['volumen'] = $item->volumen_doc;
                         }else{
-                            $cliente['cliente']['volumen'] =0
+                            $cliente['cliente']['volumen'] =0;
                         }
                         break;
                     }
