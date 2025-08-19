@@ -2532,7 +2532,6 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
 
                         // Buscar información aduanera
                         $mergedCells = $sheetListaPartidas->getMergeCells();
-                        log_message('error', 'Merged Cells: ' . json_encode($mergedCells));
                         foreach ($mergedCells as $range) {
                             [$startCell, $endCell] = explode(':', $range);
                             if (preg_match('/^B\d+$/', $startCell)) {
@@ -2543,7 +2542,6 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                                     preg_match('/\d+/', $endCell, $endMatches);
                                     $startRow = (int)$startMatches[0];
                                     $endRow = (int)$endMatches[0];
-                                    log_message('error', 'Start Row: ' . $startRow . ' End Row: ' . $endRow);
                                     for ($r = $startRow; $r <= $endRow; $r++) {
                                         $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
                                         if (trim($adValorem) == "FTA") {
