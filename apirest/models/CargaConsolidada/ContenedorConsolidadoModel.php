@@ -2422,7 +2422,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
         $fobPriceColumn = "P";
         $fobPriceNColumn = "Q";
         $startColumn = 26;
-        $startPackingListColumn = 27;
+        $startPackingListColumn = 26;
         $startListaPartidasColumn = 6;
         $startIndex = $startColumn;
         $startPackingListIndex = $startPackingListColumn;
