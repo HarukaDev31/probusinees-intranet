@@ -2532,7 +2532,6 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
 
                         // Buscar información aduanera
                         $mergedCells = $sheetListaPartidas->getMergeCells();
-                        log_message('error', 'Merged Cells: ' . json_encode($mergedCells));
                         foreach ($mergedCells as $range) {
                             [$startCell, $endCell] = explode(':', $range);
                             if (preg_match('/^B\d+$/', $startCell)) {
