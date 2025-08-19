@@ -4847,7 +4847,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         $adValorem = $sheet->getCell('R' . $i)->getValue();
                         $antiDumping = $sheet->getCell('S' . $i)->getValue();
                         $volSistema = $sheet->getCell('T' . $i)->getValue();
-                        log_message('error',$volSistema)
+                        log_message('error',$volSistema);
                         //insert before $newRow-1
                         $newSheet->insertNewRowBefore($newRow, 1);
                         $newSheet->mergeCells('F' . $newRow . ':M' . $newRow);
