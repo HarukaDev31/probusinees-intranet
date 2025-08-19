@@ -4874,7 +4874,6 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         $newSheet->getStyle('R' . $newRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                         $newSheet->getStyle('S' . $newRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
                         foreach ($dataSystem as $data) {
-                            log_message('error', 'Comparing: ' . trim($data->nombre) . ' with ' . trim($clientName));
                             if ($this->isNameMatch($clientName, $data->nombre)) {
                                 //$newSheet->setCellValue('C' . $newRow, $data->name);
                                 $newSheet->setCellValue('C' . $newRow, $data->documento);
