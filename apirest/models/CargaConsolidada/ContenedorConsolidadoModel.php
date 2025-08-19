@@ -1404,7 +1404,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
         $hoy = date('Y-m-d');
         $this->db->select('*')
             ->from($this->table)
-            ->where('estado_china', '!=', 'COMPLETADO')
+            ->where('estado', '!=', 'COMPLETADO')
             ->order_by('carga', 'desc');
         $query = $this->db->get();
         return $query->result();
