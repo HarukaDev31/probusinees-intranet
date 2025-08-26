@@ -430,7 +430,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->from($this->table_contenedor_cotizacion . " AS CC")
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'left')
             ->where('CC.id_contenedor', $idContenedor)
-                        ->where('CC.id_cliente_importacion IS NULL') 
+            ->where('CC.id_cliente_importacion IS NULL') 
 
             ->order_by('CC.id', 'asc');
         // Si el usuario es "Cotizador", filtrar por el id del usuario actual
@@ -712,6 +712,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'join')
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = CC.id_usuario', 'left')
             ->where('CC.id_contenedor', $idContenedor)
+            ->where('CC.id_cliente_importacion IS NULL') 
             ->where('CC.estado_cliente IS NOT NULL')
             ->where('CC.estado_cotizador', 'CONFIRMADO');
         $estado = $this->input->post('estado') ?? "0";
@@ -6332,6 +6333,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             ->from($this->table_contenedor_cotizacion)
             ->join($this->table_contenedor_tipo_cliente, 'contenedor_consolidado_cotizacion.id_tipo_cliente = contenedor_consolidado_tipo_cliente.id')
             ->where('id_contenedor', $idContenedor)
+            ->where('contenedor_consolidado_cotizacion.id_cliente_importacion IS NULL') 
             ->where('estado_cliente IS NOT NULL')
             ->where('estado_cotizador', 'CONFIRMADO');
         //if $this-
