@@ -325,7 +325,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'join')
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = CC.id_usuario', 'left')
             ->where('id_contenedor', $idContenedor)
-            ->where('CC.id_cliente_importacion IS NOT NULL') 
+            ->where('CC.id_cliente_importacion IS NULL') 
             ->order_by('id_cotizacion', 'asc');
         // Si el usuario es "Cotizador", filtrar por el id del usuario actual
         if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
@@ -375,7 +375,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->from($this->table_contenedor_cotizacion . " AS CC")
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'left')
             ->where('CC.id_contenedor', $idContenedor)
-                        ->where('CC.id_cliente_importacion IS NOT NULL') 
+                        ->where('CC.id_cliente_importacion IS NULL') 
 
             ->order_by('CC.id', 'asc');
         // Si el usuario es "Cotizador", filtrar por el id del usuario actual
@@ -430,7 +430,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->from($this->table_contenedor_cotizacion . " AS CC")
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'left')
             ->where('CC.id_contenedor', $idContenedor)
-                        ->where('CC.id_cliente_importacion IS NOT NULL') 
+                        ->where('CC.id_cliente_importacion IS NULL') 
 
             ->order_by('CC.id', 'asc');
         // Si el usuario es "Cotizador", filtrar por el id del usuario actual
@@ -496,7 +496,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = main.id_tipo_cliente', 'join')
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
             ->where('main.id_contenedor', $idContenedor)
-                        ->where('main.id_cliente_importacion IS NOT NULL') 
+                        ->where('main.id_cliente_importacion IS NULL') 
 
             ->order_by('main.id', 'asc');
         // Aplicar filtros solo si no son "0" (valor por defecto)
