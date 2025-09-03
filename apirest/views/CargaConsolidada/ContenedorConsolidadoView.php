@@ -1171,6 +1171,32 @@ Search for
                             </div>
                         </div>
                     <?php } ?>
+                    <?php if ($this->user->No_Grupo == "Coordinación") { ?>
+
+                        <div
+                            class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1">
+                            <!-- icon with dollar icon-->
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>Total Logistica:</span>
+                            <div class="">
+                                <strong><span type="number" id="txt-CBM_Total_Logistica" class="cbm_score"
+                                        disabled></span></strong>
+                            </div>
+                        </div>
+
+                    <?php } ?>
+                    <?php if ($this->user->No_Grupo == "Coordinación") {  ?>
+                        <div
+                            class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1">
+                            <!-- icon with dollar icon-->
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>Total Pagado:</span>
+                            <div class="">
+                                <strong><span type="number" id="txt-CBM_Total_Pagado" class="cbm_score"
+                                        disabled></span></strong>
+                            </div>
+                        </div>
+                    <?php } ?>
                     <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
                         <div
                             class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1">
@@ -1183,6 +1209,7 @@ Search for
                             </div>
                         </div>
                     <?php } ?>
+
                 </div>
                 <div class="row tabs">
                     <?php if (!in_array($this->user->No_Grupo, $rolesChina)) {  ?>
@@ -1358,7 +1385,7 @@ Search for
         </div>
 
         <div class="table-responsive" class="table table-bordered table-hover table-striped">
-            <div class="col-xl-12 list-cmb row mb-2 gap-xs-3 gap-md-0 mx-100 py-3  "
+            <div class="d-flex flex-col lg:flex-row list-cmb w-full  mb-2 gap-3 mx-100 py-3  "
                 style="border-bottom: #DFDFDF solid 2px">
 
                 <div class="row pl-3">
@@ -1373,7 +1400,7 @@ Search for
                 <?php if ($this->user->No_Grupo == "Coordinación") { ?>
 
                     <div
-                        class="col-5 col-sm-12 col-md-4 col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+                        class=" d-flex align-items-center justify-content-center justify-content-xl-start">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
                             class="country-icons" alt="Perú">
                         <span>CBM Total:</span>
@@ -1382,7 +1409,7 @@ Search for
                         </div>
                     </div>
                     <div
-                        class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center justify-content-xl-start">
+                        class=" d-flex align-items-center justify-content-center justify-content-xl-start">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg"
                             alt="China" class="country-icons">
                         <span>CBM Total:</span>
@@ -1392,7 +1419,7 @@ Search for
                     </div>
                 <?php } ?>
                 <div
-                    class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
+                    class=" d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
                     <!-- icon with dollar icon-->
                     <i class="fas fa-dollar-sign"></i>
                     <span>Total Logistica:</span>
@@ -1401,7 +1428,7 @@ Search for
                     </div>
                 </div>
                 <div
-                    class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
+                    class=" d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
                     <!-- icon with dollar icon-->
                     <i class="fas fa-dollar-sign"></i>
                     <span>Total Pagado:</span>
@@ -1411,12 +1438,35 @@ Search for
                 </div>
                 <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
                     <div
-                        class="col-5 col-sm-12  col-md-4  col-xl-2 d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
+                        class=" d-flex align-items-center justify-content-center gap-1 justify-content-xl-start">
                         <!-- icon with boxes icon-->
                         <i class="nav-icon fas fa-boxes"></i>
                         <span>Total Qty Items:</span>
                         <div class="">
                             <strong><span type="number" id="txt-CBM_Cliente_Total_Qty_Items" class="cbm_score"
+                                    disabled></span></strong>
+                        </div>
+                    </div>
+                <?php } ?>
+                <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
+                    <div
+                        class=" d-flex align-items-center justify-content-center gap-1">
+                        <!-- icon with boxes icon-->
+                        <i class="fas fa-dollar-sign"></i> <span>FOB TOTAL:</span>
+                        <div class="">
+                            <strong><span type="number" id="txt-CBM_Cliente_Total_Fob" class="cbm_score"
+                                    disabled></span></strong>
+                        </div>
+                    </div>
+                <?php } ?>
+                
+                <?php if ($this->user->No_Grupo == "Coordinación" || $this->user->No_Grupo == "Cotizador") {  ?>
+                    <div
+                        class=" d-flex align-items-center justify-content-center gap-1">
+                        <!-- icon with boxes icon-->
+                        <i class="fas fa-dollar-sign"></i> <span>Impuesto total:</span>
+                        <div class="">
+                            <strong><span type="number" id="txt-CBM_Cliente_Total_Impuestos" class="cbm_score"
                                     disabled></span></strong>
                         </div>
                     </div>
@@ -1955,7 +2005,7 @@ Search for
                     </button>
                 </div>
             </div>
-            <div class="col-xl-12 list-cmb row mb-2 gap-xs-3 gap-md-0 mx-100 pt-3 flex flex-row gap-2 align-items-center " style="border-bottom: #DFDFDF solid 2px">
+            <div class="col-xl-12 list-cmb row mb-2 gap-3 mx-100 pt-3 flex flex-row gap-2 align-items-center " style="border-bottom: #DFDFDF solid 2px">
                 <div class="d-flex align-items-center col-sm-3 xl:max-w-[200px]" style="border-right: #DFDFDF solid 2px; padding:15px 10px">
                     <span id="cotizacion-final-title"></span>
                 </div>
@@ -1965,7 +2015,7 @@ Search for
                 </div>
                 <div class="flex  gap-2" id="header-cotizacion-final">
 
-                </div>            
+                </div>
             </div>
             <div class="row tabs">
                 <div data-table="general"

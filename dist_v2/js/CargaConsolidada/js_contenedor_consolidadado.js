@@ -880,6 +880,8 @@ async function getClientesHeader() {
   $("#txt-CBM_Cliente_Total_Logistica_Pagado").html(result.total_logistica_pagado);
   $("#txt-CBM_Cliente_Total_China").html(result.cbm_total_china);
   $("#txt-CBM_Cliente_Total_Qty_Items").html(result.qty_items);
+  $("#txt-CBM_Cliente_Total_Fob").html(result.total_fob);
+  $("#txt-CBM_Cliente_Total_Impuestos").html(result.total_impuestos);
   console.log(result);
   spinner.hide();
 }

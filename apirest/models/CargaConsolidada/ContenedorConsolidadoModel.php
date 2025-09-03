@@ -4193,9 +4193,10 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
     {
 
         try {
-            // Consulta para cbm_total_china usando DISTINCT para evitar duplicación
+            // Consulta para cbm_total_china usando DISTINCT para evitar duplicación ,FOB y IMPUESTOS
             $this->db->select('
-            COALESCE(SUM( IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china
+            COALESCE(SUM( IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china,
+
         ')
                 ->from($this->table_contenedor_cotizacion_proveedores . ' cccp')
                 ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id')
@@ -4213,8 +4214,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 WHERE estado_cotizador = "CONFIRMADO"
             )
         ) as cbm_total', false);
-
-
+            //fob total
+           
 
             // Subconsulta para total_logistica
             $this->db->select('(
@@ -4233,6 +4234,23 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 AND estados_proveedor = "LOADED"
             )
         ) as total_logistica', false);
+        $this->db->select('(
+            SELECT COALESCE(SUM(valor_doc), 0) 
+            FROM ' . $this->table_contenedor_cotizacion . ' 
+            WHERE id IN (
+                SELECT DISTINCT id_cotizacion 
+                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
+                WHERE id_contenedor = ' . $idContenedor . '
+            )
+            AND estado_cotizador = "CONFIRMADO"
+            AND id IN (
+                SELECT id_cotizacion 
+                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
+                WHERE id_contenedor = ' . $idContenedor . '
+                AND estados_proveedor = "LOADED"
+            )
+        ) as total_fob', false);
+            
             // Subconsulta para total_qty_items
             $this->db->select('(
                 SELECT COALESCE(SUM(qty_item), 0)
@@ -4250,7 +4268,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             WHERE id_contenedor = ' . $idContenedor . '
             AND ' . $this->table_pagos_concept . '.name = "LOGISTICA"
         ) as total_logistica_pagado', false);
-
+            //sum of valor_doc
             $query = $this->db->get();
             $result = $query->row();
 
@@ -4270,7 +4288,13 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 ->where('id', $idContenedor);
             $query = $this->db->get();
             $result2 = $query->row();
-
+            //GET SUM OF FOB AND IMPUESTOS
+            $this->db->select('COALESCE(SUM(impuestos), 0) as total_impuestos')
+                ->from($this->table_contenedor_cotizacion)
+                ->where('estado_cotizador', 'CONFIRMADO')
+                ->where('id_contenedor', $idContenedor);
+            $query = $this->db->get();
+            $result3 = $query->row();
             if ($result) {
                 return [
                     'cbm_total_china' => $result->cbm_total_china,
@@ -4281,7 +4305,9 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                     'qty_items' => $result->total_qty_items,
                     'bl_file_url' => $result2->bl_file_url,
                     'carga' => $cargaRow ? $cargaRow->carga : '',
-                    'lista_embarque_url' => $result2->lista_embarque_url
+                    'lista_embarque_url' => $result2->lista_embarque_url,
+                    'total_fob' => $result->total_fob,
+                    'total_impuestos' => $result3->total_impuestos
                 ];
             } else {
                 return [
@@ -4294,9 +4320,13 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         'total_logistica_pagado' => 0,
                         'qty_items' => 0,
                         'cbm_total' => 0,
+                        'total_fob' => 0,
+                        'total_impuestos' => 0,
                         'bl_file_url' => '',
                         'carga' => '',
-                        'lista_embarque_url' => ''
+                        'lista_embarque_url' => '',
+                        'total_fob' => 0,
+                        'total_impuestos' => 0
                     ]
                 ];
             }
