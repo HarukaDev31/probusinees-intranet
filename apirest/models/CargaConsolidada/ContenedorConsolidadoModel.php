@@ -101,8 +101,8 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->select("*")
                 ->from($this->table)
                 ->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.id_pais', 'join');
-                $this->db->where('empresa !=', 1);
-                if ($this->input->post('Filtro_Estado') != "0") {
+            $this->db->where('empresa !=', 1);
+            if ($this->input->post('Filtro_Estado') != "0") {
                 $this->db->where('estado', $this->input->post('Filtro_Estado'));
             }
             //if no user = doc where estado_documentacion != "COMPLETADO"
@@ -130,7 +130,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ")
                 ->from($this->table)
                 ->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.id_pais', 'join');
-                $this->db->where('empresa !=', 1);
+            $this->db->where('empresa !=', 1);
             if (in_array($this->user->No_Grupo, [$this->roleCotizador, $this->roleCoordinacion, $this->roleContenedorAlmacen, $this->roleCatalogoChina])) {
                 $this->db->where('estado_china =', "COMPLETADO");
             }
@@ -172,7 +172,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 ->where('id', $idContenedor);
             $query = $this->db->get();
             $listaEmbarqueUrl = $query->row();
-           
+
             if ($listaEmbarqueUrl) {
                 //unlink file
                 unlink($listaEmbarqueUrl->lista_embarque_url);
@@ -325,7 +325,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'join')
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = CC.id_usuario', 'left')
             ->where('id_contenedor', $idContenedor)
-            ->where('CC.id_cliente_importacion IS NULL') 
+            ->where('CC.id_cliente_importacion IS NULL')
             ->order_by('id_cotizacion', 'asc');
         // Si el usuario es "Cotizador", filtrar por el id del usuario actual
         if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
@@ -375,7 +375,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->from($this->table_contenedor_cotizacion . " AS CC")
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'left')
             ->where('CC.id_contenedor', $idContenedor)
-                        ->where('CC.id_cliente_importacion IS NULL') 
+            ->where('CC.id_cliente_importacion IS NULL')
 
             ->order_by('CC.id', 'asc');
         // Si el usuario es "Cotizador", filtrar por el id del usuario actual
@@ -430,7 +430,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->from($this->table_contenedor_cotizacion . " AS CC")
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'left')
             ->where('CC.id_contenedor', $idContenedor)
-            ->where('CC.id_cliente_importacion IS NULL') 
+            ->where('CC.id_cliente_importacion IS NULL')
 
             ->order_by('CC.id', 'asc');
         // Si el usuario es "Cotizador", filtrar por el id del usuario actual
@@ -496,7 +496,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = main.id_tipo_cliente', 'join')
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
             ->where('main.id_contenedor', $idContenedor)
-                        ->where('main.id_cliente_importacion IS NULL') 
+            ->where('main.id_cliente_importacion IS NULL')
 
             ->order_by('main.id', 'asc');
         // Aplicar filtros solo si no son "0" (valor por defecto)
@@ -712,7 +712,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'join')
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = CC.id_usuario', 'left')
             ->where('CC.id_contenedor', $idContenedor)
-            ->where('CC.id_cliente_importacion IS NULL') 
+            ->where('CC.id_cliente_importacion IS NULL')
             ->where('CC.estado_cliente IS NOT NULL')
             ->where('CC.estado_cotizador', 'CONFIRMADO');
         $estado = $this->input->post('estado') ?? "0";
@@ -4382,7 +4382,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 WHERE id_contenedor = ' . $idContenedor . '
             )
             AND estado_cotizador = "CONFIRMADO"
-        ) as total_logistica', false);
+            ) as total_logistica', false);
             // Subconsulta para total_qty_items
             $this->db->select('(
                 SELECT COALESCE(SUM(qty_item), 0)
@@ -4400,7 +4400,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             JOIN ' . $this->table_pagos_concept . ' ON ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . '.id_concept = ' . $this->table_pagos_concept . '.id
             WHERE id_contenedor = ' . $idContenedor . '
             AND ' . $this->table_pagos_concept . '.name = "LOGISTICA"
-        ) as total_logistica_pagado', false);
+            ) as total_logistica_pagado', false);
             $query = $this->db->get();
             $result = $query->row();
 
@@ -4419,36 +4419,36 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             if ($userId == 28791) {
 
                 // CBM Vendido por usuario
-            $cbmVendido = [];
-            $cbmPendiente = [];
-            $cbmEmbarcado = [];
+                $cbmVendido = [];
+                $cbmPendiente = [];
+                $cbmEmbarcado = [];
 
-            // Vendido
-            $vendidoQuery = $this->db->query('
+                // Vendido
+                $vendidoQuery = $this->db->query('
              SELECT u.No_Nombres_Apellidos, COALESCE(SUM(volumen), 0) as cbm_vendido
                 FROM ' . $this->table_contenedor_cotizacion . ' c
                 LEFT JOIN usuario u ON u.ID_Usuario = c.id_usuario
                 WHERE id_contenedor = ? AND estado_cotizador = "CONFIRMADO"
                 GROUP BY u.No_Nombres_Apellidos
             ', [$idContenedor]);
-            foreach ($vendidoQuery->result() as $row) {
-                $cbmVendido[$row->No_Nombres_Apellidos] = $row->cbm_vendido;
-            }
+                foreach ($vendidoQuery->result() as $row) {
+                    $cbmVendido[$row->No_Nombres_Apellidos] = $row->cbm_vendido;
+                }
 
-            // Pendiente
-            $pendienteQuery = $this->db->query('
+                // Pendiente
+                $pendienteQuery = $this->db->query('
                 SELECT u.No_Nombres_Apellidos, COALESCE(SUM(volumen), 0) as cbm_pendiente
                 FROM ' . $this->table_contenedor_cotizacion . ' c
                 LEFT JOIN usuario u ON u.ID_Usuario = c.id_usuario
                 WHERE id_contenedor = ? AND estado_cotizador != "CONFIRMADO"
                 GROUP BY u.No_Nombres_Apellidos
             ', [$idContenedor]);
-            foreach ($pendienteQuery->result() as $row) {
-                $cbmPendiente[$row->No_Nombres_Apellidos] = $row->cbm_pendiente;
-            }
+                foreach ($pendienteQuery->result() as $row) {
+                    $cbmPendiente[$row->No_Nombres_Apellidos] = $row->cbm_pendiente;
+                }
 
-            // Embarcado
-            $embarcadoQuery = $this->db->query('
+                // Embarcado
+                $embarcadoQuery = $this->db->query('
                 SELECT u.No_Nombres_Apellidos, COALESCE(SUM(cccp.cbm_total_china), 0) as cbm_embarcado
                 FROM ' . $this->table_contenedor_cotizacion_proveedores . ' cccp
                 JOIN ' . $this->table_contenedor_cotizacion . ' cc ON cccp.id_cotizacion = cc.id
@@ -4456,23 +4456,23 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 WHERE cccp.id_contenedor = ? AND cccp.estados_proveedor = "LOADED"
                 GROUP BY u.No_Nombres_Apellidos
             ', [$idContenedor]);
-            foreach ($embarcadoQuery->result() as $row) {
-                $cbmEmbarcado[$row->No_Nombres_Apellidos] = $row->cbm_embarcado;
-            }
+                foreach ($embarcadoQuery->result() as $row) {
+                    $cbmEmbarcado[$row->No_Nombres_Apellidos] = $row->cbm_embarcado;
+                }
 
-            return [
-                'cbm_total_china'   => $result->cbm_total_china,
-                'cbm_total_peru'    => $result->cbm_total_peru,
-                'cbm_vendido'       => $cbmVendido,
-                'cbm_pendiente'     => $cbmPendiente,
-                'cbm_embarcado'     => $cbmEmbarcado,
-                'total_logistica'   => $result->total_logistica,
-                'total_logistica_pagado' => $result->total_logistica_pagado,
-                'qty_items'         => $result->total_qty_items,
-                'bl_file_url'       => $result2->bl_file_url,
-                'lista_embarque_url'=> $result2->lista_embarque_url
-            ];
-        }
+                return [
+                    'cbm_total_china'   => $result->cbm_total_china,
+                    'cbm_total_peru'    => $result->cbm_total_peru,
+                    'cbm_vendido'       => $cbmVendido,
+                    'cbm_pendiente'     => $cbmPendiente,
+                    'cbm_embarcado'     => $cbmEmbarcado,
+                    'total_logistica'   => $result->total_logistica,
+                    'total_logistica_pagado' => $result->total_logistica_pagado,
+                    'qty_items'         => $result->total_qty_items,
+                    'bl_file_url'       => $result2->bl_file_url,
+                    'lista_embarque_url' => $result2->lista_embarque_url
+                ];
+            }
 
 
             if ($result) {
@@ -4511,6 +4511,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             return $e->getMessage();
         }
     }
+
     public function uploadBL($idContenedor, $file)
     {
 
@@ -4959,14 +4960,14 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                         $cliente['cliente']['tipo_cliente'] = $item->tipoCliente;
                         $cliente['cliente']['id_tipo_cliente'] = $item->id_tipo_cliente;
                         $cliente['id'] = $item->id;
-                        if($item->vol_selected == 'volumen'){
+                        if ($item->vol_selected == 'volumen') {
                             $cliente['cliente']['volumen'] = $item->volumen;
-                        }else if($item->vol_selected == 'volumen_china'){
+                        } else if ($item->vol_selected == 'volumen_china') {
                             $cliente['cliente']['volumen'] = $item->volumen_china;
-                        }else if($item->vol_selected == 'volumen_doc'){
+                        } else if ($item->vol_selected == 'volumen_doc') {
                             $cliente['cliente']['volumen'] = $item->volumen_doc;
-                        }else{
-                            $cliente['cliente']['volumen'] =0;
+                        } else {
+                            $cliente['cliente']['volumen'] = 0;
                         }
                         break;
                     }
@@ -5178,10 +5179,10 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             //log CBMTotal cell value
             $FleteCell = $InitialColumn . '14';
             $CobroCell = $InitialColumn . '40';
-            
+
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', $data['cliente']['productos'][0]['cbm']);
             $cbmTotalProductos = $volumen;
-            
+
             $tarifaValue = $tarifa;
             $cbmTotalProductos = round($cbmTotalProductos, 2);
             if (trim(strtoupper($tipoCliente)) == "NUEVO") {
@@ -6327,13 +6328,207 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         $query = $this->db->get();
         return $query->result();
     }
+    public function getCotizacionFinalHeaders($idContenedor)
+    {
+        try {
+
+            $userId = $this->user->ID_Usuario;
+
+
+            // CBM Total China (todos los CONFIRMADO)
+            $this->db->select('
+                COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china
+            ')
+                ->from($this->table_contenedor_cotizacion_proveedores . ' cccp')
+                ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id')
+                ->where('cccp.id_contenedor', $idContenedor);
+
+            // CBM Total Perú (todos los CONFIRMADO)
+            $this->db->select('(
+                SELECT COALESCE(SUM(volumen_final), 0)
+                FROM ' . $this->table_contenedor_cotizacion . '
+                WHERE id IN (
+                    SELECT DISTINCT id_cotizacion
+                    FROM ' . $this->table_contenedor_cotizacion_proveedores . '
+                    WHERE id_contenedor = ' . $idContenedor . '
+                )
+                AND estado_cotizador = "CONFIRMADO"
+            ) as cbm_total_peru', false);
+
+            //fob_final
+
+            // Subconsulta para total_logistica
+            $this->db->select('(
+            SELECT COALESCE(SUM(logistica_final), 0) 
+            FROM ' . $this->table_contenedor_cotizacion . ' 
+            WHERE id IN (
+                SELECT DISTINCT id_cotizacion 
+                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
+                WHERE id_contenedor = ' . $idContenedor . '
+            )
+            AND estado_cotizador = "CONFIRMADO"
+            ) as total_logistica', false);
+            //sub consulta para total_impuestos
+            $this->db->select('(
+                SELECT COALESCE(SUM(impuestos_final), 0)
+                FROM ' . $this->table_contenedor_cotizacion . '
+                WHERE id IN (
+                    SELECT DISTINCT id_cotizacion
+                    FROM ' . $this->table_contenedor_cotizacion_proveedores . '
+                    WHERE id_contenedor = ' . $idContenedor . '
+                )
+                AND estado_cotizador = "CONFIRMADO"
+            ) as total_impuestos', false);
+            // sum of fob_final
+            $this->db->select('(
+                SELECT COALESCE(SUM(fob_final), 0)
+                FROM ' . $this->table_contenedor_cotizacion . '
+                WHERE id IN (
+                    SELECT DISTINCT id_cotizacion
+                    FROM ' . $this->table_contenedor_cotizacion_proveedores . '
+                    WHERE id_contenedor = ' . $idContenedor . '
+                )
+                AND estado_cotizador = "CONFIRMADO"
+            ) as total_fob', false);
+            //total vendido logistica  + impuestos
+            $this->db->select('(
+                SELECT COALESCE(SUM(logistica_final + impuestos_final), 0)
+                FROM ' . $this->table_contenedor_cotizacion . '
+                WHERE id IN (
+                    SELECT DISTINCT id_cotizacion
+                    FROM ' . $this->table_contenedor_cotizacion_proveedores . '
+                    WHERE id_contenedor = ' . $idContenedor . '
+                )
+                AND estado_cotizador = "CONFIRMADO"
+            ) as total_vendido_logistica_impuestos', false);
+             //total pagado logistica and impuestos
+            //get coalesce sum from pagos where id_contenedor = $idContenedor and id_concept= 'LOGISTICA'
+            $this->db->select('(SELECT COALESCE(SUM(monto), 0)
+            FROM ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . ' 
+            JOIN ' . $this->table_pagos_concept . ' ON ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . '.id_concept = ' . $this->table_pagos_concept . '.id
+            WHERE id_contenedor = ' . $idContenedor . '
+            AND ' . $this->table_pagos_concept . '.name = "LOGISTICA"
+        
+            ) as total_logistica_pagado', false);
+            $this->db->select('(SELECT COALESCE(SUM(monto), 0)
+            FROM ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . ' 
+            JOIN ' . $this->table_pagos_concept . ' ON ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . '.id_concept = ' . $this->table_pagos_concept . '.id
+            WHERE id_contenedor = ' . $idContenedor . '
+            AND (' . $this->table_pagos_concept . '.name = "LOGISTICA"
+            OR ' . $this->table_pagos_concept . '.name = "IMPUESTOS"
+            )) as total_pagado', false);
+            $query = $this->db->get();
+            $result = $query->row();
+
+            if ($this->db->error()['code'] != 0) {
+                log_message('error', 'Error: ' . $this->db->error()['message']);
+            }
+
+            // Obtener bl_file_url y lista_empaque_file_url del contenedor
+            $this->db->select('bl_file_url, lista_embarque_url')
+                ->from($this->table)
+                ->where('id', $idContenedor);
+            $query = $this->db->get();
+            $result2 = $query->row();
+
+            // Si es el usuario 28791, obtener los CBM por usuario (vendido, pendiente, embarcado)
+            if ($userId == 28791) {
+
+                // CBM Vendido por usuario
+                $cbmVendido = [];
+                $cbmPendiente = [];
+                $cbmEmbarcado = [];
+
+
+                return [
+                    'cbm_total_peru'    => [
+                        "value" => $result->cbm_total_peru,
+                        "label" => "CBM Total Perú"
+                    ],
+                    'total_logistica'   => [
+                        "value" => $result->total_logistica,
+                        "label" => "Total Logistica"
+                    ],
+                    'total_logistica_pagado' => [
+                        "value" => $result->total_logistica_pagado,
+                        "label" => "Total Logistica Pagado"
+                    ],
+                    'qty_items'         => [
+                        "value" => $result->total_qty_items,
+                        "label" => "Cantidad de Items"
+                    ],
+                    'total_impuestos'   => [
+                        "value" => $result->total_impuestos,
+                        "label" => "Total Impuestos"
+                    ],
+                    'total_fob'         => [
+                        "value" => $result->total_fob,
+                        "label" => "Total FOB"
+                    ]
+                ];
+            }
+
+
+            if ($result) {
+                return [
+                    'cbm_total' => [
+                        "value" => $result->cbm_total_peru,
+                        "label" => "CBM Total Perú",
+                        "imgIcon" => "https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
+                    ],
+                    'total_logistica' => [
+                        "value" => $result->total_logistica,
+                        "label" => "Total Logistica",
+                        "imgIcon" => "fas fa-dollar-sign"
+                    ],
+                   
+                    'total_impuestos'   => [
+                        "value" => $result->total_impuestos,
+                        "label" => "Total Impuestos",
+                        "imgIcon" => "fas fa-dollar-sign"
+                    ],
+                    'total_fob'         => [
+                        "value" => $result->total_fob,
+                        "label" => "Total FOB",
+                        "imgIcon" => "fas fa-dollar-sign"
+                    ],
+                    'total_pagado'         => [
+                        "value" => $result->total_pagado,
+                        "label" => "Total Pagado",
+                        "imgIcon" => "fas fa-dollar-sign"
+                    ],
+                    'total_vendido_logistica_impuestos'         => [
+                        "value" => $result->total_vendido_logistica_impuestos,
+                        "label" => "Total Vendido",
+                        "imgIcon" => "fas fa-dollar-sign"
+                    ],
+                ];
+            } else {
+                return [
+                    'status' => "error",
+                    'error' => false,
+                    "data" => [
+                        'cbm_total' => ["value" => 0, "label" => "CBM Pendiente",],
+                        'cbm_embarcado' => ["value" => 0, "label" => "CBM Embarcado"],
+                        'total_logistica' => ["value" => 0, "label" => "Total Logistica"],
+                        'qty_items' => ["value" => 0, "label" => "Cantidad de Items"],
+                        'cbm_total_peru' => ["value" => 0, "label" => "CBM Total Perú"],
+                        'total_fob' => ["value" => 0, "label" => "Total FOB"],
+                    ]
+                ];
+            }
+        } catch (Exception $e) {
+            log_message('error', '' . $e->getMessage());
+            return $e->getMessage();
+        }
+    }
     public function getContenedorCotizacionesFinales($idContenedor)
     {
         $this->db->select('*,contenedor_consolidado_cotizacion.id as id_cotizacion')
             ->from($this->table_contenedor_cotizacion)
             ->join($this->table_contenedor_tipo_cliente, 'contenedor_consolidado_cotizacion.id_tipo_cliente = contenedor_consolidado_tipo_cliente.id')
             ->where('id_contenedor', $idContenedor)
-            ->where('contenedor_consolidado_cotizacion.id_cliente_importacion IS NULL') 
+            ->where('contenedor_consolidado_cotizacion.id_cliente_importacion IS NULL')
             ->where('estado_cliente IS NOT NULL')
             ->where('estado_cotizador', 'CONFIRMADO');
         //if $this-
