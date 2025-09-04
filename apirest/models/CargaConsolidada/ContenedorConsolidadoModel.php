@@ -4826,7 +4826,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
                 $plantillaGeneralUrl = 'assets/downloads/PLANTILLA_GENERAL.xlsx';
                 $newExcel = PHPExcel_IOFactory::load($plantillaGeneralUrl);
                 $newSheet = $newExcel->getActiveSheet();
-
+                //unmerge row 2
+                $newSheet->unmergeCells('A2:T2');
                 $newSheet->setCellValue('A1', "CLIENTE");
                 $newSheet->setCellValue('B1', "TIPO");
                 $newSheet->setCellValue('C1', "DNI");
