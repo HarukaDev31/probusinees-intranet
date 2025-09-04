@@ -4533,7 +4533,7 @@ async function viewCotizacionFinal() {
   $("#cotizacion-final-title").html(`
     Cotizacion #${currentCargaNumber}`);
   spinner.show();
-  url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+  let cotFinalurl = base_url + "CargaConsolidada/ContenedorConsolidado/step";
   // Handle tab clicks for final and pagos tables
   $(".tab-clientes-final").removeClass("active");
   $(".tab-clientes-final").off("click").click(function () {
@@ -4611,7 +4611,7 @@ async function viewCotizacionFinal() {
           pageLength: 100,
           lengthMenu: [[100, 1000, -1], [100, 1000, "Todos"]],
           ajax: {
-            url: url,
+            url: cotFinalurl,
             type: "POST",
             dataType: "JSON",
             data: function (data) {
@@ -4708,7 +4708,7 @@ async function viewCotizacionFinal() {
           pageLength: 100,
           lengthMenu: [[100, 1000, -1], [100, 1000, "Todos"]],
           ajax: {
-            url: url,
+            url: cotFinalurl,
             type: "POST",
             dataType: "JSON",
             data: function (data) {
