@@ -2854,32 +2854,37 @@ const updateEstadoCliente = (id) => {
   });
 };
 const getCotizacionFinalHeaders = async () => {
-  url = base_url + "CargaConsolidada/ContenedorConsolidado/getCotizacionFinalHeaders";
-  const response = await $.ajax({
-    async: true,
-    url: url,
-    type: "POST",
-    data: { idContenedor: idContenedor },
-  });
- //response is object
- /**{"cbm_total_china":"67.04","cbm_total_peru":{"value":"0.00","label":"CBM Total Per\u00fa"},"total_logistica":{"value":"0.00","label":"Total Logistica"},"total_logistica_pagado":{"value":15078.68,"label":"Total Logistica Pagado"},"qty_items":{"value":"187","label":"Cantidad de Items"},"total_impuestos":{"value":"0.00","label":"Total Impuestos"},"total_fob":{"value":"0.00","label":"Total FOB"}}
-**/
-  const parsedResponse = JSON.parse(response);
-  
-  for (const key in parsedResponse) {
-    if (parsedResponse[key].imgIcon.includes("http")) {
-      var img = `<img src="${parsedResponse[key].imgIcon}" alt="${parsedResponse[key].label}" class="w-6 h-6">`;
-    } else {
-      var img = `<i class="${parsedResponse[key].imgIcon}" ></i>`;
-    }
-    $("#header-cotizacion-final").append(`<div class=" d-flex align-items-center justify-content-center justify-content-xl-start gap-2">
+  try {
+    const URL = base_url + "CargaConsolidada/ContenedorConsolidado/getCotizacionFinalHeaders";
+    const response = await $.ajax({
+      async: true,
+      url: URL,
+      type: "POST",
+      data: { idContenedor: idContenedor },
+    });
+    //response is object
+    /**{"cbm_total_china":"67.04","cbm_total_peru":{"value":"0.00","label":"CBM Total Per\u00fa"},"total_logistica":{"value":"0.00","label":"Total Logistica"},"total_logistica_pagado":{"value":15078.68,"label":"Total Logistica Pagado"},"qty_items":{"value":"187","label":"Cantidad de Items"},"total_impuestos":{"value":"0.00","label":"Total Impuestos"},"total_fob":{"value":"0.00","label":"Total FOB"}}
+   **/
+    $("#header-cotizacion-final").empty();
+    const parsedResponse = JSON.parse(response);
+
+    for (const key in parsedResponse) {
+      if (parsedResponse[key].imgIcon.includes("http")) {
+        var img = `<img src="${parsedResponse[key].imgIcon}" alt="${parsedResponse[key].label}" class="w-6 h-6">`;
+      } else {
+        var img = `<i class="${parsedResponse[key].imgIcon}" ></i>`;
+      }
+      $("#header-cotizacion-final").append(`<div class=" d-flex align-items-center justify-content-center justify-content-xl-start gap-2">
       ${img}
       <span>${parsedResponse[key].label}</span>
       <span>${parsedResponse[key].value}</span>
     </div>`);
+    }
+    $("#header-cotizacion-final").show();
+    spinner.hide();
+  } catch (error) {
+    console.error("Error en getCotizacionFinalHeaders:", error);
   }
-  $("#header-cotizacion-final").show();
-  spinner.hide();
 };
 const openStepFunction = async (step, id) => {
   stepIndex = step;
@@ -4267,7 +4272,6 @@ const openStepFunction = async (step, id) => {
     viewDocumentacion();
   } else if (stepIndex == 4) {
     await viewCotizacionFinal();
-    await getCotizacionFinalHeaders();
   } else if (stepIndex == 5) {
     viewFacturaGuia();
   }
@@ -4518,6 +4522,13 @@ async function viewFacturaGuia() {
   }
 }
 async function viewCotizacionFinal() {
+  // Verificar que las variables necesarias estén definidas
+  if (typeof stepIndex === 'undefined' || typeof idContenedor === 'undefined') {
+    console.error("Variables stepIndex o idContenedor no están definidas");
+    alert("Error: Faltan datos necesarios para cargar la cotización.");
+    return;
+  }
+
   cotizacionFinalContainer.show();
   $("#cotizacion-final-title").html(`
     Cotizacion #${currentCargaNumber}`);
@@ -4532,7 +4543,6 @@ async function viewCotizacionFinal() {
 
     let table = this.getAttribute("data-table");
     this.classList.add("active");
-    console.log("Table clicked:", table);
     if (table == "general") {
       // Handle final table
       $("#table-cotizacion-final").attr("style", "");
@@ -4608,15 +4618,32 @@ async function viewCotizacionFinal() {
               data.stepIndex = stepIndex;
               data.idContenedor = idContenedor;
               data.tipoTabla = "general";
+            },
+            error: function (xhr, error, thrown) {
+              console.error("Error en DataTable general:", error);
+              console.error("Respuesta del servidor:", xhr.responseText);
+              spinner.hide();
+              alert("Error al cargar los datos generales. Por favor, inténtelo de nuevo.");
+            },
+            dataSrc: function (json) {
+              // Verificar que la respuesta tenga el formato correcto
+              if (!json || !Array.isArray(json.data)) {
+                console.error("Formato de respuesta incorrecto:", json);
+                return [];
+              }
+              return json.data;
             }
           },
           initComplete: function (settings, json) {
             spinner.hide();
+            getCotizacionFinalHeaders();
+
           }
         });
       }
     }
     else if (table == "pagos") {
+      console.log("Table clicked:", table);
       $("#table-cotizacion-final-pagos").attr("style", "");
       $("#table-cotizacion-final").hide();
       if ($.fn.DataTable.isDataTable("#table-cotizacion-final-pagos")) {
@@ -4650,7 +4677,6 @@ async function viewCotizacionFinal() {
             }
           ],
           paging: true,
-          lengthChange: true,
           searching: true,
           ordering: true,
           info: true,
@@ -4688,11 +4714,27 @@ async function viewCotizacionFinal() {
             data: function (data) {
               data.stepIndex = stepIndex;
               data.idContenedor = idContenedor;
-              data.tipoTabla = "pagos"; // Add this to distinguish the data request
+              data.tipoTabla = "pagos";
+            },
+            error: function (xhr, error, thrown) {
+              console.error("Error en DataTable pagos:", error);
+              console.error("Respuesta del servidor:", xhr.responseText);
+              spinner.hide();
+              alert("Error al cargar los datos de pagos. Por favor, inténtelo de nuevo.");
+            },
+            dataSrc: function (json) {
+              // Verificar que la respuesta tenga el formato correcto
+              if (!json || !Array.isArray(json.data)) {
+                console.error("Formato de respuesta incorrecto:", json);
+                return [];
+              }
+              return json.data;
             }
           },
           initComplete: function (settings, json) {
             spinner.hide();
+            getCotizacionFinalHeaders();
+
           }
         });
       }
