@@ -4266,7 +4266,7 @@ const openStepFunction = async (step, id) => {
   } else if (stepIndex == 3) {
     viewDocumentacion();
   } else if (stepIndex == 4) {
-    viewCotizacionFinal();
+    await viewCotizacionFinal();
     await getCotizacionFinalHeaders();
   } else if (stepIndex == 5) {
     viewFacturaGuia();
@@ -4617,10 +4617,8 @@ async function viewCotizacionFinal() {
       }
     }
     else if (table == "pagos") {
-      // Handle pagos table
       $("#table-cotizacion-final-pagos").attr("style", "");
       $("#table-cotizacion-final").hide();
-
       if ($.fn.DataTable.isDataTable("#table-cotizacion-final-pagos")) {
         $("#table-cotizacion-final-pagos").show();
         $("#table-cotizacion-final-pagos_wrapper").show();
