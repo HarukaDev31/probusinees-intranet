@@ -332,7 +332,13 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->where('CC.id_usuario', $this->user->ID_Usuario);
         }
         if ($this->user->No_Grupo != "Cotizador") {
+            //where confirmado or cc.id_usuario=$this->user->ID_Usuario
+            $this->db->group_start();
             $this->db->where('CC.estado_cotizador', 'CONFIRMADO');
+            $this->db->or_where('CC.id_usuario', $this->user->ID_Usuario);
+            $this->db->group_end();
+
+
             if ($this->input->post('Filtro_Estado') != "0") {
                 $fieldToFilter = [
                     'Coordinación' => 'CC.estado',
