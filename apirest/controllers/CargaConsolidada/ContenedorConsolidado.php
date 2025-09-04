@@ -493,7 +493,7 @@ class ContenedorConsolidado extends CI_Controller
 					</div>';
 						$subdata[] = $divAcciones;
 					}
-					if ($this->user->No_Grupo == "Cotizador") {
+					if ($this->user->No_Grupo == "Cotizador" || $this->user->No_Grupo == "Coordinación") {
 						$divEstadoCotizador = '<select
 						class="form-control
 						' . ($row->estado_cotizador == "PENDIENTE" ? "bg-light" : "") .

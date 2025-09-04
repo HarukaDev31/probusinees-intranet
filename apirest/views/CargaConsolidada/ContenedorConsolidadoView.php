@@ -884,7 +884,7 @@ Search for
                                             <span class="help-block text-danger" id="error"></span>
                                         </div>
                                     </div>
-                                    <?php if ($this->user->No_Grupo == "Cotizador") {  ?>
+                                    <?php if ($this->user->No_Grupo == "Cotizador" || $this->user->No_Grupo == "Coordinación") {  ?>
                                         <div class="d-flex align-items-center p-2" style="width:300px;">
                                             <div class="d-flex" style="width:60%">Estado</div>
                                             <div style="width: 200px;">
