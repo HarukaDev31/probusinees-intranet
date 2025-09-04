@@ -508,8 +508,11 @@ class ContenedorConsolidadoModel extends CI_Model
         // Aplicar filtros solo si no son "0" (valor por defecto)
         $filtroState = $this->input->post('Filtro_State') ?? "0";
         $filtroStatus = $this->input->post('Filtro_Status') ?? "0";
-        if ($this->user->No_Grupo != "Cotizador") {
+        if ($this->user->No_Grupo != "Cotizador" ) {
+            $this->db->group_start();
             $this->db->where('estado_cotizador', 'CONFIRMADO');
+            $this->db->or_where('main.id_usuario', $this->user->ID_Usuario);
+            $this->db->group_end();
 
             if ($this->input->post('Filtro_Estado') != "0") {
                 $fieldToFilter = [
