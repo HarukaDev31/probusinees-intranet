@@ -5791,6 +5791,141 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             throw $e;
         }
     }
+    public function getMassiveExcelData($objPHPExcel)
+    {
+        $this->load->library('PHPExcel');
+
+        $excel = $objPHPExcel;
+        $worksheet = $excel->getActiveSheet();
+
+        // Obtener el rango total de datos válidos
+        $highestRow = $worksheet->getHighestRow();
+        $highestColumn = $worksheet->getHighestColumn();
+
+        // Obtener todas las celdas combinadas
+        $mergedCells = $worksheet->getMergeCells();
+
+        // Función para obtener el valor real de una celda (considerando combinadas)
+        $getCellValue = function ($col, $row) use ($worksheet, $mergedCells) {
+            $cellAddress = $col . $row;
+            $cellValue = trim($worksheet->getCell($cellAddress)->getValue());
+
+            // Si la celda está vacía, buscar en celdas combinadas
+            if (empty($cellValue)) {
+                foreach ($mergedCells as $mergedRange) {
+                    // Verificar si es un rango (contiene :)
+                    if (strpos($mergedRange, ':') !== false) {
+                        // Dividir el rango manualmente
+                        list($startCell, $endCell) = explode(':', $mergedRange);
+
+                        // Extraer coordenadas de inicio y fin
+                        preg_match('/([A-Z]+)(\d+)/', $startCell, $startMatches);
+                        preg_match('/([A-Z]+)(\d+)/', $endCell, $endMatches);
+
+                        if (count($startMatches) >= 3 && count($endMatches) >= 3) {
+                            $startCol = $startMatches[1];
+                            $startRow = (int)$startMatches[2];
+                            $endCol = $endMatches[1];
+                            $endRow = (int)$endMatches[2];
+
+                            // Verificar si la celda actual está dentro del rango
+                            if ($col >= $startCol && $col <= $endCol && $row >= $startRow && $row <= $endRow) {
+                                $cellValue = trim($worksheet->getCell($startCell)->getValue());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return $cellValue;
+        };
+
+        // Función para verificar si una fila pertenece a un cliente específico
+        $getClientRowRange = function ($startRow) use ($worksheet, $getCellValue, $highestRow) {
+            $endRow = $startRow;
+            $clientName = $getCellValue('A', $startRow);
+
+            // Buscar hasta dónde se extiende este cliente
+            for ($row = $startRow + 1; $row <= $highestRow; $row++) {
+                $nextClientName = $getCellValue('A', $row);
+                if (!empty($nextClientName) && $nextClientName !== $clientName) {
+                    break;
+                }
+                $endRow = $row;
+            }
+
+            return $endRow;
+        };
+
+        $clients = [];
+        $processedRows = [];
+
+        // Recorrer todas las filas buscando clientes
+        for ($row = 1; $row <= $highestRow; $row++) {
+            // Saltar filas ya procesadas
+            if (in_array($row, $processedRows)) {
+                continue;
+            }
+
+            $clientName = $getCellValue('A', $row);
+
+            // Verificar si hay un nombre de cliente válido
+            if (empty($clientName)) {
+                continue;
+            }
+
+            // Determinar el rango de filas para este cliente
+            $endRow = $getClientRowRange($row);
+
+            // Marcar filas como procesadas
+            for ($r = $row; $r <= $endRow; $r++) {
+                $processedRows[] = $r;
+            }
+
+            // Obtener datos básicos del cliente
+            $client = [
+                'nombre' => $clientName,
+                'tipo' => $getCellValue('B', $row),
+                'dni' => $getCellValue('C', $row),
+                'telefono' => $getCellValue('D', $row),
+                'productos' => [],
+            ];
+
+            // Procesar productos dentro del rango del cliente
+            for ($productRow = $row; $productRow <= $endRow; $productRow++) {
+                $producto = $getCellValue('F', $productRow);
+
+                if (empty($producto)) {
+                    continue;
+                }
+
+                $cantidad = $getCellValue('N', $productRow);
+                $precioUnitario = $getCellValue('O', $productRow);
+
+                // Solo agregar productos con datos esenciales
+                if (!empty($cantidad) && !empty($precioUnitario)) {
+                    $productoData = [
+                        'nombre' => $producto,
+                        'cantidad' => $cantidad,
+                        'precio_unitario' => $precioUnitario,
+                        'antidumping' => $getCellValue('P', $productRow) ?: 0,
+                        'valoracion' => $getCellValue('Q', $productRow) ?: 0,
+                        'ad_valorem' => $getCellValue('R', $productRow) ?: 0,
+                        'percepcion' => $getCellValue('S', $productRow) ?: 0.035,
+                        'peso' => $getCellValue('T', $productRow) ?: 0,
+                        'cbm' => $getCellValue('U', $productRow) ?: '',
+                    ];
+
+                    $client['productos'][] = $productoData;
+                }
+            }
+
+            $clients[] = ['cliente' => $client];
+        }
+
+        return $clients;
+    }
     public function getTipoByName($tipoCliente)
     {
         $tipoCliente = strtoupper($tipoCliente);
@@ -6206,141 +6341,7 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
         }
         return $defaultValue;
     }
-    public function getMassiveExcelData($objPHPExcel)
-    {
-        $this->load->library('PHPExcel');
 
-        $excel = $objPHPExcel;
-        $worksheet = $excel->getActiveSheet();
-
-        // Obtener el rango total de datos válidos
-        $highestRow = $worksheet->getHighestRow();
-        $highestColumn = $worksheet->getHighestColumn();
-
-        // Obtener todas las celdas combinadas
-        $mergedCells = $worksheet->getMergeCells();
-
-        // Función para obtener el valor real de una celda (considerando combinadas)
-        $getCellValue = function ($col, $row) use ($worksheet, $mergedCells) {
-            $cellAddress = $col . $row;
-            $cellValue = trim($worksheet->getCell($cellAddress)->getValue());
-
-            // Si la celda está vacía, buscar en celdas combinadas
-            if (empty($cellValue)) {
-                foreach ($mergedCells as $mergedRange) {
-                    // Verificar si es un rango (contiene :)
-                    if (strpos($mergedRange, ':') !== false) {
-                        // Dividir el rango manualmente
-                        list($startCell, $endCell) = explode(':', $mergedRange);
-
-                        // Extraer coordenadas de inicio y fin
-                        preg_match('/([A-Z]+)(\d+)/', $startCell, $startMatches);
-                        preg_match('/([A-Z]+)(\d+)/', $endCell, $endMatches);
-
-                        if (count($startMatches) >= 3 && count($endMatches) >= 3) {
-                            $startCol = $startMatches[1];
-                            $startRow = (int)$startMatches[2];
-                            $endCol = $endMatches[1];
-                            $endRow = (int)$endMatches[2];
-
-                            // Verificar si la celda actual está dentro del rango
-                            if ($col >= $startCol && $col <= $endCol && $row >= $startRow && $row <= $endRow) {
-                                $cellValue = trim($worksheet->getCell($startCell)->getValue());
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return $cellValue;
-        };
-
-        // Función para verificar si una fila pertenece a un cliente específico
-        $getClientRowRange = function ($startRow) use ($worksheet, $getCellValue, $highestRow) {
-            $endRow = $startRow;
-            $clientName = $getCellValue('A', $startRow);
-
-            // Buscar hasta dónde se extiende este cliente
-            for ($row = $startRow + 1; $row <= $highestRow; $row++) {
-                $nextClientName = $getCellValue('A', $row);
-                if (!empty($nextClientName) && $nextClientName !== $clientName) {
-                    break;
-                }
-                $endRow = $row;
-            }
-
-            return $endRow;
-        };
-
-        $clients = [];
-        $processedRows = [];
-
-        // Recorrer todas las filas buscando clientes
-        for ($row = 1; $row <= $highestRow; $row++) {
-            // Saltar filas ya procesadas
-            if (in_array($row, $processedRows)) {
-                continue;
-            }
-
-            $clientName = $getCellValue('A', $row);
-
-            // Verificar si hay un nombre de cliente válido
-            if (empty($clientName)) {
-                continue;
-            }
-
-            // Determinar el rango de filas para este cliente
-            $endRow = $getClientRowRange($row);
-
-            // Marcar filas como procesadas
-            for ($r = $row; $r <= $endRow; $r++) {
-                $processedRows[] = $r;
-            }
-
-            // Obtener datos básicos del cliente
-            $client = [
-                'nombre' => $clientName,
-                'tipo' => $getCellValue('B', $row),
-                'dni' => $getCellValue('C', $row),
-                'telefono' => $getCellValue('D', $row),
-                'productos' => [],
-            ];
-
-            // Procesar productos dentro del rango del cliente
-            for ($productRow = $row; $productRow <= $endRow; $productRow++) {
-                $producto = $getCellValue('F', $productRow);
-
-                if (empty($producto)) {
-                    continue;
-                }
-
-                $cantidad = $getCellValue('N', $productRow);
-                $precioUnitario = $getCellValue('O', $productRow);
-
-                // Solo agregar productos con datos esenciales
-                if (!empty($cantidad) && !empty($precioUnitario)) {
-                    $productoData = [
-                        'nombre' => $producto,
-                        'cantidad' => $cantidad,
-                        'precio_unitario' => $precioUnitario,
-                        'antidumping' => $getCellValue('P', $productRow) ?: 0,
-                        'valoracion' => $getCellValue('Q', $productRow) ?: 0,
-                        'ad_valorem' => $getCellValue('R', $productRow) ?: 0,
-                        'percepcion' => $getCellValue('S', $productRow) ?: 0.035,
-                        'peso' => $getCellValue('T', $productRow) ?: 0,
-                        'cbm' => $getCellValue('U', $productRow) ?: '',
-                    ];
-
-                    $client['productos'][] = $productoData;
-                }
-            }
-
-            $clients[] = ['cliente' => $client];
-        }
-
-        return $clients;
-    }
     public function getCotizacionFinalDocumentacionPagos($idContenedor)
     {
         $this->db->select(

@@ -487,8 +487,13 @@ class ContenedorConsolidado extends CI_Controller
 					$subdata[] = $row->tarifa;
 					$divFile .= '</div>';
 					$subdata[] = $divFile;
-					
-					if ($this->user->No_Grupo == "Cotizador" || $this->user->No_Grupo == "Coordinación") {
+					if ($this->user->No_Grupo == "Coordinación") {
+						$divAcciones = '<div style="display: flex;gap: 10px; justify-content:center;">
+					<i class="fas fa-trash text-danger" style="cursor:pointer;" title="Eliminar cotización" onclick="deleteCotizacion(' . $row->id_cotizacion . ')"></i>
+					</div>';
+						$subdata[] = $divAcciones;
+					}
+					if ($this->user->No_Grupo == "Cotizador") {
 						$divEstadoCotizador = '<select
 						class="form-control
 						' . ($row->estado_cotizador == "PENDIENTE" ? "bg-light" : "") .
@@ -502,16 +507,10 @@ class ContenedorConsolidado extends CI_Controller
 							<option value="CONFIRMADO" ' . ($row->estado_cotizador == "CONFIRMADO" ? "selected" : "") . '>CONFIRMADO</option>
 						</select>';
 						$subdata[] = $divEstadoCotizador;
-						if ($row->estado_cotizador == "PENDIENTE" || $this->user->No_Grupo == "Coordinación") {
+						if ($row->estado_cotizador == "PENDIENTE") {
 							$divAcciones = '<div>
 							<i class="fas fa-trash text-danger" style="cursor:pointer;" onclick="deleteCotizacion(' . $row->id_cotizacion . ')"></i>
 							</div>';
-						}
-						if ($this->user->No_Grupo == "Coordinación") {
-							$divAcciones .= '<div style="display: flex;gap: 10px; justify-content:center;">
-						<i class="fas fa-trash text-danger" style="cursor:pointer;" title="Eliminar cotización" onclick="deleteCotizacion(' . $row->id_cotizacion . ')"></i>
-						</div>';
-							$subdata[] = $divAcciones;
 						}
 						$subdata[] = $divAcciones;
 					}
