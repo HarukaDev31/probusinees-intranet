@@ -4271,7 +4271,7 @@ const openStepFunction = async (step, id) => {
   } else if (stepIndex == 3) {
     viewDocumentacion();
   } else if (stepIndex == 4) {
-     viewCotizacionFinal();
+    viewCotizacionFinal();
   } else if (stepIndex == 5) {
     viewFacturaGuia();
   }
@@ -4636,8 +4636,11 @@ async function viewCotizacionFinal() {
           },
           initComplete: function (settings, json) {
             spinner.hide();
-            getCotizacionFinalHeaders();
 
+          },
+          //on table end of load getCotizacionFinalHeaders
+          drawCallback: function (settings) {
+            getCotizacionFinalHeaders();
           }
         });
       }
@@ -4733,8 +4736,11 @@ async function viewCotizacionFinal() {
           },
           initComplete: function (settings, json) {
             spinner.hide();
-            getCotizacionFinalHeaders();
 
+          },
+          //on table end of load getCotizacionFinalHeaders
+          drawCallback: function (settings) {
+            getCotizacionFinalHeaders();
           }
         });
       }
