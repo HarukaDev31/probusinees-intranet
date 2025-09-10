@@ -6365,7 +6365,8 @@ Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda m
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'left')
             ->where('CC.id_contenedor', $idContenedor)
             ->where('CC.id_cliente_importacion IS NULL')
-            ->where('CC.estado_cliente!=', null);
+            ->where('CC.estado_cotizador', 'CONFIRMADO')
+            ->where('CC.estado_cliente!=', null);   
 
         $query = $this->db->get();
         return $query->result();
