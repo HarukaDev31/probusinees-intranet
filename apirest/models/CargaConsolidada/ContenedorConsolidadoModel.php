@@ -101,6 +101,7 @@ class ContenedorConsolidadoModel extends CI_Model
             $this->db->select("*")
                 ->from($this->table)
                 ->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.id_pais', 'join');
+            $this->db->where('empresa !=', 1);
             if ($this->input->post('Filtro_Estado') != "0") {
                 $this->db->where('estado', $this->input->post('Filtro_Estado'));
             }
@@ -129,7 +130,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ")
                 ->from($this->table)
                 ->join($this->table_pais . ' AS P', 'P.ID_Pais = ' . $this->table . '.id_pais', 'join');
-
+            $this->db->where('empresa !=', 1);
             if (in_array($this->user->No_Grupo, [$this->roleCotizador, $this->roleCoordinacion, $this->roleContenedorAlmacen, $this->roleCatalogoChina])) {
                 $this->db->where('estado_china =', "COMPLETADO");
             }
@@ -171,7 +172,7 @@ class ContenedorConsolidadoModel extends CI_Model
                 ->where('id', $idContenedor);
             $query = $this->db->get();
             $listaEmbarqueUrl = $query->row();
-           
+
             if ($listaEmbarqueUrl) {
                 //unlink file
                 unlink($listaEmbarqueUrl->lista_embarque_url);
@@ -324,13 +325,20 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'join')
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = CC.id_usuario', 'left')
             ->where('id_contenedor', $idContenedor)
+            ->where('CC.id_cliente_importacion IS NULL')
             ->order_by('id_cotizacion', 'asc');
         // Si el usuario es "Cotizador", filtrar por el id del usuario actual
         if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
             $this->db->where('CC.id_usuario', $this->user->ID_Usuario);
         }
         if ($this->user->No_Grupo != "Cotizador") {
+            //where confirmado or cc.id_usuario=$this->user->ID_Usuario
+            $this->db->group_start();
             $this->db->where('CC.estado_cotizador', 'CONFIRMADO');
+            $this->db->or_where('CC.id_usuario', $this->user->ID_Usuario);
+            $this->db->group_end();
+
+
             if ($this->input->post('Filtro_Estado') != "0") {
                 $fieldToFilter = [
                     'Coordinación' => 'CC.estado',
@@ -373,6 +381,8 @@ class ContenedorConsolidadoModel extends CI_Model
             ->from($this->table_contenedor_cotizacion . " AS CC")
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'left')
             ->where('CC.id_contenedor', $idContenedor)
+            ->where('CC.id_cliente_importacion IS NULL')
+
             ->order_by('CC.id', 'asc');
         // Si el usuario es "Cotizador", filtrar por el id del usuario actual
         if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
@@ -426,6 +436,8 @@ class ContenedorConsolidadoModel extends CI_Model
             ->from($this->table_contenedor_cotizacion . " AS CC")
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'left')
             ->where('CC.id_contenedor', $idContenedor)
+            ->where('CC.id_cliente_importacion IS NULL')
+
             ->order_by('CC.id', 'asc');
         // Si el usuario es "Cotizador", filtrar por el id del usuario actual
         if ($this->user->No_Grupo == "Cotizador" && $this->user->ID_Usuario != 28791) {
@@ -490,12 +502,17 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = main.id_tipo_cliente', 'join')
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = main.id_usuario', 'left')
             ->where('main.id_contenedor', $idContenedor)
+            ->where('main.id_cliente_importacion IS NULL')
+
             ->order_by('main.id', 'asc');
         // Aplicar filtros solo si no son "0" (valor por defecto)
         $filtroState = $this->input->post('Filtro_State') ?? "0";
         $filtroStatus = $this->input->post('Filtro_Status') ?? "0";
-        if ($this->user->No_Grupo != "Cotizador") {
+        if ($this->user->No_Grupo != "Cotizador" ) {
+            $this->db->group_start();
             $this->db->where('estado_cotizador', 'CONFIRMADO');
+            $this->db->or_where('main.id_usuario', $this->user->ID_Usuario);
+            $this->db->group_end();
 
             if ($this->input->post('Filtro_Estado') != "0") {
                 $fieldToFilter = [
@@ -704,6 +721,7 @@ class ContenedorConsolidadoModel extends CI_Model
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'join')
             ->join($this->table_usuario . ' AS U', 'U.ID_Usuario = CC.id_usuario', 'left')
             ->where('CC.id_contenedor', $idContenedor)
+            ->where('CC.id_cliente_importacion IS NULL')
             ->where('CC.estado_cliente IS NOT NULL')
             ->where('CC.estado_cotizador', 'CONFIRMADO');
         $estado = $this->input->post('estado') ?? "0";
@@ -740,7 +758,6 @@ class ContenedorConsolidadoModel extends CI_Model
 
             //get tipo cliente for e11
             $tipoCliente = $sheet->getCell('F11')->getValue();
-            //find if exists in table contenedor_consolidado_tipo_cliente with name = $tipoCliente else create new and get id
             $idTipoCliente = $this->db->select('id')
                 ->from($this->table_contenedor_tipo_cliente)
                 ->where('name', $tipoCliente)
@@ -1405,7 +1422,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
         $hoy = date('Y-m-d');
         $this->db->select('*')
             ->from($this->table)
-            ->where('DATE(f_cierre) >=', $hoy)
+            ->where('estado_china!=',  'COMPLETADO')
             ->order_by('carga', 'desc');
         $query = $this->db->get();
         return $query->result();
@@ -2423,7 +2440,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
         $fobPriceColumn = "P";
         $fobPriceNColumn = "Q";
         $startColumn = 26;
-        $startPackingListColumn = 27;
+        $startPackingListColumn = 26;
         $startListaPartidasColumn = 6;
         $startIndex = $startColumn;
         $startPackingListIndex = $startPackingListColumn;
@@ -2543,7 +2560,6 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                                     preg_match('/\d+/', $endCell, $endMatches);
                                     $startRow = (int)$startMatches[0];
                                     $endRow = (int)$endMatches[0];
-                                    log_message('error', 'Start Row: ' . $startRow . ' End Row: ' . $endRow);
                                     for ($r = $startRow; $r <= $endRow; $r++) {
                                         $adValorem = $sheetListaPartidas->getCell('G' . $r)->getValue();
                                         if (trim($adValorem) == "FTA") {
@@ -4186,9 +4202,10 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
     {
 
         try {
-            // Consulta para cbm_total_china usando DISTINCT para evitar duplicación
+            // Consulta para cbm_total_china usando DISTINCT para evitar duplicación ,FOB y IMPUESTOS
             $this->db->select('
-            COALESCE(SUM( IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china
+            COALESCE(SUM( IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china,
+
         ')
                 ->from($this->table_contenedor_cotizacion_proveedores . ' cccp')
                 ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id')
@@ -4206,8 +4223,8 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                 WHERE estado_cotizador = "CONFIRMADO"
             )
         ) as cbm_total', false);
-
-
+            //fob total
+           
 
             // Subconsulta para total_logistica
             $this->db->select('(
@@ -4226,6 +4243,23 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                 AND estados_proveedor = "LOADED"
             )
         ) as total_logistica', false);
+        $this->db->select('(
+            SELECT COALESCE(SUM(valor_doc), 0) 
+            FROM ' . $this->table_contenedor_cotizacion . ' 
+            WHERE id IN (
+                SELECT DISTINCT id_cotizacion 
+                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
+                WHERE id_contenedor = ' . $idContenedor . '
+            )
+            AND estado_cotizador = "CONFIRMADO"
+            AND id IN (
+                SELECT id_cotizacion 
+                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
+                WHERE id_contenedor = ' . $idContenedor . '
+                AND estados_proveedor = "LOADED"
+            )
+        ) as total_fob', false);
+            
             // Subconsulta para total_qty_items
             $this->db->select('(
                 SELECT COALESCE(SUM(qty_item), 0)
@@ -4243,7 +4277,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             WHERE id_contenedor = ' . $idContenedor . '
             AND ' . $this->table_pagos_concept . '.name = "LOGISTICA"
         ) as total_logistica_pagado', false);
-
+            //sum of valor_doc
             $query = $this->db->get();
             $result = $query->row();
 
@@ -4263,7 +4297,13 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                 ->where('id', $idContenedor);
             $query = $this->db->get();
             $result2 = $query->row();
-
+            //GET SUM OF FOB AND IMPUESTOS
+            $this->db->select('COALESCE(SUM(impuestos), 0) as total_impuestos')
+                ->from($this->table_contenedor_cotizacion)
+                ->where('estado_cotizador', 'CONFIRMADO')
+                ->where('id_contenedor', $idContenedor);
+            $query = $this->db->get();
+            $result3 = $query->row();
             if ($result) {
                 return [
                     'cbm_total_china' => $result->cbm_total_china,
@@ -4274,7 +4314,9 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                     'qty_items' => $result->total_qty_items,
                     'bl_file_url' => $result2->bl_file_url,
                     'carga' => $cargaRow ? $cargaRow->carga : '',
-                    'lista_embarque_url' => $result2->lista_embarque_url
+                    'lista_embarque_url' => $result2->lista_embarque_url,
+                    'total_fob' => $result->total_fob,
+                    'total_impuestos' => $result3->total_impuestos
                 ];
             } else {
                 return [
@@ -4287,9 +4329,13 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                         'total_logistica_pagado' => 0,
                         'qty_items' => 0,
                         'cbm_total' => 0,
+                        'total_fob' => 0,
+                        'total_impuestos' => 0,
                         'bl_file_url' => '',
                         'carga' => '',
-                        'lista_embarque_url' => ''
+                        'lista_embarque_url' => '',
+                        'total_fob' => 0,
+                        'total_impuestos' => 0
                     ]
                 ];
             }
@@ -4375,7 +4421,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                 WHERE id_contenedor = ' . $idContenedor . '
             )
             AND estado_cotizador = "CONFIRMADO"
-        ) as total_logistica', false);
+            ) as total_logistica', false);
             // Subconsulta para total_qty_items
             $this->db->select('(
                 SELECT COALESCE(SUM(qty_item), 0)
@@ -4393,7 +4439,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             JOIN ' . $this->table_pagos_concept . ' ON ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . '.id_concept = ' . $this->table_pagos_concept . '.id
             WHERE id_contenedor = ' . $idContenedor . '
             AND ' . $this->table_pagos_concept . '.name = "LOGISTICA"
-        ) as total_logistica_pagado', false);
+            ) as total_logistica_pagado', false);
             $query = $this->db->get();
             $result = $query->row();
 
@@ -4407,6 +4453,65 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                 ->where('id', $idContenedor);
             $query = $this->db->get();
             $result2 = $query->row();
+
+            // Si es el usuario 28791, obtener los CBM por usuario (vendido, pendiente, embarcado)
+            if ($userId == 28791) {
+
+                // CBM Vendido por usuario
+                $cbmVendido = [];
+                $cbmPendiente = [];
+                $cbmEmbarcado = [];
+
+                // Vendido
+                $vendidoQuery = $this->db->query('
+             SELECT u.No_Nombres_Apellidos, COALESCE(SUM(volumen), 0) as cbm_vendido
+                FROM ' . $this->table_contenedor_cotizacion . ' c
+                LEFT JOIN usuario u ON u.ID_Usuario = c.id_usuario
+                WHERE id_contenedor = ? AND estado_cotizador = "CONFIRMADO"
+                GROUP BY u.No_Nombres_Apellidos
+            ', [$idContenedor]);
+                foreach ($vendidoQuery->result() as $row) {
+                    $cbmVendido[$row->No_Nombres_Apellidos] = $row->cbm_vendido;
+                }
+
+                // Pendiente
+                $pendienteQuery = $this->db->query('
+                SELECT u.No_Nombres_Apellidos, COALESCE(SUM(volumen), 0) as cbm_pendiente
+                FROM ' . $this->table_contenedor_cotizacion . ' c
+                LEFT JOIN usuario u ON u.ID_Usuario = c.id_usuario
+                WHERE id_contenedor = ? AND estado_cotizador != "CONFIRMADO"
+                GROUP BY u.No_Nombres_Apellidos
+            ', [$idContenedor]);
+                foreach ($pendienteQuery->result() as $row) {
+                    $cbmPendiente[$row->No_Nombres_Apellidos] = $row->cbm_pendiente;
+                }
+
+                // Embarcado
+                $embarcadoQuery = $this->db->query('
+                SELECT u.No_Nombres_Apellidos, COALESCE(SUM(cccp.cbm_total_china), 0) as cbm_embarcado
+                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' cccp
+                JOIN ' . $this->table_contenedor_cotizacion . ' cc ON cccp.id_cotizacion = cc.id
+                LEFT JOIN usuario u ON u.ID_Usuario = cc.id_usuario
+                WHERE cccp.id_contenedor = ? AND cccp.estados_proveedor = "LOADED"
+                GROUP BY u.No_Nombres_Apellidos
+            ', [$idContenedor]);
+                foreach ($embarcadoQuery->result() as $row) {
+                    $cbmEmbarcado[$row->No_Nombres_Apellidos] = $row->cbm_embarcado;
+                }
+
+                return [
+                    'cbm_total_china'   => $result->cbm_total_china,
+                    'cbm_total_peru'    => $result->cbm_total_peru,
+                    'cbm_vendido'       => $cbmVendido,
+                    'cbm_pendiente'     => $cbmPendiente,
+                    'cbm_embarcado'     => $cbmEmbarcado,
+                    'total_logistica'   => $result->total_logistica,
+                    'total_logistica_pagado' => $result->total_logistica_pagado,
+                    'qty_items'         => $result->total_qty_items,
+                    'bl_file_url'       => $result2->bl_file_url,
+                    'lista_embarque_url' => $result2->lista_embarque_url
+                ];
+            }
 
 
             if ($result) {
@@ -4445,6 +4550,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             return $e->getMessage();
         }
     }
+
     public function uploadBL($idContenedor, $file)
     {
 
@@ -4720,7 +4826,8 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                 $plantillaGeneralUrl = 'assets/downloads/PLANTILLA_GENERAL.xlsx';
                 $newExcel = PHPExcel_IOFactory::load($plantillaGeneralUrl);
                 $newSheet = $newExcel->getActiveSheet();
-
+                //unmerge row 2
+                $newSheet->unmergeCells('A2:T2');
                 $newSheet->setCellValue('A1', "CLIENTE");
                 $newSheet->setCellValue('B1', "TIPO");
                 $newSheet->setCellValue('C1', "DNI");
@@ -4815,7 +4922,6 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                         $newSheet->getStyle('R' . $newRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                         $newSheet->getStyle('S' . $newRow)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_PERCENTAGE_00);
                         foreach ($dataSystem as $data) {
-                            log_message('error', 'Comparing: ' . trim($data->nombre) . ' with ' . trim($clientName));
                             if ($this->isNameMatch($clientName, $data->nombre)) {
                                 //$newSheet->setCellValue('C' . $newRow, $data->name);
                                 $newSheet->setCellValue('C' . $newRow, $data->documento);
@@ -4873,7 +4979,8 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
         $this->load->library('zip');
         $templatePath = 'assets/downloads/Boleta_Template.xlsx';
         $data = $this->getMassiveExcelData($objPHPExcel);
-        $result = $this->db->select('cc.id,cc.tarifa,cc.nombre,tc.id as id_tipo_cliente, tc.name as tipoCliente,cc.correo')
+        $result = $this->db->select('cc.id,cc.tarifa,cc.nombre,tc.id as id_tipo_cliente, tc.name as tipoCliente,
+        cc.correo,cc.vol_selected,cc.volumen,cc.volumen_china,cc.volumen_doc')
             ->from($this->table_contenedor_cotizacion . ' as cc')
             ->join($this->table_contenedor_tipo_cliente . ' as tc', 'cc.id_tipo_cliente = tc.id')
             ->where('id_contenedor', $idContainer)
@@ -4893,6 +5000,15 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                         $cliente['cliente']['tipo_cliente'] = $item->tipoCliente;
                         $cliente['cliente']['id_tipo_cliente'] = $item->id_tipo_cliente;
                         $cliente['id'] = $item->id;
+                        if ($item->vol_selected == 'volumen') {
+                            $cliente['cliente']['volumen'] = $item->volumen;
+                        } else if ($item->vol_selected == 'volumen_china') {
+                            $cliente['cliente']['volumen'] = $item->volumen_china;
+                        } else if ($item->vol_selected == 'volumen_doc') {
+                            $cliente['cliente']['volumen'] = $item->volumen_doc;
+                        } else {
+                            $cliente['cliente']['volumen'] = 0;
+                        }
                         break;
                     }
                 }
@@ -5040,6 +5156,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             //         $cliente['cliente']['tipo_cliente'] = $item->tipoCliente;  $cliente['cliente']['id_tipo_cliente'] = $item->id_tipo_cliente;
 
             $tipoCliente = trim($data['cliente']["tipo_cliente"]);
+            $volumen = $data['cliente']['volumen'];
             log_message('error', 'Tipo Cliente: ' . $tipoCliente);
             $tipoClienteCell = $this->incrementColumn($InitialColumn, 3) . '6';
             $tipoClienteCellValue = $this->incrementColumn($InitialColumn, 3) . '7';
@@ -5102,8 +5219,9 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             //log CBMTotal cell value
             $FleteCell = $InitialColumn . '14';
             $CobroCell = $InitialColumn . '40';
+
             $objPHPExcel->setActiveSheetIndex(2)->setCellValue($InitialColumn . '7', $data['cliente']['productos'][0]['cbm']);
-            $cbmTotalProductos = $data['cliente']['productos'][0]['cbm'];
+            $cbmTotalProductos = $volumen;
 
             $tarifaValue = $tarifa;
             $cbmTotalProductos = round($cbmTotalProductos, 2);
@@ -5656,7 +5774,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                 'documento' => $data['cliente']['dni'],
                 'correo' => $data['cliente']['correo'],
                 'whatsapp' => $data['cliente']['telefono'],
-                'volumen_final' => $data['cliente']['productos'][0]['cbm'],
+                'volumen_final' => $volumen,
                 'monto_final' => $montoFinal,
                 'tarifa_final' => $tarifaValue,
                 'impuestos_final' => $impuestos,
@@ -5672,6 +5790,141 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             return $objPHPExcel;
             throw $e;
         }
+    }
+    public function getMassiveExcelData($objPHPExcel)
+    {
+        $this->load->library('PHPExcel');
+
+        $excel = $objPHPExcel;
+        $worksheet = $excel->getActiveSheet();
+
+        // Obtener el rango total de datos válidos
+        $highestRow = $worksheet->getHighestRow();
+        $highestColumn = $worksheet->getHighestColumn();
+
+        // Obtener todas las celdas combinadas
+        $mergedCells = $worksheet->getMergeCells();
+
+        // Función para obtener el valor real de una celda (considerando combinadas)
+        $getCellValue = function ($col, $row) use ($worksheet, $mergedCells) {
+            $cellAddress = $col . $row;
+            $cellValue = trim($worksheet->getCell($cellAddress)->getValue());
+
+            // Si la celda está vacía, buscar en celdas combinadas
+            if (empty($cellValue)) {
+                foreach ($mergedCells as $mergedRange) {
+                    // Verificar si es un rango (contiene :)
+                    if (strpos($mergedRange, ':') !== false) {
+                        // Dividir el rango manualmente
+                        list($startCell, $endCell) = explode(':', $mergedRange);
+
+                        // Extraer coordenadas de inicio y fin
+                        preg_match('/([A-Z]+)(\d+)/', $startCell, $startMatches);
+                        preg_match('/([A-Z]+)(\d+)/', $endCell, $endMatches);
+
+                        if (count($startMatches) >= 3 && count($endMatches) >= 3) {
+                            $startCol = $startMatches[1];
+                            $startRow = (int)$startMatches[2];
+                            $endCol = $endMatches[1];
+                            $endRow = (int)$endMatches[2];
+
+                            // Verificar si la celda actual está dentro del rango
+                            if ($col >= $startCol && $col <= $endCol && $row >= $startRow && $row <= $endRow) {
+                                $cellValue = trim($worksheet->getCell($startCell)->getValue());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return $cellValue;
+        };
+
+        // Función para verificar si una fila pertenece a un cliente específico
+        $getClientRowRange = function ($startRow) use ($worksheet, $getCellValue, $highestRow) {
+            $endRow = $startRow;
+            $clientName = $getCellValue('A', $startRow);
+
+            // Buscar hasta dónde se extiende este cliente
+            for ($row = $startRow + 1; $row <= $highestRow; $row++) {
+                $nextClientName = $getCellValue('A', $row);
+                if (!empty($nextClientName) && $nextClientName !== $clientName) {
+                    break;
+                }
+                $endRow = $row;
+            }
+
+            return $endRow;
+        };
+
+        $clients = [];
+        $processedRows = [];
+
+        // Recorrer todas las filas buscando clientes
+        for ($row = 1; $row <= $highestRow; $row++) {
+            // Saltar filas ya procesadas
+            if (in_array($row, $processedRows)) {
+                continue;
+            }
+
+            $clientName = $getCellValue('A', $row);
+
+            // Verificar si hay un nombre de cliente válido
+            if (empty($clientName)) {
+                continue;
+            }
+
+            // Determinar el rango de filas para este cliente
+            $endRow = $getClientRowRange($row);
+
+            // Marcar filas como procesadas
+            for ($r = $row; $r <= $endRow; $r++) {
+                $processedRows[] = $r;
+            }
+
+            // Obtener datos básicos del cliente
+            $client = [
+                'nombre' => $clientName,
+                'tipo' => $getCellValue('B', $row),
+                'dni' => $getCellValue('C', $row),
+                'telefono' => $getCellValue('D', $row),
+                'productos' => [],
+            ];
+
+            // Procesar productos dentro del rango del cliente
+            for ($productRow = $row; $productRow <= $endRow; $productRow++) {
+                $producto = $getCellValue('F', $productRow);
+
+                if (empty($producto)) {
+                    continue;
+                }
+
+                $cantidad = $getCellValue('N', $productRow);
+                $precioUnitario = $getCellValue('O', $productRow);
+
+                // Solo agregar productos con datos esenciales
+                if (!empty($cantidad) && !empty($precioUnitario)) {
+                    $productoData = [
+                        'nombre' => $producto,
+                        'cantidad' => $cantidad,
+                        'precio_unitario' => $precioUnitario,
+                        'antidumping' => $getCellValue('P', $productRow) ?: 0,
+                        'valoracion' => $getCellValue('Q', $productRow) ?: 0,
+                        'ad_valorem' => $getCellValue('R', $productRow) ?: 0,
+                        'percepcion' => $getCellValue('S', $productRow) ?: 0.035,
+                        'peso' => $getCellValue('T', $productRow) ?: 0,
+                        'cbm' => $getCellValue('U', $productRow) ?: '',
+                    ];
+
+                    $client['productos'][] = $productoData;
+                }
+            }
+
+            $clients[] = ['cliente' => $client];
+        }
+
+        return $clients;
     }
     public function getTipoByName($tipoCliente)
     {
@@ -6088,141 +6341,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
         }
         return $defaultValue;
     }
-    public function getMassiveExcelData($objPHPExcel)
-    {
-        $this->load->library('PHPExcel');
 
-        $excel = $objPHPExcel;
-        $worksheet = $excel->getActiveSheet();
-
-        // Obtener el rango total de datos válidos
-        $highestRow = $worksheet->getHighestRow();
-        $highestColumn = $worksheet->getHighestColumn();
-
-        // Obtener todas las celdas combinadas
-        $mergedCells = $worksheet->getMergeCells();
-
-        // Función para obtener el valor real de una celda (considerando combinadas)
-        $getCellValue = function ($col, $row) use ($worksheet, $mergedCells) {
-            $cellAddress = $col . $row;
-            $cellValue = trim($worksheet->getCell($cellAddress)->getValue());
-
-            // Si la celda está vacía, buscar en celdas combinadas
-            if (empty($cellValue)) {
-                foreach ($mergedCells as $mergedRange) {
-                    // Verificar si es un rango (contiene :)
-                    if (strpos($mergedRange, ':') !== false) {
-                        // Dividir el rango manualmente
-                        list($startCell, $endCell) = explode(':', $mergedRange);
-
-                        // Extraer coordenadas de inicio y fin
-                        preg_match('/([A-Z]+)(\d+)/', $startCell, $startMatches);
-                        preg_match('/([A-Z]+)(\d+)/', $endCell, $endMatches);
-
-                        if (count($startMatches) >= 3 && count($endMatches) >= 3) {
-                            $startCol = $startMatches[1];
-                            $startRow = (int)$startMatches[2];
-                            $endCol = $endMatches[1];
-                            $endRow = (int)$endMatches[2];
-
-                            // Verificar si la celda actual está dentro del rango
-                            if ($col >= $startCol && $col <= $endCol && $row >= $startRow && $row <= $endRow) {
-                                $cellValue = trim($worksheet->getCell($startCell)->getValue());
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return $cellValue;
-        };
-
-        // Función para verificar si una fila pertenece a un cliente específico
-        $getClientRowRange = function ($startRow) use ($worksheet, $getCellValue, $highestRow) {
-            $endRow = $startRow;
-            $clientName = $getCellValue('A', $startRow);
-
-            // Buscar hasta dónde se extiende este cliente
-            for ($row = $startRow + 1; $row <= $highestRow; $row++) {
-                $nextClientName = $getCellValue('A', $row);
-                if (!empty($nextClientName) && $nextClientName !== $clientName) {
-                    break;
-                }
-                $endRow = $row;
-            }
-
-            return $endRow;
-        };
-
-        $clients = [];
-        $processedRows = [];
-
-        // Recorrer todas las filas buscando clientes
-        for ($row = 1; $row <= $highestRow; $row++) {
-            // Saltar filas ya procesadas
-            if (in_array($row, $processedRows)) {
-                continue;
-            }
-
-            $clientName = $getCellValue('A', $row);
-
-            // Verificar si hay un nombre de cliente válido
-            if (empty($clientName)) {
-                continue;
-            }
-
-            // Determinar el rango de filas para este cliente
-            $endRow = $getClientRowRange($row);
-
-            // Marcar filas como procesadas
-            for ($r = $row; $r <= $endRow; $r++) {
-                $processedRows[] = $r;
-            }
-
-            // Obtener datos básicos del cliente
-            $client = [
-                'nombre' => $clientName,
-                'tipo' => $getCellValue('B', $row),
-                'dni' => $getCellValue('C', $row),
-                'telefono' => $getCellValue('D', $row),
-                'productos' => [],
-            ];
-
-            // Procesar productos dentro del rango del cliente
-            for ($productRow = $row; $productRow <= $endRow; $productRow++) {
-                $producto = $getCellValue('F', $productRow);
-
-                if (empty($producto)) {
-                    continue;
-                }
-
-                $cantidad = $getCellValue('N', $productRow);
-                $precioUnitario = $getCellValue('O', $productRow);
-
-                // Solo agregar productos con datos esenciales
-                if (!empty($cantidad) && !empty($precioUnitario)) {
-                    $productoData = [
-                        'nombre' => $producto,
-                        'cantidad' => $cantidad,
-                        'precio_unitario' => $precioUnitario,
-                        'antidumping' => $getCellValue('P', $productRow) ?: 0,
-                        'valoracion' => $getCellValue('Q', $productRow) ?: 0,
-                        'ad_valorem' => $getCellValue('R', $productRow) ?: 0,
-                        'percepcion' => $getCellValue('S', $productRow) ?: 0.035,
-                        'peso' => $getCellValue('T', $productRow) ?: 0,
-                        'cbm' => $getCellValue('U', $productRow) ?: '',
-                    ];
-
-                    $client['productos'][] = $productoData;
-                }
-            }
-
-            $clients[] = ['cliente' => $client];
-        }
-
-        return $clients;
-    }
     public function getCotizacionFinalDocumentacionPagos($idContenedor)
     {
         $this->db->select(
@@ -6245,10 +6364,206 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             ->from($this->table_contenedor_cotizacion . " AS CC")
             ->join($this->table_contenedor_tipo_cliente . ' AS TC', 'TC.id = CC.id_tipo_cliente', 'left')
             ->where('CC.id_contenedor', $idContenedor)
-            ->where('CC.estado_cliente!=', null);
+            ->where('CC.id_cliente_importacion IS NULL')
+            ->where('CC.estado_cotizador', 'CONFIRMADO')
+            ->where('CC.estado_cliente!=', null);   
 
         $query = $this->db->get();
         return $query->result();
+    }
+    public function getCotizacionFinalHeaders($idContenedor)
+    {
+        try {
+
+            $userId = $this->user->ID_Usuario;
+
+
+            // CBM Total China (todos los CONFIRMADO)
+            $this->db->select('
+                COALESCE(SUM(IF(cc.estado_cotizador = "CONFIRMADO", cccp.cbm_total_china, 0)), 0) as cbm_total_china
+            ')
+                ->from($this->table_contenedor_cotizacion_proveedores . ' cccp')
+                ->join($this->table_contenedor_cotizacion . ' cc', 'cccp.id_cotizacion = cc.id')
+                ->where('cccp.id_contenedor', $idContenedor);
+
+            // CBM Total Perú (todos los CONFIRMADO)
+            $this->db->select('(
+                SELECT COALESCE(SUM(volumen_final), 0)
+                FROM ' . $this->table_contenedor_cotizacion . '
+                WHERE id IN (
+                    SELECT DISTINCT id_cotizacion
+                    FROM ' . $this->table_contenedor_cotizacion_proveedores . '
+                    WHERE id_contenedor = ' . $idContenedor . '
+                )
+                AND estado_cotizador = "CONFIRMADO"
+            ) as cbm_total_peru', false);
+
+            //fob_final
+
+            // Subconsulta para total_logistica
+            $this->db->select('(
+            SELECT COALESCE(SUM(logistica_final), 0) 
+            FROM ' . $this->table_contenedor_cotizacion . ' 
+            WHERE id IN (
+                SELECT DISTINCT id_cotizacion 
+                FROM ' . $this->table_contenedor_cotizacion_proveedores . ' 
+                WHERE id_contenedor = ' . $idContenedor . '
+            )
+            AND estado_cotizador = "CONFIRMADO"
+            ) as total_logistica', false);
+            //sub consulta para total_impuestos
+            $this->db->select('(
+                SELECT COALESCE(SUM(impuestos_final), 0)
+                FROM ' . $this->table_contenedor_cotizacion . '
+                WHERE id IN (
+                    SELECT DISTINCT id_cotizacion
+                    FROM ' . $this->table_contenedor_cotizacion_proveedores . '
+                    WHERE id_contenedor = ' . $idContenedor . '
+                )
+                AND estado_cotizador = "CONFIRMADO"
+            ) as total_impuestos', false);
+            // sum of fob_final
+            $this->db->select('(
+                SELECT COALESCE(SUM(fob_final), 0)
+                FROM ' . $this->table_contenedor_cotizacion . '
+                WHERE id IN (
+                    SELECT DISTINCT id_cotizacion
+                    FROM ' . $this->table_contenedor_cotizacion_proveedores . '
+                    WHERE id_contenedor = ' . $idContenedor . '
+                )
+                AND estado_cotizador = "CONFIRMADO"
+            ) as total_fob', false);
+            //total vendido logistica  + impuestos
+            $this->db->select('(
+                SELECT COALESCE(SUM(logistica_final + impuestos_final), 0)
+                FROM ' . $this->table_contenedor_cotizacion . '
+                WHERE id IN (
+                    SELECT DISTINCT id_cotizacion
+                    FROM ' . $this->table_contenedor_cotizacion_proveedores . '
+                    WHERE id_contenedor = ' . $idContenedor . '
+                )
+                AND estado_cotizador = "CONFIRMADO"
+            ) as total_vendido_logistica_impuestos', false);
+             //total pagado logistica and impuestos
+            //get coalesce sum from pagos where id_contenedor = $idContenedor and id_concept= 'LOGISTICA'
+            $this->db->select('(SELECT COALESCE(SUM(monto), 0)
+            FROM ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . ' 
+            JOIN ' . $this->table_pagos_concept . ' ON ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . '.id_concept = ' . $this->table_pagos_concept . '.id
+            WHERE id_contenedor = ' . $idContenedor . '
+            AND ' . $this->table_pagos_concept . '.name = "LOGISTICA"
+        
+            ) as total_logistica_pagado', false);
+            $this->db->select('(SELECT COALESCE(SUM(monto), 0)
+            FROM ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . ' 
+            JOIN ' . $this->table_pagos_concept . ' ON ' . $this->table_contenedor_consolidado_cotizacion_coordinacion_pagos . '.id_concept = ' . $this->table_pagos_concept . '.id
+            WHERE id_contenedor = ' . $idContenedor . '
+            AND (' . $this->table_pagos_concept . '.name = "LOGISTICA"
+            OR ' . $this->table_pagos_concept . '.name = "IMPUESTOS"
+            )) as total_pagado', false);
+            $query = $this->db->get();
+            $result = $query->row();
+
+            if ($this->db->error()['code'] != 0) {
+                log_message('error', 'Error: ' . $this->db->error()['message']);
+            }
+
+            // Obtener bl_file_url y lista_empaque_file_url del contenedor
+            $this->db->select('bl_file_url, lista_embarque_url')
+                ->from($this->table)
+                ->where('id', $idContenedor);
+            $query = $this->db->get();
+            $result2 = $query->row();
+
+            // Si es el usuario 28791, obtener los CBM por usuario (vendido, pendiente, embarcado)
+            if ($userId == 28791) {
+
+                // CBM Vendido por usuario
+                $cbmVendido = [];
+                $cbmPendiente = [];
+                $cbmEmbarcado = [];
+
+
+                return [
+                    'cbm_total_peru'    => [
+                        "value" => $result->cbm_total_peru,
+                        "label" => "CBM Total Perú"
+                    ],
+                    'total_logistica'   => [
+                        "value" => $result->total_logistica,
+                        "label" => "Total Logistica"
+                    ],
+                    'total_logistica_pagado' => [
+                        "value" => $result->total_logistica_pagado,
+                        "label" => "Total Logistica Pagado"
+                    ],
+                    'qty_items'         => [
+                        "value" => $result->total_qty_items,
+                        "label" => "Cantidad de Items"
+                    ],
+                    'total_impuestos'   => [
+                        "value" => $result->total_impuestos,
+                        "label" => "Total Impuestos"
+                    ],
+                    'total_fob'         => [
+                        "value" => $result->total_fob,
+                        "label" => "Total FOB"
+                    ]
+                ];
+            }
+
+
+            if ($result) {
+                return [
+                    'cbm_total' => [
+                        "value" => $result->cbm_total_peru,
+                        "label" => "CBM Total Perú",
+                        "imgIcon" => "https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
+                    ],
+                    'total_logistica' => [
+                        "value" => $result->total_logistica,
+                        "label" => "Total Logistica",
+                        "imgIcon" => "fas fa-dollar-sign"
+                    ],
+                   
+                    'total_impuestos'   => [
+                        "value" => $result->total_impuestos,
+                        "label" => "Total Impuestos",
+                        "imgIcon" => "fas fa-dollar-sign"
+                    ],
+                    'total_fob'         => [
+                        "value" => $result->total_fob,
+                        "label" => "Total FOB",
+                        "imgIcon" => "fas fa-dollar-sign"
+                    ],
+                    'total_pagado'         => [
+                        "value" => $result->total_pagado,
+                        "label" => "Total Pagado",
+                        "imgIcon" => "fas fa-dollar-sign"
+                    ],
+                    'total_vendido_logistica_impuestos'         => [
+                        "value" => $result->total_vendido_logistica_impuestos,
+                        "label" => "Total Vendido",
+                        "imgIcon" => "fas fa-dollar-sign"
+                    ],
+                ];
+            } else {
+                return [
+                    'status' => "error",
+                    'error' => false,
+                    "data" => [
+                        'cbm_total' => ["value" => 0, "label" => "CBM Pendiente",],
+                        'cbm_embarcado' => ["value" => 0, "label" => "CBM Embarcado"],
+                        'total_logistica' => ["value" => 0, "label" => "Total Logistica"],
+                        'qty_items' => ["value" => 0, "label" => "Cantidad de Items"],
+                        'cbm_total_peru' => ["value" => 0, "label" => "CBM Total Perú"],
+                        'total_fob' => ["value" => 0, "label" => "Total FOB"],
+                    ]
+                ];
+            }
+        } catch (Exception $e) {
+            log_message('error', '' . $e->getMessage());
+            return $e->getMessage();
+        }
     }
     public function getContenedorCotizacionesFinales($idContenedor)
     {
@@ -6256,6 +6571,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             ->from($this->table_contenedor_cotizacion)
             ->join($this->table_contenedor_tipo_cliente, 'contenedor_consolidado_cotizacion.id_tipo_cliente = contenedor_consolidado_tipo_cliente.id')
             ->where('id_contenedor', $idContenedor)
+            ->where('contenedor_consolidado_cotizacion.id_cliente_importacion IS NULL')
             ->where('estado_cliente IS NOT NULL')
             ->where('estado_cotizador', 'CONFIRMADO');
         //if $this-

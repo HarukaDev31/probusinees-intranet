@@ -880,6 +880,8 @@ async function getClientesHeader() {
   $("#txt-CBM_Cliente_Total_Logistica_Pagado").html(result.total_logistica_pagado);
   $("#txt-CBM_Cliente_Total_China").html(result.cbm_total_china);
   $("#txt-CBM_Cliente_Total_Qty_Items").html(result.qty_items);
+  $("#txt-CBM_Cliente_Total_Fob").html(result.total_fob);
+  $("#txt-CBM_Cliente_Total_Impuestos").html(result.total_impuestos);
   console.log(result);
   spinner.hide();
 }
@@ -1852,11 +1854,11 @@ async function viewSteps(id, carga, disabled = false) {
         contentHeader.hide();
         return;
       }
-    if(currentPrivilege == "Cotizador" && Number(idusuario) !== 28791){
-          openStepFunction(1, id);
-          mainContainer.hide();
-          contentHeader.hide();
-          return;
+      if (currentPrivilege == "Cotizador" && Number(idusuario) !== 28791) {
+        openStepFunction(1, id);
+        mainContainer.hide();
+        contentHeader.hide();
+        return;
       }
       mainContainer.hide();
       contentHeader.hide();
@@ -2190,7 +2192,7 @@ async function showDocumentacionDocumentacionContainer(id) {
               Array.from(files).forEach(file => {
                 if (file.name.endsWith('.xlsx')) {
                   const fileSize = (file.size / 1024).toFixed(0) + ' KB';
-                  console.log(file.name,fileSize);
+                  console.log(file.name, fileSize);
                   const $fileItem = $(`
                     <div class="flex items-center justify-between bg-gray-50 p-3 rounded">
                       <div class="flex items-center">
@@ -2374,67 +2376,67 @@ async function deleteCotizacionFile(id) {
   });
 }
 function moveCotizacionToConsolidado(idCotizacion) {
-    // Mostrar modal con select de consolidados habilitados
-    $('#modal-move-cotizacion').modal('show');
-    $('#selectConsolidado').empty();
-    $('#selectConsolidado').append('<option value="" disabled selected>Selecciona una carga consolidada</option>');
-    // Cargar cargas consolidadas disponibles haces un ajax
-    $.ajax({
-        url: base_url + 'CargaConsolidada/ContenedorConsolidado/getCargasConsolidadasDisponibles',
-        method: "GET",
-        success: function(data) {
-            const contenedores = JSON.parse(data);
-            contenedores.forEach(function(consolidado) {
-                $('#selectConsolidado').append(`<option value="${consolidado.id}">Carga consolidada #${consolidado.carga}</option>`);
-            });
-        }
-    });
-    // Configurar el botón de confirmación
-    $('#btn-confirm-move').off('click').on('click', function() {
-        // Validar que se haya seleccionado un contenedor
-        if (!$('#selectConsolidado').val()) {
-            Swal.fire("Error", "Debes seleccionar un contenedor consolidado.", "error");
-            return;
-        }
-        // Confirmar movimiento
-        Swal.fire({
-            title: "¿Estás seguro?",
-            text: "Esta acción moverá la cotización al contenedor consolidado seleccionado.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sí, mover",
-            cancelButtonText: "No, cancelar",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                url = base_url + "CargaConsolidada/ContenedorConsolidado/moveCotizacionToConsolidado";
-                // Al confirmar, hacer AJAX:
-                $.ajax({
-                  url: url,
-                  method: "POST",
-                  data: {
-                    idCotizacion: idCotizacion,
-                    idContenedorDestino: $('#selectConsolidado').val()
-                }, success: function(resp) {
-                    // Refrescar tabla y mostrar mensaje
-                    const result = JSON.parse(resp);
-                    if (result.status == "success") {
-                      Swal.fire("¡Éxito!", result.message, "success");
-                      reloadTableCotizacion();
-                    } else {
-                      Swal.fire("Error", result.message, "error");
-                    }
-                  }, error: function() {
-                    Swal.fire("Error", "Ocurrió un error al mover la cotización.", "error");
-                  }
-                });
-                // Cerrar modal
-                $('#modal-move-cotizacion').modal('hide');
+  // Mostrar modal con select de consolidados habilitados
+  $('#modal-move-cotizacion').modal('show');
+  $('#selectConsolidado').empty();
+  $('#selectConsolidado').append('<option value="" disabled selected>Selecciona una carga consolidada</option>');
+  // Cargar cargas consolidadas disponibles haces un ajax
+  $.ajax({
+    url: base_url + 'CargaConsolidada/ContenedorConsolidado/getCargasConsolidadasDisponibles',
+    method: "GET",
+    success: function (data) {
+      const contenedores = JSON.parse(data);
+      contenedores.forEach(function (consolidado) {
+        $('#selectConsolidado').append(`<option value="${consolidado.id}">Carga consolidada #${consolidado.carga}</option>`);
+      });
+    }
+  });
+  // Configurar el botón de confirmación
+  $('#btn-confirm-move').off('click').on('click', function () {
+    // Validar que se haya seleccionado un contenedor
+    if (!$('#selectConsolidado').val()) {
+      Swal.fire("Error", "Debes seleccionar un contenedor consolidado.", "error");
+      return;
+    }
+    // Confirmar movimiento
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Esta acción moverá la cotización al contenedor consolidado seleccionado.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, mover",
+      cancelButtonText: "No, cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        url = base_url + "CargaConsolidada/ContenedorConsolidado/moveCotizacionToConsolidado";
+        // Al confirmar, hacer AJAX:
+        $.ajax({
+          url: url,
+          method: "POST",
+          data: {
+            idCotizacion: idCotizacion,
+            idContenedorDestino: $('#selectConsolidado').val()
+          }, success: function (resp) {
+            // Refrescar tabla y mostrar mensaje
+            const result = JSON.parse(resp);
+            if (result.status == "success") {
+              Swal.fire("¡Éxito!", result.message, "success");
+              reloadTableCotizacion();
             } else {
-                // Si se cancela, simplemente cerrar el modal
-                $('#modal-move-cotizacion').modal('hide');
+              Swal.fire("Error", result.message, "error");
             }
+          }, error: function () {
+            Swal.fire("Error", "Ocurrió un error al mover la cotización.", "error");
+          }
         });
+        // Cerrar modal
+        $('#modal-move-cotizacion').modal('hide');
+      } else {
+        // Si se cancela, simplemente cerrar el modal
+        $('#modal-move-cotizacion').modal('hide');
+      }
     });
+  });
 }
 async function updateRotulado(idCotizacion, idProveedor) {
   url =
@@ -2850,6 +2852,39 @@ const updateEstadoCliente = (id) => {
       reloadTableClientesGeneral();
     },
   });
+};
+const getCotizacionFinalHeaders = async () => {
+  try {
+    const URL = base_url + "CargaConsolidada/ContenedorConsolidado/getCotizacionFinalHeaders";
+    const response = await $.ajax({
+      async: true,
+      url: URL,
+      type: "POST",
+      data: { idContenedor: idContenedor },
+    });
+    //response is object
+    /**{"cbm_total_china":"67.04","cbm_total_peru":{"value":"0.00","label":"CBM Total Per\u00fa"},"total_logistica":{"value":"0.00","label":"Total Logistica"},"total_logistica_pagado":{"value":15078.68,"label":"Total Logistica Pagado"},"qty_items":{"value":"187","label":"Cantidad de Items"},"total_impuestos":{"value":"0.00","label":"Total Impuestos"},"total_fob":{"value":"0.00","label":"Total FOB"}}
+   **/
+    $("#header-cotizacion-final").empty();
+    const parsedResponse = JSON.parse(response);
+
+    for (const key in parsedResponse) {
+      if (parsedResponse[key].imgIcon.includes("http")) {
+        var img = `<img src="${parsedResponse[key].imgIcon}" alt="${parsedResponse[key].label}" class="w-6 h-6">`;
+      } else {
+        var img = `<i class="${parsedResponse[key].imgIcon}" ></i>`;
+      }
+      $("#header-cotizacion-final").append(`<div class=" d-flex align-items-center justify-content-center justify-content-xl-start gap-2">
+      ${img}
+      <span>${parsedResponse[key].label}</span>
+      <span>${parsedResponse[key].value}</span>
+    </div>`);
+    }
+    $("#header-cotizacion-final").show();
+    spinner.hide();
+  } catch (error) {
+    console.error("Error en getCotizacionFinalHeaders:", error);
+  }
 };
 const openStepFunction = async (step, id) => {
   stepIndex = step;
@@ -3485,7 +3520,7 @@ const openStepFunction = async (step, id) => {
                   orderable: false,
                 },
                 {
-                  targets: [1,2,3,4,6,13],
+                  targets: [1, 2, 3, 4, 6, 13],
                   visible: false,
                 },
                 {
@@ -3780,17 +3815,17 @@ const openStepFunction = async (step, id) => {
         $("#table-clientes-pagos").hide();
         var columnshide = [];
         var columnsexport = [];
-        if(currentPrivilege == "Documentacion"){
-          columnshide = [1,2,3,4,5,6,12,13,14,15,16,17,18,19],
-          columnsexport = [-1,-2,-3,-4,-5,-6,-7,-8,-9];
+        if (currentPrivilege == "Documentacion") {
+          columnshide = [1, 2, 3, 4, 5, 6, 12, 13, 14, 15, 16, 17, 18, 19],
+            columnsexport = [-1, -2, -3, -4, -5, -6, -7, -8, -9];
         }
-        if(currentPrivilege == "Coordinación"){
-          columnshide = [1,2,3,4,5,6,13],
-          columnsexport = [14,-1,-2,-3];
+        if (currentPrivilege == "Coordinación") {
+          columnshide = [1, 2, 3, 4, 5, 6, 13],
+            columnsexport = [14, -1, -2, -3];
         }
-        if(currentPrivilege == "Cotizador"){
-          columnshide = [1,2,3,4,5,6,13,-2,-3],
-          columnsexport = [14,-1,-2,-3];
+        if (currentPrivilege == "Cotizador") {
+          columnshide = [1, 2, 3, 4, 5, 6, 13, -2, -3],
+            columnsexport = [14, -1, -2, -3];
         }
 
         if ($.fn.DataTable.isDataTable("#table-clientes-general")) {
@@ -3804,145 +3839,145 @@ const openStepFunction = async (step, id) => {
               "<'row'<'col-sm-12'tr>>" +
               "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-5'i><'col-sm-12 col-md-5'p>>",
             buttons: [
-                {
-                  extend: "excel",
-                  text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
-                  titleAttr: "Excel",
-                  exportOptions: {
-                    columns: function(idx, data, node) {
-                        // Usa la instancia global de la tabla
-                        if (typeof tableClientesGeneral !== "undefined" && tableClientesGeneral.settings) {
-                            var colDef = tableClientesGeneral.settings()[0].aoColumns[idx];
-                            return !colDef.exported;
-                        }
-                        // Si no está definida, exporta todo
-                        return true;
-                    },
-                    format: {
-                      body: function (data, row, column, node) {
-                        // Handle multiple inputs in a div
-                        if ($(node).find('input').length > 1) {
-                          const inputValues = [];
-                          $(node).find('input').each(function () {
-                            const value = $(this).val();
-                            if (value && value.trim()) {
-                              inputValues.push(value.trim());
-                            }
-                          });
-                          return inputValues.join('\n');
-                        }
-
-                        if ($(node).find('select').length > 1) {
-                          const selectValues = [];
-                          $(node).find('select').each(function () {
-                            const $select = $(this);
-                            // Try different approaches to get selected value
-                            let selectedText = '';
-
-                            // Method 1: Direct selected option text
-                            const selectedOption = $select.find('option:selected');
-                            if (selectedOption.length > 0) {
-                              selectedText = selectedOption.text().trim();
-                            }
-
-                            // Method 2: If method 1 fails, try getting by value
-                            if (!selectedText) {
-                              const selectedValue = $select.val();
-                              if (selectedValue) {
-                                const optionByValue = $select.find('option[value="' + selectedValue + '"]');
-                                if (optionByValue.length > 0) {
-                                  selectedText = optionByValue.text().trim();
-                                } else {
-                                  selectedText = selectedValue; // Use value as fallback
-                                }
-                              }
-                            }
-
-                            // Method 3: If still no text, try selectedIndex
-                            if (!selectedText && $select[0].selectedIndex >= 0) {
-                              const option = $select[0].options[$select[0].selectedIndex];
-                              if (option) {
-                                selectedText = option.text.trim();
-                              }
-                            }
-
-                            if (selectedText) {
-                              selectValues.push(selectedText);
-                            }
-                          });
-                          return selectValues.join('\n');
-                        }
-
-                        // Handle single input
-                        if ($(node).find('input').length === 1) {
-                          const inputValue = $(node).find('input').val();
-                          return inputValue || '';
-                        }
-
-                        // Handle multiple selects (if needed)
-
-
-                        // Handle mixed inputs and selects
-                        if ($(node).find('input, select').length > 0) {
-                          const allValues = [];
-
-                          // Get all input values
-                          $(node).find('input').each(function () {
-                            const value = $(this).val();
-                            if (value && value.trim()) {
-                              allValues.push(value.trim());
-                            }
-                          });
-
-                          // Get all select values
-                          $(node).find('select').each(function () {
-                            const selectedText = $(this).find('option:selected').text();
-                            if (selectedText && selectedText.trim()) {
-                              allValues.push(selectedText.trim());
-                            }
-                          });
-
-                          return allValues.join('\n');
-                        }
-
-                        // Handle textareas (if you have them)
-                        if ($(node).find('textarea').length > 0) {
-                          const textareaValues = [];
-                          $(node).find('textarea').each(function () {
-                            const value = $(this).val();
-                            if (value && value.trim()) {
-                              textareaValues.push(value.trim());
-                            }
-                          });
-                          return textareaValues.join('\n');
-                        }
-
-                        // Handle divs with text content (as fallback)
-                        if ($(node).find('div').length > 1) {
-                          const divValues = [];
-                          $(node).find('div').each(function () {
-                            const text = $(this).text().trim();
-                            if (text) {
-                              divValues.push(text);
-                            }
-                          });
-                          if (divValues.length > 0) {
-                            return divValues.join('\n');
-                          }
-                        }
-
-                        // Default: return the cell data as is
-                        return data;
-                      }
+              {
+                extend: "excel",
+                text: '<i class="fa fa-file-excel color_icon_excel"></i> Excel',
+                titleAttr: "Excel",
+                exportOptions: {
+                  columns: function (idx, data, node) {
+                    // Usa la instancia global de la tabla
+                    if (typeof tableClientesGeneral !== "undefined" && tableClientesGeneral.settings) {
+                      var colDef = tableClientesGeneral.settings()[0].aoColumns[idx];
+                      return !colDef.exported;
                     }
+                    // Si no está definida, exporta todo
+                    return true;
                   },
-                  attr: {
-                    id: actionButtonsIds["table-clientes-general"].excel,
-                    class: "hidden",
-                  },
+                  format: {
+                    body: function (data, row, column, node) {
+                      // Handle multiple inputs in a div
+                      if ($(node).find('input').length > 1) {
+                        const inputValues = [];
+                        $(node).find('input').each(function () {
+                          const value = $(this).val();
+                          if (value && value.trim()) {
+                            inputValues.push(value.trim());
+                          }
+                        });
+                        return inputValues.join('\n');
+                      }
+
+                      if ($(node).find('select').length > 1) {
+                        const selectValues = [];
+                        $(node).find('select').each(function () {
+                          const $select = $(this);
+                          // Try different approaches to get selected value
+                          let selectedText = '';
+
+                          // Method 1: Direct selected option text
+                          const selectedOption = $select.find('option:selected');
+                          if (selectedOption.length > 0) {
+                            selectedText = selectedOption.text().trim();
+                          }
+
+                          // Method 2: If method 1 fails, try getting by value
+                          if (!selectedText) {
+                            const selectedValue = $select.val();
+                            if (selectedValue) {
+                              const optionByValue = $select.find('option[value="' + selectedValue + '"]');
+                              if (optionByValue.length > 0) {
+                                selectedText = optionByValue.text().trim();
+                              } else {
+                                selectedText = selectedValue; // Use value as fallback
+                              }
+                            }
+                          }
+
+                          // Method 3: If still no text, try selectedIndex
+                          if (!selectedText && $select[0].selectedIndex >= 0) {
+                            const option = $select[0].options[$select[0].selectedIndex];
+                            if (option) {
+                              selectedText = option.text.trim();
+                            }
+                          }
+
+                          if (selectedText) {
+                            selectValues.push(selectedText);
+                          }
+                        });
+                        return selectValues.join('\n');
+                      }
+
+                      // Handle single input
+                      if ($(node).find('input').length === 1) {
+                        const inputValue = $(node).find('input').val();
+                        return inputValue || '';
+                      }
+
+                      // Handle multiple selects (if needed)
+
+
+                      // Handle mixed inputs and selects
+                      if ($(node).find('input, select').length > 0) {
+                        const allValues = [];
+
+                        // Get all input values
+                        $(node).find('input').each(function () {
+                          const value = $(this).val();
+                          if (value && value.trim()) {
+                            allValues.push(value.trim());
+                          }
+                        });
+
+                        // Get all select values
+                        $(node).find('select').each(function () {
+                          const selectedText = $(this).find('option:selected').text();
+                          if (selectedText && selectedText.trim()) {
+                            allValues.push(selectedText.trim());
+                          }
+                        });
+
+                        return allValues.join('\n');
+                      }
+
+                      // Handle textareas (if you have them)
+                      if ($(node).find('textarea').length > 0) {
+                        const textareaValues = [];
+                        $(node).find('textarea').each(function () {
+                          const value = $(this).val();
+                          if (value && value.trim()) {
+                            textareaValues.push(value.trim());
+                          }
+                        });
+                        return textareaValues.join('\n');
+                      }
+
+                      // Handle divs with text content (as fallback)
+                      if ($(node).find('div').length > 1) {
+                        const divValues = [];
+                        $(node).find('div').each(function () {
+                          const text = $(this).text().trim();
+                          if (text) {
+                            divValues.push(text);
+                          }
+                        });
+                        if (divValues.length > 0) {
+                          return divValues.join('\n');
+                        }
+                      }
+
+                      // Default: return the cell data as is
+                      return data;
+                    }
+                  }
                 },
-              ],
-              columnDefs: [
+                attr: {
+                  id: actionButtonsIds["table-clientes-general"].excel,
+                  class: "hidden",
+                },
+              },
+            ],
+            columnDefs: [
               {
                 targets: "no-hidden",
                 visible: false,
@@ -4487,11 +4522,18 @@ async function viewFacturaGuia() {
   }
 }
 async function viewCotizacionFinal() {
+  // Verificar que las variables necesarias estén definidas
+  if (typeof stepIndex === 'undefined' || typeof idContenedor === 'undefined') {
+    console.error("Variables stepIndex o idContenedor no están definidas");
+    alert("Error: Faltan datos necesarios para cargar la cotización.");
+    return;
+  }
+
   cotizacionFinalContainer.show();
   $("#cotizacion-final-title").html(`
     Cotizacion #${currentCargaNumber}`);
   spinner.show();
-  url = base_url + "CargaConsolidada/ContenedorConsolidado/step";
+  let cotFinalurl = base_url + "CargaConsolidada/ContenedorConsolidado/step";
   // Handle tab clicks for final and pagos tables
   $(".tab-clientes-final").removeClass("active");
   $(".tab-clientes-final").off("click").click(function () {
@@ -4501,7 +4543,6 @@ async function viewCotizacionFinal() {
 
     let table = this.getAttribute("data-table");
     this.classList.add("active");
-    console.log("Table clicked:", table);
     if (table == "general") {
       // Handle final table
       $("#table-cotizacion-final").attr("style", "");
@@ -4570,26 +4611,44 @@ async function viewCotizacionFinal() {
           pageLength: 100,
           lengthMenu: [[100, 1000, -1], [100, 1000, "Todos"]],
           ajax: {
-            url: url,
+            url: cotFinalurl,
             type: "POST",
             dataType: "JSON",
             data: function (data) {
               data.stepIndex = stepIndex;
               data.idContenedor = idContenedor;
               data.tipoTabla = "general";
+            },
+            error: function (xhr, error, thrown) {
+              console.error("Error en DataTable general:", error);
+              console.error("Respuesta del servidor:", xhr.responseText);
+              spinner.hide();
+              alert("Error al cargar los datos generales. Por favor, inténtelo de nuevo.");
+            },
+            dataSrc: function (json) {
+              // Verificar que la respuesta tenga el formato correcto
+              if (!json || !Array.isArray(json.data)) {
+                console.error("Formato de respuesta incorrecto:", json);
+                return [];
+              }
+              return json.data;
             }
           },
           initComplete: function (settings, json) {
             spinner.hide();
+
+          },
+          //on table end of load getCotizacionFinalHeaders
+          drawCallback: function (settings) {
+            getCotizacionFinalHeaders();
           }
         });
       }
     }
     else if (table == "pagos") {
-      // Handle pagos table
+      console.log("Table clicked:", table);
       $("#table-cotizacion-final-pagos").attr("style", "");
       $("#table-cotizacion-final").hide();
-
       if ($.fn.DataTable.isDataTable("#table-cotizacion-final-pagos")) {
         $("#table-cotizacion-final-pagos").show();
         $("#table-cotizacion-final-pagos_wrapper").show();
@@ -4621,7 +4680,6 @@ async function viewCotizacionFinal() {
             }
           ],
           paging: true,
-          lengthChange: true,
           searching: true,
           ordering: true,
           info: true,
@@ -4653,17 +4711,36 @@ async function viewCotizacionFinal() {
           pageLength: 100,
           lengthMenu: [[100, 1000, -1], [100, 1000, "Todos"]],
           ajax: {
-            url: url,
+            url: cotFinalurl,
             type: "POST",
             dataType: "JSON",
             data: function (data) {
               data.stepIndex = stepIndex;
               data.idContenedor = idContenedor;
-              data.tipoTabla = "pagos"; // Add this to distinguish the data request
+              data.tipoTabla = "pagos";
+            },
+            error: function (xhr, error, thrown) {
+              console.error("Error en DataTable pagos:", error);
+              console.error("Respuesta del servidor:", xhr.responseText);
+              spinner.hide();
+              alert("Error al cargar los datos de pagos. Por favor, inténtelo de nuevo.");
+            },
+            dataSrc: function (json) {
+              // Verificar que la respuesta tenga el formato correcto
+              if (!json || !Array.isArray(json.data)) {
+                console.error("Formato de respuesta incorrecto:", json);
+                return [];
+              }
+              return json.data;
             }
           },
           initComplete: function (settings, json) {
             spinner.hide();
+
+          },
+          //on table end of load getCotizacionFinalHeaders
+          drawCallback: function (settings) {
+            getCotizacionFinalHeaders();
           }
         });
       }
@@ -4823,6 +4900,24 @@ async function reloadTableCotizacionFinal() {
   tableCotizacionFinal.ajax.reload();
   enableHorizontalAutoScrollForAllTables();
 }
+// Modal simple usando Swal para mostrar los detalles
+function showCBMDetalleModal(uniqueId) {
+  const val = window[uniqueId];
+  let html = "<div class='flex flex-column text-sm text-center' style='color:#888'>";
+  for (const usuario in val) {
+    html += `<div class="flex ">${usuario}: <b>${val[usuario]}</b><br></div>`;
+  }
+  html += "</div>";
+  Swal.fire({
+    title: "Detalle por usuario",
+    html: html,
+    confirmButtonText: "Cerrar",
+    width: 350,
+    customClass: {
+      title: 'min-h-[60px]'
+    }
+  });
+}
 async function getTableCotizacionEmbarqueHeaders() {
   url =
     base_url +
@@ -4833,15 +4928,25 @@ async function getTableCotizacionEmbarqueHeaders() {
   const result = await response.json();
   function formatCBMDetalle(val) {
     if (typeof val === "object" && val !== null) {
-      let html = "<div style='font-size:11px;color:#888'>";
+      // Sumar todos los valores numéricos
+      let total = 0;
       for (const usuario in val) {
-        html += `${usuario}: <b>${val[usuario]}</b><br>`;
+        const num = parseFloat(val[usuario]);
+        if (!isNaN(num)) total += num;
       }
-      html += "</div>";
-      return html;
+      // Crear un id único para el elemento
+      const uniqueId = "cbm-detalle-" + Math.random().toString(36).substr(2, 9);
+
+      // Guardar los detalles en el window para acceso desde el evento
+      window[uniqueId] = val;
+
+      // Retornar el HTML con evento onclick
+      return `<span style="cursor:pointer;font-weight:bold;color:#e67e22;" onclick="showCBMDetalleModal('${uniqueId}')">${total.toFixed(2)}</span>`;
     }
     return val ?? 0;
   }
+
+
 
   $("#cotizacion_name").val('#' + currentCargaNumber);
   $("#txt-CBM_Total_Peru").html(result.cbm_total_peru);

@@ -200,6 +200,7 @@ class PedidosCursoModel extends CI_Model
 			PC.Nu_Estado as Nu_Estado, 
 			PC.Nu_Estado_Usuario_Externo as Nu_Estado_Usuario_Externo,
 			PC.ID_Pedido_Curso as id_pedido_curso,
+			PC.url_constancia as url_constancia,
 			MONTH(CC.Fe_Inicio) as mes_numero"
 		)
 			->from($this->table . ' AS PC')
