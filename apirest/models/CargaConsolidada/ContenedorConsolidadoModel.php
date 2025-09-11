@@ -3177,12 +3177,12 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             ) {
                 $this->sendMessage("Hola 🙋🏻‍♀, te escribe el área de coordinación de Probusiness. 
 
-📢 Añadiste un nuevo proveedor en el *Consolidado #${carga}*
+        📢 Añadiste un nuevo proveedor en el *Consolidado #${carga}*
 
-*Rotulado: 👇🏼*  
-Tienes que indicarle a tu proveedor que las cajas máster 📦 cuenten con un rotulado para 
-identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro almacén.");
-            }
+        *Rotulado: 👇🏼*  
+        Tienes que indicarle a tu proveedor que las cajas máster 📦 cuenten con un rotulado para 
+        identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro almacén.");
+                    }
 
 
 
@@ -3292,13 +3292,13 @@ identificar tus paquetes y diferenciarlas de los demás cuando llegue a nuestro 
             $sleepSendMedia += 3;
             $this->sendMessage("También necesito los datos de tu proveedor para comunicarnos y recibir tu carga.
 
-➡ *Datos del proveedor: (Usted lo llena)*
+        ➡ *Datos del proveedor: (Usted lo llena)*
 
-☑ Nombre del producto:
-☑ Nombre del vendedor:
-☑ Celular del vendedor:
+        ☑ Nombre del producto:
+        ☑ Nombre del vendedor:
+        ☑ Celular del vendedor:
 
-Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡", null, $sleepSendMedia);
+        Te avisaré apenas tu carga llegue a nuestro almacén de China, cualquier duda me escribes. 🫡", null, $sleepSendMedia);
 
             // Enviar ZIP al cliente
             if (!file_exists($zipFileName)) {
