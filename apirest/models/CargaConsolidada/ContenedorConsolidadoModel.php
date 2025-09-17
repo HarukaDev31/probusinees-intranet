@@ -4972,7 +4972,7 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
         }
     }
     public function generateMassiveExcelPayrolls($objPHPExcel, $idContainer)
-    {
+    {   
         $originalMemoryLimit = ini_get('memory_limit');
         ini_set('memory_limit', '2048M');
         $this->load->library('PHPExcel');
@@ -7749,49 +7749,37 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
             return false;
         }
 
-        // Comparación exacta primero
+        // Comparación exacta - la única forma válida de match
         if ($fullName === $partialName) {
             return true;
         }
 
-        // Verificar si el nombre parcial está contenido en el completo
-        // Verificar que $partialName no esté vacío antes de usar strpos
-        if (!empty($partialName) && strpos($fullName, $partialName) !== false) {
-            return true;
-        }
+        // Comparar palabra por palabra - TODAS las palabras deben coincidir exactamente
+        $fullWords = array_filter(explode(' ', $fullName));
+        $partialWords = array_filter(explode(' ', $partialName));
 
-        // Comparar palabra por palabra
-        $fullWords = array_filter(explode(' ', $fullName)); // array_filter elimina elementos vacíos
-        $partialWords = array_filter(explode(' ', $partialName)); // array_filter elimina elementos vacíos
+        // Deben tener el mismo número de palabras para ser exactos
+        if (count($fullWords) !== count($partialWords)) {
+            return false;
+        }
 
         // Verificar que tenemos palabras para comparar
         if (empty($fullWords) || empty($partialWords)) {
             return false;
         }
 
-        $matchCount = 0;
+        // Ordenar las palabras para comparar independientemente del orden
+        sort($fullWords);
+        sort($partialWords);
 
-        foreach ($partialWords as $partialWord) {
-            // Verificar que la palabra parcial no esté vacía
-            if (empty($partialWord)) {
-                continue;
-            }
-
-            foreach ($fullWords as $fullWord) {
-                // Verificar que la palabra completa no esté vacía
-                if (empty($fullWord)) {
-                    continue;
-                }
-
-                if (strpos($fullWord, $partialWord) !== false) {
-                    $matchCount++;
-                    break;
-                }
+        // Comparar palabra por palabra - deben ser exactamente iguales
+        for ($i = 0; $i < count($fullWords); $i++) {
+            if ($fullWords[$i] !== $partialWords[$i]) {
+                return false;
             }
         }
 
-        // Si coinciden al menos 70% de las palabras del nombre parcial
-        return $matchCount >= ceil(count($partialWords) * 0.7);
+        return true;
     }
 
 
