@@ -4991,10 +4991,12 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
 
             foreach ($data as &$cliente) {
                 $nombreCliente = $cliente['cliente']['nombre'];
+                $matchFound = false;
 
                 foreach ($result as $item) {
                     log_message('error', 'Comparing: ' . $nombreCliente . ' with ' . $item->nombre);
                     if ($this->isNameMatch($nombreCliente, $item->nombre)) {
+                        log_message('error', 'MATCH FOUND: ' . $nombreCliente . ' matched with ' . $item->nombre . ' (ID: ' . $item->id . ')');
                         $cliente['cliente']['tarifa'] = $item->tarifa;
                         $cliente['cliente']['correo'] = $item->correo;
                         $cliente['cliente']['tipo_cliente'] = $item->tipoCliente;
@@ -5009,8 +5011,13 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                         } else {
                             $cliente['cliente']['volumen'] = 0;
                         }
+                        $matchFound = true;
                         break;
                     }
+                }
+                
+                if (!$matchFound) {
+                    log_message('error', 'NO MATCH FOUND for client: ' . $nombreCliente . ' - This client will not be updated in database');
                 }
             }
             unset($cliente);
@@ -5037,9 +5044,20 @@ Te comento que cerramos nuestro consolidado este ' . $f_cierre . ' Por favor si 
                 unset($result['excel_file_path']);
                 unset($result['whatsapp']);
                 //update table cotizciones with result
-                log_message('error', json_encode($result));
-                $this->db->where('id', $result['id']);
-                $this->db->update($this->table_contenedor_cotizacion, $result);
+                if (isset($result['id'])) {
+                    log_message('error', 'UPDATING DATABASE for client: ' . $value['cliente']['nombre'] . ' with ID: ' . $result['id']);
+                    log_message('error', 'Update data: ' . json_encode($result));
+                    $this->db->where('id', $result['id']);
+                    $this->db->update($this->table_contenedor_cotizacion, $result);
+                    
+                    if ($this->db->affected_rows() > 0) {
+                        log_message('error', 'DATABASE UPDATE SUCCESS for client: ' . $value['cliente']['nombre']);
+                    } else {
+                        log_message('error', 'DATABASE UPDATE FAILED for client: ' . $value['cliente']['nombre'] . ' - No rows affected');
+                    }
+                } else {
+                    log_message('error', 'SKIPPING DATABASE UPDATE for client: ' . $value['cliente']['nombre'] . ' - No ID found (no match in database)');
+                }
             }
 
             // Save the ZIP file
